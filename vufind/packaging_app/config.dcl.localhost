@@ -1,0 +1,12 @@
+;Rename this to config.ini and update settings as appropriate
+[Database]
+database_packaging_jdbc = "jdbc:mysql://vufind-dev/packaging?user=root&password=&useUnicode=yes&characterEncoding=UTF-8"
+
+[Packaging]
+rootPackagingDir            = //transfer/vufinddata/filesToPackage/a2d462e4-55d2-49c6-88de-1805f857d057
+packagingUrl                = http://acs.dcl.lan:8080/packaging/Package
+distributionUrl             = 
+
+
+[DistributorSecrets]
+urn:uuid:a2d462e4-55d2-49c6-88de-1805f857d057 = "407AC7CB431605CD20ACD6AA67D64D61"

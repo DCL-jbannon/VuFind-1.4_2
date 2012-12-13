@@ -1,0 +1,72 @@
+@CHARSET "ISO-8859-1";
+div.generic-item-background
+{
+	background: url('/interface/themes/default/images/generic.png') no-repeat;
+	height:32px;
+	background-position:center;
+	padding-top:14px;
+	background-size:100px 36px;
+}
+
+div.generic-item-background-wishList
+{
+	background: url('/interface/themes/default/images/generic.png') no-repeat;
+	height:36px;
+	background-position:center;
+	padding-top:5px;
+	background-size:100px 36px;
+}
+
+div.video-on-demand
+{
+	background: url('/interface/themes/default/images/generic.png') no-repeat;
+	height:35px;
+	background-position:center;
+	padding-top:6px;
+	background-size:100px 40px;
+}
+
+div.generic-item-background a.generic-item-text
+{
+	color:#FFFFFF;
+	font-size:1em;
+	font-weight: bold;
+}
+
+ div.video-on-demand a.generic-item-text
+{
+	color:#FFFFFF;
+	font-size:1em;
+	font-weight: bold;
+}
+
+div.generic-item-background-wishList a.generic-item-text
+{
+	color:#FFFFFF;
+	font-size:1em;
+	font-weight: bold;
+}
+
+div#preview
+{
+	width: 200px;
+	margin-left: 5px;
+}
+
+div#preview h2
+{
+	height: 10px;
+}
+
+div#preview div.previewIcons
+{
+	height: 30px;
+	margin: 0 auto;
+}
+
+div#preview div.icon-preview
+{
+	float:left;
+	margin-right:5px;
+}
+

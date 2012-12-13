@@ -1,0 +1,72 @@
+@CHARSET "ISO-8859-1";
+
+#searchInfo{
+	font-size: 12px; 
+	position: absolute;
+	right:0px;
+}
+.selectTitle{
+	display: inline-block;
+	vertical-align: top;
+	width: 17px;
+	zoom: 1;
+	*display: inline;
+}
+.imageColumn{
+	display: inline-block;
+	vertical-align: top;
+	width: 110px;
+	text-align: center;
+	zoom: 1;
+	*display: inline;
+}
+.imageColumn .listResultImage{
+	max-width: 100px;
+	padding-bottom: 4px;
+}
+.resultDetails{
+	display: inline-block;
+	vertical-align: top;
+	width: 405px;	
+	zoom: 1;
+	*display: inline;
+}
+.resultActions{
+	display: inline-block;
+	vertical-align: top;
+	width: 125px;	
+	zoom: 1;
+	*display: inline;
+	position: relative;
+}
+#searchResultTopTools {
+	margin:30px 0 0 0;
+	text-align: right;
+}
+.searchtool-top {
+	position:relative;
+	top:-15px;
+	display: inline;
+	font-size:10px;
+}
+#searchResultTopToolLinks {
+	text-align:left
+}
+
+.holdingsSummary{
+	height: 4.5em;
+}
+#formatCategories{
+  min-height: 60px;
+	margin:10px 0 0 50px;
+}
+
+#noResultsSuggest ul {
+  margin-left:20px;
+  list-style-type:disc
+  }
+#noResultsSuggest li {
+  margin-left:20px;
+  list-style-type:disc
+  }
+
