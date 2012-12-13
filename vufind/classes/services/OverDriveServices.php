@@ -35,12 +35,27 @@ class OverDriveServices
 			return EContentFormatType::eAudio; 
 		}
 		
+		if (preg_match("/Audiobook/i", $eContentRecord->genre) > 0)
+		{
+			return EContentFormatType::eAudio;
+		}
+		
 		if (preg_match("/ebooks/i", $eContentRecord->genre) > 0 )
 		{
 			return EContentFormatType::eBook;
 		}
 		
+		if (preg_match("/eBook/i", $eContentRecord->genre) > 0 )
+		{
+			return EContentFormatType::eBook;
+		}
+		
 		if (preg_match("/evideo/i", $eContentRecord->genre) > 0)
+		{
+			return EContentFormatType::eVideo;
+		}
+		
+		if (preg_match("/Video/i", $eContentRecord->genre) > 0)
 		{
 			return EContentFormatType::eVideo;
 		}

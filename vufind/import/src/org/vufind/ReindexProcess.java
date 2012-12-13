@@ -12,12 +12,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.API.OverDrive.OverDriveAPIServices;
+import org.API.OverDrive.OverDriveCollectionIterator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.econtent.ExtractEContentFromMarc;
+import org.econtent.PopulateSolrOverDriveAPIItems;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
+import org.solr.SolrWrapper;
 import org.strands.StrandsProcessor;
 
 
@@ -108,6 +112,31 @@ public class ReindexProcess {
 			for (IRecordProcessor processor : recordProcessors){
 				processor.finish();
 			}
+		}
+		
+		//Let get the OverDrive API items
+		logger.info("Importing OverDrive API Items");
+		
+		String clientKey = configIni.get("OverDriveAPI","clientKey");
+		String clientSecret = configIni.get("OverDriveAPI","clientSecret");
+		int libraryId = new Integer(configIni.get("OverDriveAPI","libraryId"));
+		ProcessorResults pr = new ProcessorResults("OverDrive API Item", reindexLogId, vufindConn, logger);
+		SolrWrapper solrWrapper = new SolrWrapper("http://" + configIni.get("IndexShards", "eContent"));
+		pr.addNote("The eContent Solr url is: " + "http://" + configIni.get("IndexShards", "eContent"));
+		OverDriveCollectionIterator odci = new OverDriveCollectionIterator(clientKey, clientSecret, libraryId);
+		OverDriveAPIServices overDriveAPIServices = new OverDriveAPIServices(clientKey, clientSecret, libraryId);
+		
+		PopulateSolrOverDriveAPIItems service = new PopulateSolrOverDriveAPIItems(odci, econtentConn, solrWrapper, overDriveAPIServices, pr);
+		
+		try
+		{
+			service.execute();
+			pr.saveResults();
+		}
+		catch (SQLException e) 
+		{
+			System.out.println(e.getMessage());
+			System.exit(0);
 		}
 		
 		// Send completion information

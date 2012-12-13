@@ -98,10 +98,13 @@ class EContentDriver implements DriverInterface{
 		$eContentRecord->id = $id;
 		$eContentRecord->find(true);
 		
-		if (strcasecmp($eContentRecord->source, 'OverDrive') == 0){
+		if ($eContentRecord->isOverDrive())
+		{
 			require_once 'Drivers/OverDriveDriver.php';
 			$items = $eContentRecord->getItems(true);
-		}else{
+		}
+		else
+		{
 			//Check to see if the record is checked out or on hold
 			$checkedOut = false;
 			$onHold = false;
@@ -206,7 +209,8 @@ class EContentDriver implements DriverInterface{
 		}
 		
 		$overdriveTitle = false;
-		if (strcasecmp($eContentRecord->source, 'OverDrive') == 0){
+		if ($eContentRecord->isOverDrive())
+		{
 			$overdriveTitle = true;
 			//Check to see if any items are available
 			$available = false;
@@ -564,7 +568,8 @@ class EContentDriver implements DriverInterface{
 			$return['title'] = $eContentRecord->title;
 			
 			//If the source is overdrive, process it as an overdrive title
-			if (strcasecmp($eContentRecord->source, 'OverDrive') == 0){
+			if ($eContentRecord->isOverDrive())
+			{
 				require_once 'Drivers/OverDriveDriver.php';
 				$overDriveDriver = new OverDriveDriver();
 				$overDriveId = substr($eContentRecord->sourceUrl, -36);
@@ -575,7 +580,9 @@ class EContentDriver implements DriverInterface{
 				$overDriveResult = $overDriveDriver->placeOverDriveHold($overDriveId, $format, $user);
 				$return['result'] = $overDriveResult['result'];
 				$return['message'] = $overDriveResult['message'];
-			}else{
+			}
+			else
+			{
 				//Check to see if the user already has a hold placed
 				$holds = new EContentHold();
 				$holds->userId = $user->id;

@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/classes/covers/LibraryThingCoversTests.php';
 require_once dirname(__FILE__).'/classes/covers/SyndeticsCoversTests.php';
 require_once dirname(__FILE__).'/classes/covers/OverDriveCoversTests.php';
 require_once dirname(__FILE__).'/classes/covers/AttachedEcontentCoversTests.php';
+require_once dirname(__FILE__).'/classes/covers/ThreeMCoversTests.php';
 
 class SuiteUtilsTests
 {
@@ -47,6 +48,7 @@ class SuiteUtilsTests
 		$suite->addTestSuite('OverDriveCoversTests');
 		$suite->addTestSuite('AttachedEcontentCoversTests');
 		$suite->addTestSuite('DateTimeUtilsTests');
+		$suite->addTestSuite('ThreeMCoversTests');
 		return $suite;
 	}
 }

@@ -103,14 +103,7 @@ class Home extends Action{
 		if (!$eContentRecord->find(true)){
 			//TODO: display record not found error
 		}else{
-			/*if ($configArray['Catalog']['ils'] == 'Millennium')
-			{
-				if (isset($eContentRecord->ilsId) && strlen($eContentRecord->ilsId) > 0){
-					$interface->assign('classicId', substr($eContentRecord->ilsId, 1, strlen($eContentRecord->ilsId) -2));
-					$interface->assign('classicUrl', $configArray['Catalog']['linking_url']);
-				}
-			}*/
-		
+	
 			if ($eContentRecord->isGutenberg())
 			{
 				$interface->assign('enablePurchaseLinks', 0);
@@ -220,9 +213,11 @@ class Home extends Action{
 			$interface->assign('MobileTitle','&nbsp;');
 
 			//Load Staff Details
-			if($eContentRecord->source != 'Freegal')
+			$interface->assign('hasMarcRecord', false);
+			if($eContentRecord->hasMarcRecord())
 			{
 				$interface->assign('staffDetails', $this->getStaffView($eContentRecord));
+				$interface->assign('hasMarcRecord', true);
 			}
 
 			// Display Page
@@ -231,7 +226,8 @@ class Home extends Action{
 		}
 	}
 
-	public function getStaffView($eContentRecord){
+	public function getStaffView($eContentRecord)
+	{
 		global $interface;
 
 		$marc = new File_MARC($eContentRecord->getNormalizedMarcRecord(), File_MARC::SOURCE_STRING);

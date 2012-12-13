@@ -13,6 +13,7 @@ require_once dirname(__FILE__).'/../classes/covers/OpenLibraryCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/SyndeticsCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/OverDriveCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/FreeGalCovers.php';
+require_once dirname(__FILE__).'/../classes/covers/ThreeMCovers.php';
 require_once dirname(__FILE__).'/services/MyResearch/lib/Resource.php';
 require_once dirname(__FILE__).'/../classes/covers/CoversType.php';
 require_once dirname(__FILE__).'/sys/eContent/EContentRecord.php';
@@ -78,7 +79,9 @@ if(isEcontentBookCover())
 	$eContentCoversProcessors[1]['name'] = "OverDriveCovers";
 	$eContentCoversProcessors[1]['instance'] = new OverDriveCovers();
 	$eContentCoversProcessors[2]['name'] = "FreeGalCovers";
-	$eContentCoversProcessors[2]['instance'] = new FreeGalCovers($baseFreeGalUrl, $apiKey, $libraryId, $patronID);;
+	$eContentCoversProcessors[2]['instance'] = new FreeGalCovers($baseFreeGalUrl, $apiKey, $libraryId, $patronID);
+	$eContentCoversProcessors[3]['name'] = "ThreeMCovers";
+	$eContentCoversProcessors[3]['instance'] = new ThreeMCovers();
 	
 	foreach ($eContentCoversProcessors as $processor)
 	{

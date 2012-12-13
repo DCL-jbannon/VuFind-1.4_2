@@ -36,7 +36,7 @@ class OverDriveCovers
 		$eContentRecord->fetch();
 
 		//Check if the record it is a OverDrive Record
-		if($eContentRecord->source != "OverDrive")
+		if ( !$eContentRecord->isOverDrive() )
 		{
 			throw new DomainException("OverDriveCovers::getImageUrl The EContent with ID ".$id." is not an OverDrive Record <".$eContentRecord->source.">");
 		}

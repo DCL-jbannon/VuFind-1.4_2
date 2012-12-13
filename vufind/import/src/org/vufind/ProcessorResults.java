@@ -31,7 +31,8 @@ public class ProcessorResults {
 	
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public ProcessorResults(String processorName, long reindexLogId, Connection vufindConn, Logger logger){
+	public ProcessorResults(String processorName, long reindexLogId, Connection vufindConn, Logger logger)
+	{
 		this.processorName = processorName;
 		this.reindexLogId = reindexLogId;
 		this.vufindConn = vufindConn;
@@ -84,6 +85,7 @@ public class ProcessorResults {
 	public synchronized void addNote(String note) {
 		Date date = new Date();
 		this.notes.add(dateFormat.format(date) + " - " + note);
+		this.logger.info(note);
 	}
 	public int getEContentRecordsProcessed() {
 		return eContentRecordsProcessed;

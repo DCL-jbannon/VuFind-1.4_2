@@ -169,6 +169,7 @@ class Results extends Action {
 		
 		// Process Search
 		$result = $searchObject->processSearch(true, true);
+		//die(print_r($result)); //Real query to Sol)
 		if (PEAR::isError($result)) {
 			PEAR::raiseError($result->getMessage());
 		}

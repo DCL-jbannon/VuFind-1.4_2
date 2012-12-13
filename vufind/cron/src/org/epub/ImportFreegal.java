@@ -6,6 +6,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -51,10 +52,23 @@ public class ImportFreegal implements IProcessHandler {
 			//Connect to the eContent database
 			PreparedStatement getEContentRecord = econtentConn.prepareStatement("SELECT id FROM econtent_record WHERE title = ? AND author = ?");
 			PreparedStatement addAlbumToDatabase = econtentConn.prepareStatement("INSERT INTO econtent_record (title, author, author2, accessType, availableCopies, contents, language, genre, source, collection, date_added, addedBy, cover) VALUES (?, ?, ?, 'free', 1, ?, ?, ?, 'Freegal', ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-			PreparedStatement updateAlbumInDatabase = econtentConn.prepareStatement("UPDATE econtent_record SET title = ?, author = ?, author2 = ?, contents = ?, language = ?, genre = ?, collection = ?, date_updated = ?, cover = ? WHERE id = ?");
+			PreparedStatement updateAlbumInDatabase = econtentConn.prepareStatement("UPDATE econtent_record SET title = ?, author = ?, author2 = ?, contents = ?, language = ?, genre = ?, collection = ?, date_updated = ?, cover = ?, status = 'active' WHERE id = ?");
 			PreparedStatement removeSongsForAlbum = econtentConn.prepareStatement("DELETE FROM econtent_item WHERE recordId = ?");
 			PreparedStatement addSongToDatabase = econtentConn.prepareStatement("INSERT INTO econtent_item (recordId, link, item_type, notes, addedBy, date_added, date_updated) VALUES (?, ?, 'externalMP3', ?, ?, ?, ?)");
-		
+			
+			// Temporarily set all freegal album status to "deleted"
+			// Later on, when we process an album from freegal API, 
+			// we set that album status to "active" again
+			// Then, when all freegal albums have been processed, we go through all
+			// albums that have "deleted" status and delete them from SOLR and eContent database
+			// because they were not found in the freegal download.
+			// NOTE: we also set the date_updated to the current timestamp
+			// so the jUnit tests do not delete all records
+			long thisRunTimestamp = (int) ((new Date()).getTime() / 100);
+			PreparedStatement setAllFreegalStatusToDeleted = econtentConn.prepareStatement("UPDATE econtent_record SET status = 'deleted', date_updated = ? WHERE source = 'freegal' AND status = 'active'");
+			setAllFreegalStatusToDeleted.setLong(1, thisRunTimestamp);
+			setAllFreegalStatusToDeleted.executeUpdate();
+			
 			//Get a list of all genres in the freegal site
 			String genreUrl = freegalUrl + "/services/genre/" + freegalAPIkey + "/" + freegalLibrary + "/" + freegalUser;
 			logger.info("Genre url: " + genreUrl);
@@ -199,6 +213,49 @@ public class ImportFreegal implements IProcessHandler {
 				}
 			}
 			
+			// Now, delete albums with status = "deleted" from SOLR and econtent_record table.
+			PreparedStatement getAlbumsWithDeletedStatus = econtentConn.prepareStatement("SELECT id FROM econtent_record WHERE status = 'deleted' AND source = 'freegal'");
+			ResultSet albumsWithDeletedStatus = getAlbumsWithDeletedStatus.executeQuery();
+			while (albumsWithDeletedStatus.next()) {
+				long recordId = albumsWithDeletedStatus.getLong("id");
+				if (Util.doSolrUpdate(configIni.get("Index", "url") + "/econtent", "<delete><id>econtentRecord" + recordId + "</id></delete>")) {
+					logger.info("Deleted record ID : " + recordId + " from SOLR econtent core.");
+					try {
+						// delete the album and its songs from econtent database
+						deleteAlbumAndSongs(econtentConn, recordId);
+						logger.info("Deleted record ID : " + recordId + " from econtent database.");
+					} catch (Exception e) {
+						logger.error("Error deleting album: " + recordId + " from econtent database.");
+						processLog.incErrors();
+						processLog.addNote("Error deleting album: " + recordId + " from econtent database.");
+						processLog.saveToDatabase(vufindConn, logger);
+					}
+				} else {
+					logger.error("Error deleting album: " + recordId + " from SOLR.");
+					processLog.incErrors();
+					processLog.addNote("Error deleting album: " + recordId + " from SOLR.");
+					processLog.saveToDatabase(vufindConn, logger);
+				}
+			}
+			
+			// commit econtent core
+			if (Boolean.valueOf(processSettings.get("commitSolr"))) {
+				if (!Util.doSolrUpdate(configIni.get("Index", "url") + "/econtent", "<commit/>")) {
+					logger.error("Error committing changes to SOLR econtent core.");
+					processLog.incErrors();
+					processLog.addNote("Error committing changes to SOLR econtent core.");
+					processLog.saveToDatabase(vufindConn, logger);
+				}
+			}
+			// optimize econtent core
+			if (Boolean.valueOf(processSettings.get("optimizeSolr"))) {
+				if (!Util.doSolrUpdate(configIni.get("Index", "url") + "/econtent", "<optimize/>")) {
+					logger.error("Error optimizing SOLR econtent core.");
+					processLog.incErrors();
+					processLog.addNote("Error optimizing SOLR econtent core.");
+					processLog.saveToDatabase(vufindConn, logger);
+				}
+			}			
 		} catch (Exception ex) {
 			// handle any errors
 			logger.error("Error loading content from Freegal. ", ex);
@@ -210,6 +267,20 @@ public class ImportFreegal implements IProcessHandler {
 
 	}
 
+	public void deleteAlbumAndSongs(Connection econtentConn, long id) throws SQLException {
+		PreparedStatement removeSongsForAlbum = econtentConn
+				.prepareStatement("DELETE FROM econtent_item WHERE recordId = ?");
+		removeSongsForAlbum.setLong(1, id);
+		removeSongsForAlbum.executeUpdate();
+		removeSongsForAlbum.close();
+		PreparedStatement removeAlbum = econtentConn
+				.prepareStatement("DELETE FROM econtent_record WHERE id = ?");
+		removeAlbum.setLong(1, id);
+		removeAlbum.executeUpdate();
+		removeAlbum.close();
+	}
+	
+	
 	private boolean loadConfig(Ini configIni, Section processSettings, Logger logger) {
 		freegalUrl = processSettings.get("freegalUrl");
 		if (freegalUrl == null || freegalUrl.length() == 0) {

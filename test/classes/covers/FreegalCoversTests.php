@@ -100,9 +100,11 @@ require_once dirname(__FILE__).'/../../../vufind/classes/covers/FreeGalCovers.ph
 		$id = "aDummyRecord";
 		$albumId = "aDummyAlbumId";
 		$albumName = "aDummyAlbumName";
+		$author = "aDummyAuthor";
 		$expected = $imageUrl = "aDummyUrl"; //Can be false
 		
 		$this->eContentRecordMock->title = $albumName;
+		$this->eContentRecordMock->author = $author;
 		
 		$this->eContentRecordMock->expects($this->once())
 									->method("find")
@@ -120,7 +122,7 @@ require_once dirname(__FILE__).'/../../../vufind/classes/covers/FreeGalCovers.ph
 		
 		$this->freegalApiServicesMock->expects($this->once())
 									 	->method("getCoverUrlByAlbum")
-									 	->with($this->equalTo($albumName), $this->equalTo($albumId))
+									 	->with($this->equalTo($albumName), $this->equalTo($albumId), $this->equalTo($author))
 									 	->will($this->returnValue($imageUrl));
 		
 		$actual = $this->service->getImageUrl($id, $this->eContentRecordMock);

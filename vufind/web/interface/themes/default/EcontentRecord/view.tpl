@@ -620,7 +620,7 @@ function redrawSaveStatus() {literal}{{/literal}
       	{/if}
       </div>
       
-      {if $eContentRecord->marcRecord}
+      {if $hasMarcRecord}
         <div id = "stafftab">
         	{include file=$staffDetails}
 	      </div>

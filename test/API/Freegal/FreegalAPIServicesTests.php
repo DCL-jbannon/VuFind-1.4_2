@@ -19,7 +19,7 @@ class FreegalAPIServicesTests extends PHPUnit_Framework_TestCase
 	{
 		$this->freeApiResultsMother = new FreegalAPIResultsMother();
 		
-		$this->freegalAPIWrapperMock = $this->getMock("IFreegalAPIWrapper",array("getSongsByTypeSearch"));
+		$this->freegalAPIWrapperMock = $this->getMock("IFreegalAPIWrapper",array("search"));
 		$this->service = new FreegalAPIServices(self::baseUrl, self::apiKey, self::apiKey, self::patronID, $this->freegalAPIWrapperMock);
 		parent::setUp();		
 	}
@@ -77,19 +77,36 @@ class FreegalAPIServicesTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 	
+	/**
+	* method getCoverUrlByAlbum 
+	* when calledWithAuthor
+	* should executesCorrectly
+	*/
+	public function test_getCoverUrlByAlbum_calledWithAuthor_executesCorrectly()
+	{
+		$albumName = "aDummyAlbumName";
+		$albumId = 221776;
+		$author = "aDummyAuthor";
+		
+		$result = $this->freeApiResultsMother->getSongsSameAlbum();
+		
+		$this->exerciseGetSongsByTypeSearch($albumName, $result, $author);
+		$this->service->getCoverUrlByAlbum($albumName, $albumId, $author);
+	}
 	
 	//Exercises
-	private function exerciseGetSongsByTypeSearch($albumName, $result)
+	private function exerciseGetSongsByTypeSearch($albumName, $result, $author=NULL)
 	{
+		$searchParams['album'] = $albumName;
+		if($author !== NULL)
+		{
+			$searchParams['artist'] = $author;
+		}
 		$this->freegalAPIWrapperMock->expects($this->once())
-									->method("getSongsByTypeSearch")
-									->with($this->equalTo(FreegalAPIServices::typeSearchAlbum), $this->equalTo($albumName))
+									->method("search")
+									->with($this->equalTo($searchParams))
 									->will($this->returnValue($result));
 	}
-		
-	
-		
-
 }
 
 

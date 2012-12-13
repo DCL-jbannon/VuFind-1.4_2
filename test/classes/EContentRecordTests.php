@@ -80,6 +80,97 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 		$this->assertFalse($actual);
 	}
 	
+	/**
+	* method isOverDrive 
+	* when isNotOverDrive
+	* should returnFalse
+	*/
+	public function test_isOverDrive_isNotOverDrive_returnFalse()
+	{
+		$this->service->source = "aNonDummyOverDriveRecord";
+		$actual = $this->service->isOverDrive();
+		$this->assertFalse($actual);
+	}
+	
+	/**
+	 * method isOverDrive
+	 * when isOverDrive
+	 * should returnFalse
+	 * @dataProvider DP_isOverDrive
+	 */
+	public function test_isOverDrive_isOverDrive_returnFalse($source)
+	{
+		$this->service->source = $source;
+		$actual = $this->service->isOverDrive();
+		$this->assertTrue($actual);
+	}
+	
+	public function DP_isOverDrive()
+	{
+		return array(
+					array("OverDrive"),
+					array("OverDriveAPI")
+				);
+	}
+		
+	/**
+	* method hasMarcRecord 
+	* when itHasNot
+	* should returnfalse
+	* @dataProvider DP_hasMarcRecordAttached_itHasNot
+	*/
+	public function test_hasMarcRecord_itHasNot_returnfalse($source)
+	{
+		$this->service->source = $source;
+		$actual = $this->service->hasMarcRecord();
+		$this->assertFalse($actual);
+	}
+	
+	public function DP_hasMarcRecordAttached_itHasNot()
+	{
+		return array(
+				array("Freegal"),
+				array("OverDriveAPI")
+		);
+	}
+		
+	/**
+	 * method hasMarcRecord
+	 * when itHas
+	 * should returnfalse
+	 */
+	public function test_hasMarcRecord_itHas_returnfalse()
+	{
+		$this->service->source = "aDummyRecordShouldHaveMarcRecord";
+		$actual = $this->service->hasMarcRecord();
+		$this->assertTrue($actual);
+	}
+	
+	/**
+	* method is3M 
+	* when isNot3M
+	* should returnFalse
+	*/
+	public function test_is3M_isNot3M_returnFalse()
+	{
+		$this->service->source = "aDummyNon3MEcontent";
+		$actual = $this->service->is3M();
+		$this->assertFalse($actual);
+	}
+	
+	/**
+	 * method is3M
+	 * when is3M
+	 * should returnTrue
+	 */
+	public function test_is3M_is3M_returnTrue()
+	{
+		$this->service->source = "3M";
+		$actual = $this->service->is3M();
+		$this->assertTrue($actual);
+	}	
+	
+		
 		
 
 }

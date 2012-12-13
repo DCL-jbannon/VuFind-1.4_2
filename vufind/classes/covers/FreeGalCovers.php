@@ -39,7 +39,7 @@ class FreeGalCovers
 			throw new DomainException("FreeGalCovers::getCovers The eContent with id ".$id." is not a FreeGal Record");
 		}
 		
-		return $this->freegalApiServices->getCoverUrlByAlbum($eContentRecord->title, $albumId);
+		return $this->freegalApiServices->getCoverUrlByAlbum($eContentRecord->title, $albumId, $eContentRecord->author);
 		
 	}
 	

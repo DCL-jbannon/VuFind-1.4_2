@@ -813,7 +813,7 @@ public class MarcProcessor {
 		try {
 			PreparedStatement inActiveEContentRecordsStmt = econtentConn.prepareStatement(
 				"SELECT DISTINCT e.id FROM econtent_record e " +
-				"WHERE e.status='active' AND e.source <> 'Freegal' AND e.ilsId IS NOT NULL AND e.ilsId <> ' ' AND e.ilsId <> '' AND NOT EXISTS " +
+				"WHERE e.status='active' AND e.source <> 'Freegal' AND e.source <> 'OverDriveAPI' AND e.ilsId IS NOT NULL AND e.ilsId <> ' ' AND e.ilsId <> '' AND NOT EXISTS " +
 				"(SELECT 1 FROM active_econtent_records a WHERE a.ilsId=e.ilsId)"
 			);
 			ResultSet inActiveEContentRecords = inActiveEContentRecordsStmt.executeQuery();

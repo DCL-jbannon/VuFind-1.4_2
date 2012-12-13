@@ -10,6 +10,8 @@
 		{else}
 			{if strcasecmp($holdingsSummary.source, 'OverDrive') == 0}
 				Available for use from OverDrive.
+			{elseif strcasecmp($holdingsSummary.source, 'OverDriveAPI') == 0}
+				Available for use from OverDrive.
 			{elseif $holdingsSummary.source == 'Freegal'}
 				Downloadable from Freegal.
 			{elseif ($holdingsSummary.accessType == 'free') || ($holdingsSummary.accessType == 'singleUse')}

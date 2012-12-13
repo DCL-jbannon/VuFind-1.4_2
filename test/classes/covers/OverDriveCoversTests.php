@@ -17,7 +17,7 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 		$this->overDriveResultsMother = new OverDriveResultsMother();
 		$this->overDriveServicesMock = $this->getMock("IOverDriveServicesAPI", array("getItemMetadata"));
 		$this->regularExpressionsMock = $this->getMock("IRegularExpressions",array("getFieldValueFromURL"));
-		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("find","fetch"));
+		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("find","fetch", "isOverDrive"));
 		$this->service = new OverDriveCovers($this->overDriveServicesMock, $this->regularExpressionsMock);
 		parent::setUp();		
 	}
@@ -31,7 +31,6 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 	*/
 	public function test_getImageUrl_idNotFound_throw()
 	{
-		$this->eContentRecordMock->source = "NotOverDriveSource";
 		$this->eContentRecordMock->expects($this->once())
 									->method("find")
 									->will($this->returnValue(false));
@@ -55,6 +54,9 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 								 ->will($this->returnValue(true));
 		$this->eContentRecordMock->expects($this->once())
 								->method("fetch");
+		$this->eContentRecordMock->expects($this->once())
+								 ->method("isOverDrive")
+								 ->will($this->returnValue(false));
 
 		$id="aDummyId";
 		$this->service->getImageUrl($id, $this->eContentRecordMock);
@@ -65,16 +67,21 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 	* when OverDriveRecordNoInfo
 	* should throw
 	* @expectedException DomainException
+	* @dataProvider DP_OverDriveSource
 	*/
-	public function test_getImageUrl_OverDriveRecordNoInfo_throw()
+	public function test_getImageUrl_OverDriveRecordNoInfo_throw($source)
 	{
-		$this->eContentRecordMock->source = "OverDrive";
+		$this->eContentRecordMock->source = $source;
 		$this->eContentRecordMock->sourceUrl = "aNonValidSourceOverDriveUrl";
 		$this->eContentRecordMock->expects($this->once())
 									->method("find")
 									->will($this->returnValue(true));
 		$this->eContentRecordMock->expects($this->once())
 									->method("fetch");
+		
+		$this->eContentRecordMock->expects($this->once())
+								->method("isOverDrive")
+								->will($this->returnValue(true));
 		
 		$this->regularExpressionsMock->expects($this->once())
 									 ->method("getFieldValueFromURL")
@@ -89,14 +96,15 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 	 * method getImageUrl
 	 * when isValidOverDriveRecord
 	 * should returnCorrectImageUrl
+	 * @dataProvider DP_OverDriveSource
 	 */
-	public function test_getImageUrl_isValidOverDriveRecord_returnCorrectImageUrl()
+	public function test_getImageUrl_isValidOverDriveRecord_returnCorrectImageUrl($source)
 	{
 		$overDriveResults = $this->overDriveResultsMother->getItemMetadataResult();
 		$expected = "http://images.contentreserve.com/ImageType-100/0887-1/{30AF0828-3A80-4701-938F-D867930A0D88}Img100.jpg";
 		$overDriveID = "aDummyOverDriveID";
 		
-		$this->eContentRecordMock->source = "OverDrive";
+		$this->eContentRecordMock->source = $source;
 		$this->eContentRecordMock->sourceUrl = "aDummyValudUrl";
 		$this->eContentRecordMock->expects($this->once())
 								->method("find")
@@ -104,6 +112,10 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 		$this->eContentRecordMock->expects($this->once())
 								  ->method("fetch");
 	
+		$this->eContentRecordMock->expects($this->once())
+									->method("isOverDrive")
+									->will($this->returnValue(true));
+		
 		$this->regularExpressionsMock->expects($this->once())
 										->method("getFieldValueFromURL")
 										->with($this->equalTo($this->eContentRecordMock->sourceUrl), $this->equalTo("ID"))
@@ -117,6 +129,12 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 		$id="aDummyId";
 		$actual = $this->service->getImageUrl($id, $this->eContentRecordMock);
 		$this->assertEquals($expected, $actual);
+	}
+	
+	public function DP_OverDriveSource()
+	{
+		return array(array("OverDrive"),array("OverDriveAPI"));
+					
 	}
 
 }

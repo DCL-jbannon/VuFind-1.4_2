@@ -21,13 +21,17 @@ class FreegalAPIServices implements IFreegalAPIServices{
 	 * @param integer $albumId
 	 * @return String|Boolean
 	 */
-	public function getCoverUrlByAlbum($albumName, $albumId)
+	public function getCoverUrlByAlbum($albumName, $albumId, $author=null)
 	{
 		$coverUrl = false;
-		$results = $this->fapiw->getSongsByTypeSearch(self::typeSearchAlbum, $albumName);
+		$params = array('album' => $albumName);
+		if ($author) {
+			$params['artist'] = $author;
+		}
+		$results = $this->fapiw->search($params);
 		foreach ($results as $result)
 		{
-			if($result->ProductID == $albumId)
+			if($result->ProductID == $albumId || $result->ReferenceID == $albumId)
 			{
 				$coverUrl = (string)$result->Album_Artwork;
 			}

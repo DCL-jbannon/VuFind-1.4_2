@@ -28,6 +28,16 @@ class FreegalAPIWrapper implements IFreegalAPIWrapper
 		return $this->getResults($url);
 	}
 	
+	public function search($searchParameters)
+	{
+		$url = $this->baseUrl.self::searchUriPath.$this->apiKey."/".$this->libraryId.'/'.$this->patronID;
+		foreach ($searchParameters as $type => $query) 
+		{
+			$query = preg_replace('/[\-\/]/', ' ', $query);
+			$url .= '/'.$type.':'.urlencode($query);
+		}
+		return $this->getResults($url);
+	}
 	
 	private function getResults($url)
 	{

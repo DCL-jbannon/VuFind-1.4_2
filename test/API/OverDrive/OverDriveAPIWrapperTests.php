@@ -26,9 +26,10 @@ class OverDriveAPIWrapperTests extends PHPUnit_Framework_TestCase
 	*/
 	public function test_01_login_called_returnCorrectLoginInfo()
 	{
+		$expected = "LIB META AVAIL SRCH";
 		$result = $this->service->login(self::clientKey, self::clientSecret);
 		$this->assertEquals("stdClass", get_class($result));
-		$this->assertEquals($result->scope, "LIB META AVAIL SRCH");
+		$this->assertEquals($expected, $result->scope);
 		self::$accessToken = $result->access_token;
 	}
 	

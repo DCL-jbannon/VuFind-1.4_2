@@ -54,8 +54,19 @@ class FreegalAPIWrapperTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, (string)$actual->message);
 	}
 	
-		
-
+	
+	/**
+	* method search 
+	* when called
+	* should executesCorrectly
+	*/
+	public function test_search_called_executesCorrectly()
+	{
+		$parameters['artist'] = "Arden";
+		$parameters['album'] = "Pursuit";
+		$actual = $this->service->search($parameters);
+		$this->assertNotEmpty($actual->Song);
+	}
 }
 
 

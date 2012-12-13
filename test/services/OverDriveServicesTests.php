@@ -59,6 +59,9 @@ class OverDriveServicesTests extends PHPUnit_Framework_TestCase
 				  		array("Downloadable Overdrive eaudio.Audiobooks.", EContentFormatType::eAudio),
 						array("Downloadable Overdrive ebooks.Love stories.His....", EContentFormatType::eBook),
 						array("Downloadable Overdrive evideo.Comedy films.Fea...", EContentFormatType::eVideo),
+						array("eBook", EContentFormatType::eBook),
+						array("Audiobook", EContentFormatType::eAudio),
+						array("Video", EContentFormatType::eVideo)
 					);
 	}
 	

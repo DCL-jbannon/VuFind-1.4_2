@@ -57,7 +57,9 @@ class RegularExpressionsTests extends PHPUnit_Framework_TestCase
 		return array(
 				  		array("http://www.emedia2go.org/ContentDetails.htm?ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E"),
 						array("http://www.emedia2go.org/ContentDetails.htm?ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E&anotherParam=aDummyValue"),
-						array("http://www.emedia2go.org/ContentDetails.htm?anotherParam1=aDummyValue&ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E&anotherParam2=aDummyValue2")
+						array("http://www.emedia2go.org/ContentDetails.htm?anotherParam1=aDummyValue&ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E&anotherParam2=aDummyValue2"),
+						array("http://www.emedia2go.org/ContentDetails.htm?anotherParam1=aDummyValue&ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E"),
+						array("https://www.emedia2go.org/ContentDetails.htm?anotherParam1=aDummyValue&ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E")
 					);
 	}
 	

@@ -6,6 +6,7 @@ require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
 require_once dirname(__FILE__).'/../SolrDataObject.php';
 require_once dirname(__FILE__).'/../../../classes/interfaces/IEContentRecord.php';
+require_once dirname(__FILE__).'/../../../classes/Utils/RegularExpressions.php';
 
 class EContentRecord extends SolrDataObject implements IEContentRecord{
 	public $__table = 'econtent_record';    // table name
@@ -904,7 +905,8 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		//Check to see if the item is checked out or if it has available holds
 		if ($this->status == 'active'){
 			require_once('Drivers/EContentDriver.php');
-			if (strcasecmp($this->source, 'OverDrive') == 0){
+			if ($this->isOverDrive())
+			{
 				//TODO: Check to see if i really is available
 				return array('OverDrive');
 			}elseif ($this->source == 'Freegal'){
@@ -1094,7 +1096,8 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 				$this->items[] = clone $eContentItem;
 			}
 
-			if (strcasecmp($this->source, 'OverDrive') == 0){
+			if ($this->isOverDrive())
+			{
 				$this->items = $this->_getOverDriveItems($reload);
 			}
 		}
@@ -1116,7 +1119,9 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 														 $configArray['OverDriveAPI']['libraryId']);
 		
 		$marRecord = $this->getNormalizedMarcRecord();
-		$overDriveId = $overDriveServices->getOverDriveIdFromMarcRecord($marRecord);
+		
+		$regularExpressions = new RegularExpressions();
+		$overDriveId = $regularExpressions->getFieldValueFromURL($this->sourceUrl, "ID");
 		
 		$availability = $overDriveServicesAPI->getItemAvailability($overDriveId);
 		
@@ -1375,6 +1380,45 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 			return true;
 		}
 		return false;
+	}
+	
+	public function is3M()
+	{
+		if ($this->getsource() == '3M')
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public function isOverDrive()
+	{
+		
+		switch ($this->getsource())
+		{
+			case "OverDrive":
+			case "OverDriveAPI":
+				return true;
+				break;
+			default:
+				return false;
+				break;
+		}
+	}
+	
+	public function hasMarcRecord()
+	
+	{
+		switch ($this->getsource())
+		{
+			case "Freegal":
+			case "OverDriveAPI":
+				return false;
+				break;
+			default:
+				return true;
+				break;
+		}
 	}
 
 	//setters and getters

@@ -1032,6 +1032,7 @@ class SearchObject_Solr extends SearchObject_Base
 				$facetSet['sort'] = $this->facetSort;
 			}
 		}
+		
 		$timer->logTime("create facets");
 
 		// Build our spellcheck query
@@ -1075,8 +1076,9 @@ class SearchObject_Solr extends SearchObject_Base
 		$this->method,     // HTTP Request method
 		$returnIndexErrors // Include errors in response?
 		);
+		
 		$timer->logTime("run solr search");
-
+		
 		// Get time after the query
 		$this->stopQueryTimer();
 
@@ -1109,7 +1111,7 @@ class SearchObject_Solr extends SearchObject_Base
 		}
 
 		//Add debug information to the results if available
-		if ($this->debug){
+		if (false){
 			$explainInfo = $this->indexResult['debug']['explain'];
 			foreach ($this->indexResult['response']['docs'] as $key => $result){
 				if (array_key_exists($result['id'], $explainInfo)){
