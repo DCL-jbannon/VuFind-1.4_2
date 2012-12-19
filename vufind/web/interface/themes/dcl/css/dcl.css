@@ -102,3 +102,51 @@
 #notestab, #reviewtab, #readertab, #citetab, #stafftab, #holdingstab {
 	padding:20px;
 }
+
+h1.idclreader-title
+{
+	color: #366603;
+	font: 800 1.4em/1.5em "Palatino Linotype",Georgia,Times New Roman,Times,serif;	
+}
+
+img.idclreader-leftimg
+{
+	float:left;
+	margin: 0 15px 5px 0;
+}
+
+div.idcltext
+{
+	background: none repeat scroll 0 0 #007B85;
+    display: inline-block;
+    font-family: arial,helvetica,sans-serif;
+    font-size: 14px;
+    margin: 10px 0;
+    padding: 5px;
+    text-align: center;
+}
+
+div.idcltext a
+{
+	color: #FFFFFF;
+    float: left;
+    margin: 10px;
+    padding: 0;
+    width: 175px;
+}
+
+div#ipad
+{
+	float: left;
+    margin: 10px;
+    padding: 10px 0 0 117px;
+    width: 155px;
+}
+
+div#android
+{
+	float: left;
+    margin: 10px;
+    padding: 10px 0 0 117px;
+    width: 155px;
+}
