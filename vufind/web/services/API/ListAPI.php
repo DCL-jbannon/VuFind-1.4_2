@@ -465,8 +465,8 @@ class ListAPI extends Action {
 			return array('success'=>false, 'message'=>'The specified list is empty');
 		}
 		elseif (preg_match('/review:(.*)/', $listId, $reviewInfo)){
-			require_once '/services/MyResearch/lib/Comments.php';
-			require_once '/services/MyResearch/lib/User_resource.php';
+			require_once dirname(__FILE__).'/../MyResearch/lib/Comments.php';
+			require_once dirname(__FILE__).'/../MyResearch/lib/User_resource.php';
 			//Load the data from strands
 			$reviewTag = $reviewInfo[1];
 			//Load a list of reviews based on the tag
