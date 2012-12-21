@@ -310,7 +310,7 @@ function processImageURL($imageUrl, $size, $cache = true)
 		// image for analysis.  $finalFile will be used for long-term storage if
 		// $cache is true or for temporary display purposes if $cache is false.
 		$tempFile = str_replace('.jpg', uniqid(), $localFile);
-		$finalFile = $cache ? $localFile : $tempFile . '.jpg';
+		$finalFile = $localFile;//.'jpg';
 
 		// If some services can't provide an image, they will serve a 1x1 blank
 		// or give us invalid image data.  Let's analyze what came back before
@@ -388,6 +388,7 @@ function processImageURL($imageUrl, $size, $cache = true)
 					$logger->log("Could not create image from string ".$imageUrl, PEAR_LOG_ERR);
 					return false;
 				}
+				
 				if (!@imagejpeg($imageGD, $finalFile, 90)) {
 					$logger->log("Could not save image to file ".$localFile, PEAR_LOG_ERR);
 					return false;
@@ -406,7 +407,7 @@ function processImageURL($imageUrl, $size, $cache = true)
 
 		// If we don't want to cache the image, delete it now that we're done.
 		if (!$cache) {
-			@unlink($finalFile);
+			//@unlink($finalFile);
 		}
 		$timer->logTime("Finished processing image url");
 

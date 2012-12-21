@@ -2,6 +2,7 @@ package org.econtent;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.API.OverDrive.IOverDriveAPIServices;
 import org.API.OverDrive.IOverDriveAPIUtils;
@@ -83,29 +84,39 @@ public class PopulateSolrOverDriveAPIItems
 		{
 			this.processorResults.addNote(note);
 		}
+		else
+		{
+			//System.out.println(note);
+		}
 	}
 
 	public void execute() throws SQLException 
 	{
 		this.addNote("Started getting OverDrive API Collection");
 		int j = 0;
-		long totalItems;
-	
+		long totalItems = new Long("0");
+		ArrayList<SolrInputDocument> collection = new ArrayList<SolrInputDocument>();
+		JSONArray items = new JSONArray();
+		
 		while (this.overDriveAPICollectionIterator.hasNext())
 		{
-			JSONObject resultsDC = this.overDriveAPICollectionIterator.next();
-			JSONArray items = (JSONArray) resultsDC.get("products");
 			
-			totalItems = (Long)resultsDC.get("totalItems");
+			try
+			{
+				JSONObject resultsDC = this.overDriveAPICollectionIterator.next();
+				items = (JSONArray) resultsDC.get("products");
+				totalItems = (Long)resultsDC.get("totalItems");
+			}
+			catch (Exception e)
+			{
+				this.addNote("\rError getting Items. OFFSSET:" +  j*300 );
+			}
 			
 			
 			for (int i = 0; i < items.size(); i++) 
 			{
 				j++;
-				if(this.processorResults!=null)
-				{
-					System.out.print("\rProcessing OverDrive API Item: " + j + "/" + totalItems);
-				}
+				this.addNote("\rProcessing OverDrive API Item: " + j + "/" + totalItems);
 				
 				JSONObject item = (JSONObject) items.get(i);
 				
@@ -116,10 +127,18 @@ public class PopulateSolrOverDriveAPIItems
 					String recordId = this.eContentRecordDAO.selectRecordIdByOverDriveIdBySource(overDriveId, "OverDriveAPI");
 					if(recordId != null)
 					{
-						this.addNote("Deleting OverDrive API Item because it is now on Marc File. ID: " + overDriveId);
-						String solrDocumentId = "econtentRecord" + recordId;
-						this.solrWrapper.deleteDocumentById(solrDocumentId);
-						this.eContentRecordDAO.deleteRecordById(recordId);
+						try
+						{
+							this.addNote("Deleting OverDrive API Item because it is now on Marc File. ID: " + overDriveId);
+							String solrDocumentId = "econtentRecord" + recordId;
+							this.solrWrapper.deleteDocumentById(solrDocumentId);
+							this.eContentRecordDAO.deleteRecordById(recordId);
+						}
+						catch (Exception e)
+						{
+							this.addNote("Could not delete old OverDrive API Item: " + e.getMessage());
+							e.printStackTrace();
+						}
 					}
 				}
 				else
@@ -128,9 +147,17 @@ public class PopulateSolrOverDriveAPIItems
 					JSONObject itemMetadata = this.overDriveApiServices.getItemMetadata(overDriveId);
 					if(recordId == null)
 					{
-						this.addNote("New OverDrive API Item" + overDriveId);
-						this.eContentRecordDAO.addOverDriveAPIItem(itemMetadata);
-						recordId = this.eContentRecordDAO.selectRecordIdByOverDriveIdBySource(overDriveId, "OverDriveAPI");
+						try
+						{
+							this.addNote("New OverDrive API Item" + overDriveId);
+							this.eContentRecordDAO.addOverDriveAPIItem(itemMetadata);
+							recordId = this.eContentRecordDAO.selectRecordIdByOverDriveIdBySource(overDriveId, "OverDriveAPI");
+						}
+						catch (Exception e)
+						{
+							this.addNote("Could not delete old OverDrive API Item: " + e.getMessage());
+							e.printStackTrace();
+						}
 					}
 					else
 					{
@@ -138,17 +165,27 @@ public class PopulateSolrOverDriveAPIItems
 						{
 							this.eContentRecordDAO.updateOverDriveAPIItem(recordId, itemMetadata);	
 						}
-						catch (Exception e) {
+						catch (Exception e) 
+						{
 							this.addNote("Error Updating  " + overDriveId + "API Item to the Database: " + e.getMessage());
 						}
-						
 					}
-					SolrInputDocument document = this.overDriveAPIUtils.getSolrInputDocumentFromDigitalCollectionItem(recordId, itemMetadata);
-					this.solrWrapper.addDocument(document);
+					
+					try
+					{
+						SolrInputDocument document = this.overDriveAPIUtils.getSolrInputDocumentFromDigitalCollectionItem(recordId, itemMetadata);
+						collection.add(document);
+					}
+					catch(Exception e)
+					{
+						this.addNote("Error creating SolrInputDocument for recordId: " + recordId + ". Exception Message: " + e.getMessage());
+					}
 			 	}
 			}
 		}
 		
+		this.addNote("Updating Solr with " + collection.size() + " documents");
+		this.solrWrapper.addCollectionDocuments(collection);
 		this.addNote("Added " + j + " new items from OverDrive API");
 		this.addNote("Finished getting OverDrive API Collection");
 	}

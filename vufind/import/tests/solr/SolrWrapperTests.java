@@ -1,6 +1,10 @@
 package solr;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import mother.SolrInputDocumentMother;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -13,7 +17,7 @@ import org.solr.SolrWrapper;
 /**
  * http://wiki.apache.org/solr/Solrj
  * http://lucidworks.lucidimagination.com/display/solr/Using+SolrJ
- * @author jgimenez
+ * @author jgimenez@dclibraries.org
  *
  */
 
@@ -90,5 +94,28 @@ public class SolrWrapperTests
 		
 		assertEquals(expected, actual.getResults().getNumFound());
 	}
-
+	
+	/**
+	 * method addColletionDocuments
+	 * when called
+	 * should executesCorrectly
+	 */
+	@Test
+	public void test_addColletionDocuments_called_executesCorrectly()
+	{
+		int expected = 2;
+		SolrInputDocument document1 = this.solrInputDocumentMother.getEContentOPverDriveAPIItemSolrInputDocument("aDummyId");
+		SolrInputDocument document2 = this.solrInputDocumentMother.getEContentOPverDriveAPIItemSolrInputDocument("anotherDummyId");
+		
+		ArrayList<SolrInputDocument> collection = new ArrayList<SolrInputDocument>();
+		collection.add(document1);
+		collection.add(document2);
+		
+		this.service.addCollectionDocuments(collection);
+		QueryResponse actual = this.service.select("*:*");
+		int numFound = actual.getResponse().size();
+		this.service.deleteDocumentById("aDummyId");
+		this.service.deleteDocumentById("anotherDummyId");
+		assertEquals(expected, numFound);
+	}
 }

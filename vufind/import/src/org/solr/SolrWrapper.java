@@ -1,5 +1,7 @@
 package org.solr;
 
+import java.util.Collection;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -63,5 +65,17 @@ public class SolrWrapper implements ISolrWrapper
 		}
 		return null;
 	}
-	
+
+	public UpdateResponse addCollectionDocuments(Collection<SolrInputDocument> collection)
+	{
+		SolrServer server = new HttpSolrServer(this.serverUrl);
+		try
+		{
+			return server.add(collection);
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

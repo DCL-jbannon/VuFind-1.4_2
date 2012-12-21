@@ -3,6 +3,7 @@ package org.econtent;
 import static org.junit.Assert.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import mother.OverDriveAPIResultsMother;
 import mother.SolrInputDocumentMother;
@@ -106,6 +107,10 @@ public class PopulateSolrOverDriveAPIItemsTests {
 		SolrInputDocument document1 = this.solrDocumentMother.getEContentOPverDriveAPIItemSolrInputDocument("aDummIdBase64_1");
 		SolrInputDocument document2 = this.solrDocumentMother.getEContentOPverDriveAPIItemSolrInputDocument("aDummIdBase64_2");
 		
+		ArrayList<SolrInputDocument> collection = new ArrayList<SolrInputDocument>();
+		collection.add(document1);
+		collection.add(document2);
+		
 		/**
 		 * MOCKITOS WHEN
 		 **/
@@ -132,7 +137,7 @@ public class PopulateSolrOverDriveAPIItemsTests {
 		Mockito.when(this.overDriveAPIUtilsMock.getSolrInputDocumentFromDigitalCollectionItem(dbId1, itemMetadata1)).thenReturn(document1);
 		Mockito.when(this.overDriveAPIUtilsMock.getSolrInputDocumentFromDigitalCollectionItem(dbId2, itemMetadata2)).thenReturn(document2);
 		
-		Mockito.when(this.solrWrapperMock.addDocument(document2)).thenReturn(new NamedList<Object>());
+		Mockito.when(this.solrWrapperMock.addCollectionDocuments(collection)).thenReturn(null);
 		
 		/**
 		 * Execute the method
@@ -161,8 +166,8 @@ public class PopulateSolrOverDriveAPIItemsTests {
 		Mockito.verify(this.daoEContentMock, Mockito.times(1)).updateOverDriveAPIItem(dbId1, itemMetadata1);
 		Mockito.verify(this.daoEContentMock, Mockito.times(0)).updateOverDriveAPIItem(dbId2, itemMetadata2);
 		
-		Mockito.verify(this.solrWrapperMock, Mockito.times(1)).addDocument(document1);
-		Mockito.verify(this.solrWrapperMock, Mockito.times(1)).addDocument(document2);
+		Mockito.verify(this.solrWrapperMock, Mockito.times(1)).addCollectionDocuments(collection);
+		
 	}
 	
 	/**
