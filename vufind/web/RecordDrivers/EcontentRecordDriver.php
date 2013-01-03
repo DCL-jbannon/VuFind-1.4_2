@@ -22,6 +22,8 @@ require_once 'File/MARC.php';
 require_once 'RecordDrivers/IndexRecord.php';
 require_once 'sys/eContent/EContentRecord.php';
 require_once dirname(__FILE__).'/../../classes/Utils/DateTimeUtils.php';
+require_once dirname(__FILE__).'/../../classes/econtentBySource/EcontentRecordConstants.php';
+require_once dirname(__FILE__).'/../../classes/econtentBySource/ThreemRecordDetails.php';
 
 /**
  * EContent Record Driver
@@ -74,7 +76,20 @@ class EcontentRecordDriver extends IndexRecord
 			$this->eContentRecord->id = $this->getUniqueID();
 			$this->eContentRecord->find(true);
 		}
-		$interface->assign('source', $this->eContentRecord->source);
+		
+		$interface->assign('methodToLoadStatusSummaries', EcontentRecordConstants::MethodMultipleToLoadStatusSummaries);
+		$detailsEcontent = EcontentDetailsFactory::get($this->eContentRecord);
+		
+		if($detailsEcontent !== false)
+		{
+			$interface->assign('methodToLoadStatusSummaries', $detailsEcontent->getMethodLoadStatusSummaries());
+		}
+		elseif($this->eContentRecord->isOverDrive())
+		{
+			$interface->assign('methodToLoadStatusSummaries', EcontentRecordConstants::MethodUniqueToLoadStatusSummaries);
+		}
+		
+		$interface->assign('source', $this->eContentRecord->source);		
 		$searchResultTemplate = parent::getSearchResult();
 		//Override fields as needed
 		return 'RecordDrivers/Econtent/result.tpl';

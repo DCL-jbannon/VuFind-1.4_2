@@ -687,6 +687,7 @@ class OverDriveDriver {
 		$addToCartUrl = $overDriveInfo['cartUrl'];
 		$addToCartUrl .= "?Action=Add&ID={$overDriveId}&Format=$format";
 		curl_setopt($overDriveInfo['ch'], CURLOPT_URL, $addToCartUrl);
+
 		$addCartConfirmation = curl_exec($overDriveInfo['ch']);
 		$addCartConfirmationInfo = curl_getinfo($overDriveInfo['ch']);
 		if (preg_match('/We\'re sorry, but there are currently no copies of the selected title available for check out./', $addCartConfirmation)){

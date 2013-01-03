@@ -82,8 +82,6 @@
     <div id="popupbox" class="popupBox"></div>
     {* End LightBox *}
     
-    {include file="bookcart.tpl"}
-    
     <div id="pageBody" class="{$page_body_style}">
     
     {include file="top-menu.tpl"}
@@ -106,6 +104,7 @@
       </div>
     </div>
     
+    
     {if $showBreadcrumbs}
     <div class="breadcrumbs">
       <div class="breadcrumbinner">
@@ -113,6 +112,13 @@
         {include file="$module/breadcrumbs.tpl"}
       </div>
     </div>
+    {/if}
+    
+	{if !($module == 'Search' && $pageTemplate == 'home.tpl')}
+	<div id="fixed_container">
+      {include file="bookcart.tpl"}
+    </div>
+    <div id="book_bag_spacer"></div>
     {/if}
     
       {if $useSolr || $useWorldcat || $useSummon}

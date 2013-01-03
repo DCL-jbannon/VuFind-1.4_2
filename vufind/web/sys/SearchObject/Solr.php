@@ -1120,7 +1120,6 @@ class SearchObject_Solr extends SearchObject_Base
 				}
 			}
 		}
-
 		// Return the result set
 		return $this->indexResult;
 	}
@@ -1714,4 +1713,6 @@ class SearchObject_Solr extends SearchObject_Base
 		return $this->indexEngine->getRecords($ids);
 	}
 	
+
+
 }

@@ -1,19 +1,16 @@
-<div id="book_bag" style="display:none;">
-  {* Top toolbar that is always displayed *}
-  <div id="bag_open_button">
-    <div class = "icon plus" id="bag_summary_holder">
-      <span id ="bag_summary"></span>
-    </div>
-  </div>
-   
+<div id="book_bag">    
   {* Canvas that displays when the bookcart is opened.  Hidden by default. *}
-  <div id="book_bag_canvas" class="round left-side-round" style="display: none; ">
-    <div id="book_bag_header">
-    	<span id ="bag_summary_header">Cart summary</span> 
-    	<a href="#" id="bag_empty_button_header" class="empty_cart">empty cart</a> 
-    </div>
+  <div id="book_bag_canvas">
+      <div id="book_bag_header">
+        <span id ="bag_summary_header">Your book cart</span> 
+      </div>
+  
     {* Placeholder for items.  Will be filled with code in JavaScript *}
-    <div id="bag_items"></div>
+    <div id="bag_content" style="display: none">    
+      <div id="bag_content_header">
+        <a href="#" id="bag_empty_button_header" class="button empty_cart">empty cart</a> 
+      </div>
+      <div id="bag_items"></div>
     
     {* Actions that are displayed when the user selects an action to perform. *} 
     <div id="bag_actions">
@@ -112,6 +109,6 @@
       <div id="bag_add_to_my_list_button" class="logged-in-button" style="display: none; "><a href="#" >Add to <span class="myListLabel">My List</span></a></div>  
       <div class="button round less-round longer-button logged-out-button" id="login_bag">Login</div>
    </div>
-       
+  </div>
   </div>
 </div> 

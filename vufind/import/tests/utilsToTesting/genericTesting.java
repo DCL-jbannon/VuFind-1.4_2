@@ -17,7 +17,7 @@ import org.solr.SolrWrapper;
 
 public class genericTesting
 {
-	@Test
+	//@Test
 	public void test1() throws SQLException
 	{
 		SolrWrapper solrWrapper = new SolrWrapper("vufind-dev:8080/solr/testEcontent");

@@ -1,24 +1,92 @@
 @CHARSET "ISO-8859-1";
-
 /* Local overrides of css */
-#book_bag #bag_open_button {
-	background-image: url(/interface/themes/dcl/images/bookbag-expand.png);
-	background-repeat: no-repeat;
-	background-position: 7px 7px;
+#fixed_container {
+    width: 990px;
+    position: absolute;
 }
-
+#fixed_container.cling {
+    z-index: 20000;
+    position: fixed;
+    top: 0;
+    background-color: #ffffff;
+    border-bottom: 1px solid #999999;
+    height: 10px;
+}
+#book_bag_spacer {
+	height: 30px;
+}
+#book_bag {
+    background-color: #eeeeee;
+    background-image: url("../images/gradient-small-2.png");
+    background-repeat: repeat-x;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+    border-bottom: 1px solid #999999;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    display: block;
+    margin-right: 95px;
+    float: right;
+    position: relative;
+    width: 320px;
+    z-index: 20000;    
+}
+#book_bag.cling {
+	margin-top: 10px;
+}
 #book_bag_header {
-	background-image: url(/interface/themes/dcl/images/bookbag-expand.png );
-	background-repeat: no-repeat;
+    background-color: transparent;
+    color: #3E3E3E;
+    cursor: pointer;
+    height: auto;
+    padding: 5px;
+    border: none;
+    border-radius: 0;
+    font-family: "Arial Unicode MS",Arial,Sans-Serif;
+    font-size: 1.167em;
+    text-align: center;
 }
+#book_bag_header:hover {
+	background-image: none;
+	background-color: #ffff99;
+}
+#bag_summary_header {
+    background-image: url("../images/cart.png");
+    background-repeat: no-repeat;
+    padding-left: 1.667em;
+}
+#book_bag #book_bag_canvas {
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
 
+    position: relative;
+    right: auto;
+    bottom: auto;
+    top: auto;
+    left: auto;
+    height: auto;
+    width: auto;
+    z-index: auto;
+    display: block;
+}
+#book_bag .empty_cart {
+	float: none;
+	margin-left: 105px;
+}
+#book_bag #bag_content {
+	padding: 5px;
+	border-top: 1px solid #999999;
+}
+#book_bag #bag_actions {
+    height: auto;
+}
 #library-footer {
 	background: #949494 url('/interface/themes/dcl/images/library-footer-top.png') repeat-x left top;
 }
 #similarTitlesSidegroup {
 	display: none;
 }
-
 #searchbar {
 	background-image: url(/interface/themes/dcl/images/searchbar-gradient.png);
 	background-repeat: repeat-x;
@@ -33,7 +101,6 @@
 	vertical-align: top;
 	width: 200px;
 }
-
 .sidegroup {
 	border: 1px solid #949494;
 	margin: 0 0 20px 0;

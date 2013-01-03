@@ -3,24 +3,24 @@ require_once dirname(__FILE__).'/CoversType.php';
 /**
  * Information for Title
  * 		Widht Every Single Character : 23px
- * 		Max Characters in one line: 12
+ * 		Max Characters in one line: 10
  * Information for Author
  * 		Widht Every Single Character : 14px
- * 		Max Characters in one line: 20 
+ * 		Max Characters in one line: 16 
  * 
  * 			IMAGE
  *              Width: 280px
  *               Height: 400px
  *         --------------------
  * 		   |                  |
- * 		   |      ICON        | 
- * 		   |                  |
- * 		   |******************|
  * 		   |                  | 
- * 		   |    PRINTABLE     |   
- * 		   |                  |  Printable Area in pixel: 
+ * 		   |    PRINTABLE     |
  * 		   |                  |
+ * 		   |                  | 
  * 		   |      COVER       |   
+ * 		   |                  |
+ * 		   |                  |
+ * 		   |                  |   
  * 		   |                  |   
  *         --------------------
  *         
@@ -34,11 +34,11 @@ require_once dirname(__FILE__).'/CoversType.php';
 class TitleNoCovers {
 	
 	private $titleConst  = array(
-								"maxCharPerLine"=>12,
-								"fontSize"=>29,
-								"pixelsCharacter"=>23,
+								"maxCharPerLine"=>13,
+								"fontSize"=>26,
+								"pixelsCharacter"=>21,
 								"YPositionFirtsLineOnCover" => 40, //May be more than one line for the title.
-								"incrementYPosition" => 33
+								"incrementYPosition" => 36
 							);
 	
 	private $authorConst  = array(
@@ -52,13 +52,13 @@ class TitleNoCovers {
 	const angle = 0; //The text angle is always Zero 
 	const imageWidth = 280;  //Pixels
 	const imageHeight = 400; // Pixels
-	const imagePrintableAreaHeight = 290; //Area printable in Pixels
+	const imagePrintableAreaHeight = 400; //Area printable in Pixels
 	private $fontText; 
-	private $colorText = array("red"=>255, "green"=>255, "blue"=>255);
+	private $colorText = array("red"=>1, "green"=>1, "blue"=>1);
 	
 	public function __construct()
 	{
-		$this->fontText = dirname(__FILE__).'/fonts/COURBD.TTF'; //same lenght per character
+		$this->fontText = dirname(__FILE__).'/fonts/SourceCodePro-Regular.otf'; //same lenght per character
 	}
 	
 	

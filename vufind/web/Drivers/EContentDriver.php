@@ -11,6 +11,11 @@ require_once dirname(__FILE__).'/../../classes/services/OverDriveServices.php';
 require_once dirname(__FILE__).'/../../classes/services/FreeEContentRecordServices.php';
 require_once dirname(__FILE__).'/../../classes/services/EContentRecordServices.php';
 require_once dirname(__FILE__).'/../../classes/API/OverDrive/OverDriveServicesAPI.php';
+require_once dirname(__FILE__).'/../../classes/econtentBySource/EcontentDetailsFactory.php';
+require_once dirname(__FILE__).'/../../classes/econtentBySource/EcontentRecordStatusText.php';
+require_once dirname(__FILE__).'/../../classes/econtentBySource/EcontentRecordShowButtons.php';
+require_once dirname(__FILE__).'/../../classes/API/3M/ThreeMAPI.php';
+require_once dirname(__FILE__).'/../../classes/Utils/ThreeMUtils.php';
 
 /**
  * Handles processing of account information related to eContent. 
@@ -87,10 +92,13 @@ class EContentDriver implements DriverInterface{
 	 *                              If an error occurs, return a PEAR_Error
 	 * @access  public
 	 */
-	public function getHolding($id){
+	public function getHolding($id)
+	{
 		if (array_key_exists($id, EContentDriver::$holdings)){
 			return EContentDriver::$holdings[$id];
 		}
+		
+		/** $user User */
 		global $user, $configArray;
 		$libaryScopeId = $this->getLibraryScopingId();
 		//Get any items that are stored for the record
@@ -98,34 +106,62 @@ class EContentDriver implements DriverInterface{
 		$eContentRecord->id = $id;
 		$eContentRecord->find(true);
 		
-		if ($eContentRecord->isOverDrive())
+		
+		$checkedOut = false;
+		$onHold = false;
+		$holdPosition = 0;
+		
+		$detailsEcontent = EcontentDetailsFactory::get($eContentRecord);
+		if($detailsEcontent !== false)
+		{
+			if($user)
+			{
+				$patronId = $user->getBarcode();
+				$checkedOut = $detailsEcontent->isCheckedOutByPatron($patronId);
+				$onHold = $detailsEcontent->isCancelHoldAvailable($patronId);
+			}
+			
+			$item->item_type = $detailsEcontent->getFormatType();
+			$item->source = $detailsEcontent->getSourceName();
+			$item->usageNotes = $detailsEcontent->getStatusText()->getUsageNotesMessage();
+			$item->size = $detailsEcontent->getSize();
+			$item->checkedOut = $checkedOut;
+			$item->onHold = $onHold;
+			$item->holdPosition = $holdPosition;
+			$item->notes = '';
+			$item->showActionButtons = false;
+			$items[] = $item;
+			
+		}
+		elseif ($eContentRecord->isOverDrive())
 		{
 			require_once 'Drivers/OverDriveDriver.php';
 			$items = $eContentRecord->getItems(true);
 		}
 		else
 		{
-			//Check to see if the record is checked out or on hold
-			$checkedOut = false;
-			$onHold = false;
-			$holdPosition = 0;
-			if ($user){
+			if ($user)
+			{
 				$eContentCheckout = new EContentCheckout();
 				$eContentCheckout->userId = $user->id;
 				$eContentCheckout->status = 'out';
 				$eContentCheckout->recordId = $id;
 				$eContentCheckout->find();
-				if ($eContentCheckout->N > 0){
+				if ($eContentCheckout->N > 0)
+				{
 					//The item is checked out to the current user
 					$eContentCheckout->fetch();
 					$checkedOut = true;
-				}else{
+				}
+				else
+				{
 					$eContentHold = new EContentHold();
 					$eContentHold->userId = $user->id;
 					$eContentHold->whereAdd("status in ('active', 'suspended', 'available')");
 					$eContentHold->recordId = $id;
 					$eContentHold->find();
-					if ($eContentHold->N > 0){
+					if ($eContentHold->N > 0)
+					{
 						$onHold = true;
 						$eContentHold->fetch();
 						$holdPosition = $this->_getHoldPosition($eContentHold);
@@ -138,24 +174,32 @@ class EContentDriver implements DriverInterface{
 			
 			$eContentItem = new EContentItem();
 			$eContentItem->recordId = $id;
-			if ($libaryScopeId != -1){
+			if ($libaryScopeId != -1)
+			{
 				$eContentItem->whereAdd("libraryId = -1 or libraryId = $libaryScopeId");
 			}
 			$items = array();
 			$eContentItem->find();
-			while ($eContentItem->fetch()){
+			while ($eContentItem->fetch())
+			{
 				$item = clone $eContentItem;
 				$item->source = $eContentRecord->source;
 				//Generate links for the items
 				$links = array();
-				if ($checkedOut){
+				if ($checkedOut)
+				{
 					$links = $this->_getCheckedOutEContentLinks($eContentRecord, $item, $eContentCheckout);
-				}else if ($eContentServices->isFree($eContentRecord) && $item->isExternalItem()){
+				}
+				else if ($eContentServices->isFree($eContentRecord) && $item->isExternalItem())
+				{
 					$links = $this->_getFreeExternalLinks($eContentRecord, $item);
-				}else if ($onHold){
+				}
+				else if ($onHold)
+				{
 					$links = $this->getOnHoldEContentLinks($eContentHold);
 				}
 				
+				$item->showActionButtons = true;
 				$item->checkedOut = $checkedOut;
 				$item->onHold = $onHold;
 				$item->holdPosition = $holdPosition;
@@ -163,7 +207,6 @@ class EContentDriver implements DriverInterface{
 				$items[] = $item;
 			}
 		}
-		
 		EContentDriver::$holdings[$id] = $items;
 		return $items;
 	}
@@ -182,192 +225,259 @@ class EContentDriver implements DriverInterface{
 		}
 	}
 	
-	public function getStatusSummary($id, $holdings){
-		global $user, $configArray;
-		
-		//Get the eContent Record
-		$eContentRecord = new EContentRecord();
-		$eContentRecord->id = $id;
-		$eContentRecord->find(true);
+public function getStatusSummary($id, $holdings)
+{ 
+	/** $user User */
+	global $user, $configArray;
+	
+	//Get the eContent Record
+	$eContentRecord = new EContentRecord();
+	$eContentRecord->id = $id;
+	$eContentRecord->find(true);
 
-		$drmType = $eContentRecord->accessType;
-		$checkedOut = false;
-		$onHold = false;
-		$addedToWishList = false;
-		$holdPosition = 0;
-		
-				//Load status summary
-		$statusSummary = array();
-		$statusSummary['recordId'] = $id;
-		$statusSummary['totalCopies'] = $eContentRecord->availableCopies;
-		$statusSummary['onOrderCopies'] = $eContentRecord->onOrderCopies;
-		$statusSummary['accessType'] = $eContentRecord->accessType;
-		foreach ($holdings as $item){
-			$checkedOut = $item->checkedOut;
-			$onHold = $item->onHold;
-			$holdPosition = $item->holdPosition;
-		}
-		
-		$overdriveTitle = false;
-		if ($eContentRecord->isOverDrive())
+	$drmType = $eContentRecord->accessType;
+	$checkedOut = false;
+	$onHold = false;
+	$addedToWishList = false;
+	$holdPosition = 0;
+	
+			//Load status summary
+	$statusSummary = array();
+	$statusSummary['recordId'] = $id;
+	$statusSummary['totalCopies'] = $eContentRecord->availableCopies;
+	$statusSummary['onOrderCopies'] = $eContentRecord->onOrderCopies;
+	$statusSummary['accessType'] = $eContentRecord->accessType;
+	foreach ($holdings as $item)
+	{
+		$checkedOut = $item->checkedOut;
+		$onHold = $item->onHold;
+		$holdPosition = $item->holdPosition;
+	}
+	
+	$detailsEContent = EcontentDetailsFactory::get($eContentRecord);
+	$overdriveTitle = false;
+	if($detailsEContent !== false)
+	{
+		$patronId = NULL;
+		if ($user)
 		{
-			$overdriveTitle = true;
-			//Check to see if any items are available
-			$available = false;
-			foreach ($holdings as $holding){
-				if ($holding->available){
-					$available = true;
-					break;
-				}
-			}
-			if (isset($holding)){
-				$statusSummary['totalCopies'] = $holding->totalCopies;
-				$statusSummary['availableCopies'] = $holding->availableCopies;
-				$statusSummary['numHolds'] = $holding->numHolds;
-				$statusSummary['holdQueueLength'] = $holding->numHolds;
-			}
-		
-			if ($available){
-				$statusSummary['status'] = 'Available from OverDrive';
-			}else{
-				$statusSummary['status'] = 'Checked out in OverDrive';
-			}
-			$wishListSize = 0;
-		}else{
-			//Check to see if it is checked out
-			$checkouts = new EContentCheckout();
-			$checkouts->status = 'out';
-			$checkouts->recordId = $id;
-			$checkouts->find();
-			$statusSummary['numCheckedOut'] = $checkouts->N;
-	
-			//Get a count of the holds on the record
-			$holds = new EContentHold();
-			$holds->recordId = $id;
-			$holds->whereAdd("(status = 'active' or status = 'suspended')");
-			$holds->find();
-			$statusSummary['numHolds'] = $holds->N;
-	
-			//Get a count of the available holds on the record
-			$holds = new EContentHold();
-			$holds->recordId = $id;
-			$holds->status = 'available';
-			$holds->find();
-			$statusSummary['numAvailableHolds'] = $holds->N;
-			
-			//Check to see if the record is on the user's wishlist
-			if ($user){
-				$eContentWishList = new EContentWishList();
-				$eContentWishList->userId = $user->id;
-				$eContentWishList->recordId = $id;
-				$eContentWishList->status = 'active';
-				$eContentWishList->find();
-				if ($eContentWishList->N > 0){
-					$addedToWishList = true;
-				}
-			}
-			
-			if (count($holdings) == 0){
-				$statusSummary['availableCopies'] = 0; 
-			}else{
-				$statusSummary['availableCopies'] = $statusSummary['totalCopies'] - $statusSummary['numCheckedOut'] - $statusSummary['numAvailableHolds'];
-			}
-
-			if ($checkedOut == true){
-				$statusSummary['status'] = 'Checked Out to you';
-				$statusSummary['available'] = false;
-			}elseif ($onHold == true){
-				$statusSummary['status'] = 'On Hold for you';
-				$statusSummary['available'] = false;
-			}elseif ($addedToWishList == true){
-				$statusSummary['status'] = 'On your wishlist';
-				$statusSummary['available'] = false;
-			}elseif (count($holdings) == 0){
-				$statusSummary['status'] = 'Not available yet';
-				$statusSummary['available'] = false;
-			}elseif ($statusSummary['numCheckedOut'] < $statusSummary['totalCopies']){
-				$statusSummary['status'] = 'Available Online';
-				$statusSummary['available'] = true;
-			}else{
-				$statusSummary['status'] = 'Checked Out';
-				$statusSummary['available'] = false;
-			}
-	
-			$wishList = new EContentWishList();
-			$wishList->recordId = $id;
-			$wishList->status = 'active';
-			$wishList->find();
-			$wishListSize = $wishList->N;
+			$patronId = $user->getBarcode();
 		}
 		
-		//Determine which buttons to show
-		$statusSummary['source'] = $eContentRecord->source;
+		$statusSummary['totalCopies'] = $detailsEContent->getTotalCopies();
+		$statusSummary['availableCopies'] = $detailsEContent->getAvailableCopies();
+		$statusSummary['numHolds'] = $detailsEContent->getHoldLength();
+		$statusSummary['holdQueueLength'] = $detailsEContent->getHoldLength();
+		$statusSummary['status'] = $detailsEContent->getStatusText()->getString($patronId);
+		$wishListSize = $detailsEContent->getWishListSize();
 		
-		$eContentRecordServices = new EContentRecordServices();
-		$isFreeExternalLink = $eContentRecordServices->isFree($eContentRecord);
-
-		if ($overdriveTitle){
-			$overDriveServices = new OverDriveServices();
-			
-			$statusSummary['showPlaceHold'] = false;
-			$statusSummary['showCheckout'] = false;
-			$statusSummary['showAddToWishlist'] = false;
-			
-			$statusSummary['showAccessOnline'] = true;
-			$statusSummary['formatType'] = $overDriveServices->getFormatType($eContentRecord);
-		}elseif ($isFreeExternalLink){
-			$freeEContentRecordService = new FreeEcontentRecordServices();
-			
-			$statusSummary['showPlaceHold'] = false;
-			$statusSummary['showCheckout'] = false;
-			$statusSummary['showAddToWishlist'] = false;
-			
-			$statusSummary['showAccessOnline'] = true;
-			$statusSummary['formatType'] = $freeEContentRecordService->getFormatType($eContentRecord);
-		}else{
-			$statusSummary['showPlaceHold'] = (!$checkedOut && !$onHold) && $drmType != 'free' && ($statusSummary['availableCopies'] == 0) && count($holdings) > 0;
-			$statusSummary['showCheckout'] = (!$checkedOut && !$onHold) && ($statusSummary['availableCopies'] > 0);
-			$statusSummary['showAddToWishlist'] = (count($holdings) == 0 && !$addedToWishList);
-			
-			$statusSummary['showAccessOnline'] = ($checkedOut && count($holdings) > 0);
-			$statusSummary['formatType'] = '';
-		}
-		
-		$statusSummary['holdQueueLength'] = $this->getWaitList($id);
-		$statusSummary['onHold'] = $onHold;
-		$statusSummary['checkedOut'] = $checkedOut;
-		$statusSummary['holdPosition'] = $holdPosition;
-		$statusSummary['numHoldings'] = count($holdings);
-		$statusSummary['wishListSize'] = $wishListSize;
-
-		return $statusSummary;
+		//Buttons
+		$statusSummary['showPlaceHold'] = $detailsEContent->getShowButtons()->showPlaceHold($patronId);
+		$statusSummary['showCheckout'] =  $detailsEContent->getShowButtons()->showCheckOut($patronId);
+		$statusSummary['showAddToWishlist'] = $detailsEContent->getShowButtons()->showAddToWishList($patronId);
+		$statusSummary['showAccessOnline'] = $detailsEContent->getShowButtons()->showAccessOnline();
+		$statusSummary['formatType'] = $detailsEContent->getFormatType();
 	}
-
-	public function getStatusSummaries($ids){
-		$summaries = array();
-		if (is_array($ids) && count($ids) > 0){
-			foreach ($ids as $id){
-				$holdings = $this->getHolding($id);
-				//Load status summary
-				$result = $this->getStatusSummary($id, $holdings);
-				if (PEAR::isError($result)) {
-					PEAR::raiseError($result);
-				}
-				$summaries[$id] = $result;
+	elseif ($eContentRecord->isOverDrive())
+	{
+		$overdriveTitle = true;
+		//Check to see if any items are available
+		$available = false;
+		foreach ($holdings as $holding)
+		{
+			if ($holding->available)
+			{
+				$available = true;
+				break;
 			}
 		}
-		return $summaries;
+		if (isset($holding))
+		{
+			$statusSummary['totalCopies'] = $holding->totalCopies;
+			$statusSummary['availableCopies'] = $holding->availableCopies;
+			$statusSummary['numHolds'] = $holding->numHolds;
+			$statusSummary['holdQueueLength'] = $holding->numHolds;
+		}
+	
+		if ($available)
+		{
+			$statusSummary['status'] = 'Available from OverDrive';
+		}
+		else
+		{
+			$statusSummary['status'] = 'Checked out in OverDrive';
+		}
+		$wishListSize = 0;
 	}
+	else
+	{
+		//Check to see if it is checked out
+		$checkouts = new EContentCheckout();
+		$checkouts->status = 'out';
+		$checkouts->recordId = $id;
+		$checkouts->find();
+		$statusSummary['numCheckedOut'] = $checkouts->N;
+
+		//Get a count of the holds on the record
+		$holds = new EContentHold();
+		$holds->recordId = $id;
+		$holds->whereAdd("(status = 'active' or status = 'suspended')");
+		$holds->find();
+		$statusSummary['numHolds'] = $holds->N;
+
+		//Get a count of the available holds on the record
+		$holds = new EContentHold();
+		$holds->recordId = $id;
+		$holds->status = 'available';
+		$holds->find();
+		$statusSummary['numAvailableHolds'] = $holds->N;
+		
+		//Check to see if the record is on the user's wishlist
+		if ($user)
+		{
+			$eContentWishList = new EContentWishList();
+			$eContentWishList->userId = $user->id;
+			$eContentWishList->recordId = $id;
+			$eContentWishList->status = 'active';
+			$eContentWishList->find();
+			if ($eContentWishList->N > 0){
+				$addedToWishList = true;
+			}
+		}
+		
+		if (count($holdings) == 0)
+		{
+			$statusSummary['availableCopies'] = 0; 
+		}
+		else
+		{
+			$statusSummary['availableCopies'] = $statusSummary['totalCopies'] - $statusSummary['numCheckedOut'] - $statusSummary['numAvailableHolds'];
+		}
+
+		if ($checkedOut == true)
+		{
+			$statusSummary['status'] = 'Checked Out to you';
+			$statusSummary['available'] = false;
+		}
+		elseif ($onHold == true)
+		{
+			$statusSummary['status'] = 'On Hold for you';
+			$statusSummary['available'] = false;
+		}
+		elseif ($addedToWishList == true)
+		{
+			$statusSummary['status'] = 'On your wishlist';
+			$statusSummary['available'] = false;
+		}
+		elseif (count($holdings) == 0)
+		{
+			$statusSummary['status'] = 'Not available yet';
+			$statusSummary['available'] = false;
+		}
+		elseif ($statusSummary['numCheckedOut'] < $statusSummary['totalCopies'])
+		{
+			$statusSummary['status'] = 'Available Online';
+			$statusSummary['available'] = true;
+		}
+		else
+		{
+			$statusSummary['status'] = 'Checked Out';
+			$statusSummary['available'] = false;
+		}
+
+		$wishList = new EContentWishList();
+		$wishList->recordId = $id;
+		$wishList->status = 'active';
+		$wishList->find();
+		$wishListSize = $wishList->N;
+	}
+		
+	//Determine which buttons to show
+	$statusSummary['source'] = $eContentRecord->source;
+	
+	$eContentRecordServices = new EContentRecordServices();
+	$isFreeExternalLink = $eContentRecordServices->isFree($eContentRecord);
+
+	if($detailsEContent !== false)
+	{
+		//Done it before
+	}
+	elseif ($overdriveTitle)
+	{
+		$overDriveServices = new OverDriveServices();
+		
+		$statusSummary['showPlaceHold'] = false;
+		$statusSummary['showCheckout'] = false;
+		$statusSummary['showAddToWishlist'] = false;
+		
+		$statusSummary['showAccessOnline'] = true;
+		$statusSummary['formatType'] = $overDriveServices->getFormatType($eContentRecord);
+	}
+	elseif ($isFreeExternalLink)
+	{
+		$freeEContentRecordService = new FreeEcontentRecordServices();
+		
+		$statusSummary['showPlaceHold'] = false;
+		$statusSummary['showCheckout'] = false;
+		$statusSummary['showAddToWishlist'] = false;
+		
+		$statusSummary['showAccessOnline'] = true;
+		$statusSummary['formatType'] = $freeEContentRecordService->getFormatType($eContentRecord);
+	}
+	else
+	{
+		$statusSummary['showPlaceHold'] = (!$checkedOut && !$onHold) && $drmType != 'free' && ($statusSummary['availableCopies'] == 0) && count($holdings) > 0;
+		$statusSummary['showCheckout'] = (!$checkedOut && !$onHold) && ($statusSummary['availableCopies'] > 0);
+		$statusSummary['showAddToWishlist'] = (count($holdings) == 0 && !$addedToWishList);
+		
+		$statusSummary['showAccessOnline'] = ($checkedOut && count($holdings) > 0);
+		$statusSummary['formatType'] = '';
+	}
+	
+	$statusSummary['holdQueueLength'] = $this->getWaitList($id);
+	$statusSummary['onHold'] = $onHold;
+	$statusSummary['checkedOut'] = $checkedOut;
+	$statusSummary['holdPosition'] = $holdPosition;
+	$statusSummary['numHoldings'] = count($holdings);
+	$statusSummary['wishListSize'] = $wishListSize;
+
+	return $statusSummary;
+}
+
+public function getStatusSummaries($ids){
+	$summaries = array();
+	if (is_array($ids) && count($ids) > 0){
+		foreach ($ids as $id){
+			$holdings = $this->getHolding($id);
+			//Load status summary
+			$result = $this->getStatusSummary($id, $holdings);
+			if (PEAR::isError($result)) {
+				PEAR::raiseError($result);
+			}
+			$summaries[$id] = $result;
+		}
+	}
+	return $summaries;
+}
+
 	public function getPurchaseHistory($id){
-
+	
 	}
 
 	public function getMyHolds($user){
-		$holds = array();
-		$holds['holds'] = array();
-		$holds['holds']['available'] = array();
-		$holds['holds']['unavailable'] = array();
 		
+		$holds = array();
+				
+		$holds['holds']['available'] = $this->getAvailableHolds($user);
+		$holds['holds']['unavailable'] = $this->getUnAvailableHolds($user);
+		
+		return $holds;
+	}
+	
+	
+	private function getAvailableHolds($user)
+	{
+		$holds = array();
 		$availableHolds = new EContentHold();
 		$availableHolds->userId = $user->id;
 		$availableHolds->status ='available';
@@ -377,20 +487,55 @@ class EContentDriver implements DriverInterface{
 			$eContentRecord->id = $availableHolds->recordId;
 			if ($eContentRecord->find(true)){
 				$expirationDate = $availableHolds->dateUpdated + 5 * 24 * 60 * 60;
-				$holds['holds']['available'][] = array(
-					'id' => $eContentRecord->id,
-					'recordId' => 'econtentRecord' . $eContentRecord->id,
-					'source' => $eContentRecord->source,
-					'title' => $eContentRecord->title,
-					'author' => $eContentRecord->author,
-					'available' => true,
-					'create' => $availableHolds->datePlaced,
-					'expire' => $expirationDate,
-					'status' => $availableHolds->status,
-					'links' => $this->getOnHoldEContentLinks($availableHolds)
+				$holds[] = array(
+						'id' => $eContentRecord->id,
+						'recordId' => 'econtentRecord' . $eContentRecord->id,
+						'source' => $eContentRecord->source,
+						'title' => $eContentRecord->title,
+						'author' => $eContentRecord->author,
+						'available' => true,
+						'create' => $availableHolds->datePlaced,
+						'expire' => $expirationDate,
+						'status' => $availableHolds->status,
+						'links' => $this->getOnHoldEContentLinks($availableHolds)
 				);
 			}
 		}
+		
+		//3M
+		$threeMAPI = new ThreeMAPI();
+		$patronCirculation = $threeMAPI->getPatronCirculation($user->getBarcode());
+		if(count($patronCirculation->Reserves[0]) > 0)
+		{
+			
+			foreach($patronCirculation->Reserves[0] as $reserve)
+			{
+				$eContentRecord = ThreeMUtils::getEcontentRecordFrom3MId($reserve->ItemId);
+				$details = EcontentDetailsFactory::get($eContentRecord);
+				
+				$holds[] = array(
+						'id' => $eContentRecord->id,
+						'recordId' => 'econtentRecord' . $eContentRecord->id,
+						'source' => $eContentRecord->source,
+						'title' => $eContentRecord->title,
+						'author' => $eContentRecord->author,
+						'available' => true,
+						'create' => $reserve->EventStartDateInUTC,
+						'expire' => $reserve->EventEndDateInUTC,
+						'status' => '',
+						'links' => $details->getLinksInfo()->getLinksAvailableHolds()
+				);
+				
+			}
+		}
+		
+		return $holds;
+	}
+	
+	
+	private function  getUnAvailableHolds($user)
+	{
+		$holds = array();
 		$unavailableHolds = new EContentHold();
 		$unavailableHolds->userId = $user->id;
 		$unavailableHolds->whereAdd("(status = 'active' or status = 'suspended')");
@@ -399,27 +544,51 @@ class EContentDriver implements DriverInterface{
 			$eContentRecord = new EContentRecord();
 			$eContentRecord->id = $unavailableHolds->recordId;
 			if ($eContentRecord->find(true)){
-				$holds['holds']['unavailable'][] = array(
-					'id' => $eContentRecord->id,
-					'recordId' => 'econtentRecord' . $eContentRecord->id,
-					'source' => $eContentRecord->source,
-					'title' => $eContentRecord->title,
-					'author' => $eContentRecord->author,
-					'available' => true,
-					'createTime' => $unavailableHolds->datePlaced,
-					'status' => $unavailableHolds->status,
-					'position' => $this->_getHoldPosition($unavailableHolds),
-					'links' => $this->getOnHoldEContentLinks($unavailableHolds),
-					'frozen' => $unavailableHolds->status == 'suspended',
-					'reactivateDate' => $unavailableHolds->reactivateDate,
+				$holds[] = array(
+						'id' => $eContentRecord->id,
+						'recordId' => 'econtentRecord' . $eContentRecord->id,
+						'source' => $eContentRecord->source,
+						'title' => $eContentRecord->title,
+						'author' => $eContentRecord->author,
+						'available' => true,
+						'createTime' => $unavailableHolds->datePlaced,
+						'status' => $unavailableHolds->status,
+						'position' => $this->_getHoldPosition($unavailableHolds),
+						'links' => $this->getOnHoldEContentLinks($unavailableHolds),
+						'frozen' => $unavailableHolds->status == 'suspended',
+						'reactivateDate' => $unavailableHolds->reactivateDate,
 				);
 			}
 		}
 		
+		//3M
+		$threeMAPI = new ThreeMAPI();
+		$patronCirculation = $threeMAPI->getPatronCirculation($user->getBarcode());
+		if(count($patronCirculation->Holds[0]) > 0)
+		{
+			foreach($patronCirculation->Holds[0] as $hold)
+			{
+				$eContentRecord = ThreeMUtils::getEcontentRecordFrom3MId($hold->ItemId);
+				$details = EcontentDetailsFactory::get($eContentRecord);
+				
+				$holds[] = array(
+						'id' => $eContentRecord->id,
+						'recordId' => 'econtentRecord' . $eContentRecord->id,
+						'source' => $eContentRecord->source,
+						'title' => $eContentRecord->title,
+						'author' => $eContentRecord->author,
+						'available' => true,
+						'createTime' => $hold->EventStartDateInUTC,
+						'status' => 'active',
+						'position' => 'unknown',
+						'links' => $details->getLinksInfo()->getCancelHoldsLinks(),
+						'frozen' => false,
+						'reactivateDate' => '',
+				);
+			}
+		}		
 		return $holds;
 	}
-	
-	
 
 	private function _getHoldPosition($existingHold){
 		$eContentHold = new EContentHold();
@@ -429,7 +598,8 @@ class EContentDriver implements DriverInterface{
 		return $eContentHold->N + 1;
 	}
 
-	public function getMyTransactions($user){
+	public function getMyTransactions($user)
+	{
 		global $configArray;
 		
 		$idclReaderService = new IDCLReaderServices();
@@ -473,6 +643,33 @@ class EContentDriver implements DriverInterface{
 						'links' => $links,
 					);
 				}
+			}
+		}
+
+		//3M??
+		$threeMAPI = new ThreeMAPI();
+		$results = $threeMAPI->getPatronCirculation($user->getBarcode());
+		if ($results !== false)
+		{
+			foreach ($results->Checkouts[0] as $item)
+			{
+				$id = $item->ItemId;
+				$eContentRecord = ThreeMUtils::getEcontentRecordFrom3MId($id);
+				$details = EcontentDetailsFactory::get($eContentRecord);
+				$daysUntilDue = (strtotime($item->EventEndDateInUTC) - strtotime($item->EventStartDateInUTC)) / (24 * 60 * 60);
+				
+				$return['transactions'][] = array(
+						'id' => $eContentRecord->id,
+						'recordId' => 'econtentRecord' . $eContentRecord->id,
+						'source' => $eContentRecord->source,
+						'title' => $eContentRecord->title,
+						'author' => $eContentRecord->author,
+						'duedate' => $item->EventEndDateInUTC,
+						'checkoutdate' => $item->EventStartDateInUTC,
+						'daysUntilDue' => $daysUntilDue,
+						'holdQueueLength' => $details->getHoldLength(),
+						'links' => $details->getLinksInfo()->getLinksItemChekedOut($user->getBarcode())
+				);
 			}
 		}
 		return $return;
@@ -568,8 +765,7 @@ class EContentDriver implements DriverInterface{
 			$return['title'] = $eContentRecord->title;
 			
 			//If the source is overdrive, process it as an overdrive title
-			if ($eContentRecord->isOverDrive())
-			{
+			if (strcasecmp($eContentRecord->source, 'OverDrive') == 0){
 				require_once 'Drivers/OverDriveDriver.php';
 				$overDriveDriver = new OverDriveDriver();
 				$overDriveId = substr($eContentRecord->sourceUrl, -36);
@@ -580,9 +776,7 @@ class EContentDriver implements DriverInterface{
 				$overDriveResult = $overDriveDriver->placeOverDriveHold($overDriveId, $format, $user);
 				$return['result'] = $overDriveResult['result'];
 				$return['message'] = $overDriveResult['message'];
-			}
-			else
-			{
+			}else{
 				//Check to see if the user already has a hold placed
 				$holds = new EContentHold();
 				$holds->userId = $user->id;
@@ -648,6 +842,27 @@ class EContentDriver implements DriverInterface{
 
 	public function cancelHold($id){
 		global $user;
+
+		$details = EcontentDetailsFactory::getById($id);
+		if($details !== false)
+		{
+			$result = $details->cancelHold($user->getBarcode());
+			if($result === true)
+			{
+				return array(
+						'title' => '',
+						'result' => true,
+						'message' => 'Your hold was cancelled successfully.');
+			}
+			else
+			{
+				return array(
+						'title' => '',
+						'result' => true,
+						'message' => 'Unabled to cancel your hold');
+			}
+		}
+		
 		//Check to see if there is an existing hold for the record
 		$record = new EContentRecord();
 		$record->id = $id;
@@ -1064,13 +1279,6 @@ class EContentDriver implements DriverInterface{
 			'onclick' => "if (confirm('Are you sure you want to cancel this title?')){cancelEContentHold('{$configArray['Site']['path']}/EcontentRecord/{$eContentHold->recordId}/CancelHold')};return false;",
 		
 		);
-		//Link to suspend hold
-		/*if ($eContentHold->status == 'active'){
-			$links[] = array(
-				'text' => 'Suspend&nbsp;Hold',
-				'url' => $configArray['Site']['path'] . "/EcontentRecord/{$eContentHold->recordId}/SuspendHold",
-			);
-		}*/
 		//Link to reactivate hold
 		if ($eContentHold->status == 'suspended'){
 			$links[] = array(
@@ -1094,6 +1302,18 @@ class EContentDriver implements DriverInterface{
 	function returnRecord($id){
 		global $user;
 		$logger = new Logger();
+		
+		$detailsEcontent = EcontentDetailsFactory::getById($id);
+		if($detailsEcontent !== false)
+		{
+			$result = $detailsEcontent->checkin($user->getBarcode());
+			if($result !== false)
+			{
+				return array('success' => true, 'message' => "The title was returned successfully.");
+			}
+			return array('success' => false, 'message' => "Could not return the item");
+		}
+		
 		//Get the item information for the record
 		require_once('sys/eContent/EContentCheckout.php');
 		$checkout = new EContentCheckout();
@@ -1235,30 +1455,42 @@ class EContentDriver implements DriverInterface{
 		$entry->insert();
 	}
 	
-	public function getAccountSummary(){
+	public function getAccountSummary()
+	{
 		global $user;
 		$accountSummary = array();
-		if ($user){
+		if ($user)
+		{
+			$totalCheckOuts = 0;
+			$totalUnAvailableHolds = 0;
+			
+			//3M??
+			$threeMAPI = new ThreeMAPI();
+			$results = $threeMAPI->getPatronCirculation($user->getBarcode());
+			$totalCheckOuts = count($results->Checkouts[0]);
+			$totalUnAvailableHolds = count($results->Holds[0]);
+			$totalAvailableHolds = count($results->Reserves[0]);
+			
 			//Get a count of checked out items
 			$eContentCheckout = new EContentCheckout();
 			$eContentCheckout->status = 'out';
 			$eContentCheckout->userId = $user->id;
 			$eContentCheckout->find();
-			$accountSummary['numEContentCheckedOut'] = $eContentCheckout->N;
+			$accountSummary['numEContentCheckedOut'] = $totalCheckOuts + $eContentCheckout->N;
 			
 			//Get a count of available holds
 			$eContentHolds = new EContentHold();
 			$eContentHolds->status = 'available';
 			$eContentHolds->userId = $user->id;
 			$eContentHolds->find();
-			$accountSummary['numEContentAvailableHolds'] = $eContentHolds->N;
+			$accountSummary['numEContentAvailableHolds'] = $totalAvailableHolds + $eContentHolds->N;
 			
 			//Get a count of unavailable holds
 			$eContentHolds = new EContentHold();
 			$eContentHolds->whereAdd("status IN ('active', 'suspended')");
 			$eContentHolds->userId = $user->id;
 			$eContentHolds->find();
-			$accountSummary['numEContentUnavailableHolds'] = $eContentHolds->N;
+			$accountSummary['numEContentUnavailableHolds'] = $totalUnAvailableHolds + $eContentHolds->N;
 			
 			//Get a count of items on the wishlist
 			$eContentWishList = new EContentWishList();

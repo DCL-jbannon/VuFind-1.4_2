@@ -20,23 +20,28 @@
 
 require_once 'services/MyResearch/MyResearch.php';
 
-class EContentHolds extends MyResearch {
-	function launch(){
+class EContentHolds extends MyResearch
+{
+	function launch()
+	{
 		global $configArray;
 		global $interface;
 		global $user;
 		global $timer;
 
 		// Get My Transactions
-		if ($this->catalog->status) {
-			if ($user->cat_username) {
+		if ($this->catalog->status) 
+		{
+			if ($user->cat_username) 
+			{
 				$patron = $this->catalog->patronLogin($user->cat_username, $user->cat_password);
 				$timer->logTime("Logged in patron to get checked out items.");
 				if (PEAR::isError($patron))
 				PEAR::raiseError($patron);
 
 				$patronResult = $this->catalog->getMyProfile($patron);
-				if (!PEAR::isError($patronResult)) {
+				if (!PEAR::isError($patronResult)) 
+				{
 					$interface->assign('profile', $patronResult);
 				}
 				$timer->logTime("Got patron profile to get checked out items.");
@@ -54,7 +59,8 @@ class EContentHolds extends MyResearch {
 				require_once 'Drivers/EContentDriver.php';
 				$driver = new EContentDriver();
 				
-				if (isset($_REQUEST['multiAction']) && $_REQUEST['multiAction'] == 'suspendSelected'){
+				if (isset($_REQUEST['multiAction']) && $_REQUEST['multiAction'] == 'suspendSelected')
+				{
 					$ids = array();
 					foreach ($_REQUEST['unavailableHold'] as $id => $selected){
 						$ids[] = $id;
@@ -78,5 +84,4 @@ class EContentHolds extends MyResearch {
 		$interface->setPageTitle('On Hold eContent');
 		$interface->display('layout.tpl');
 	}
-
 }

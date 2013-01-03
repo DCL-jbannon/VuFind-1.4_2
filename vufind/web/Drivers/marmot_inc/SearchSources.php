@@ -55,7 +55,7 @@ class SearchSources{
 		}else{
 			$marmotAdded = true;
 			$searchOptions['local'] = array(
-              'name' => 'Marmot Catalog',
+              'name' => 'DCL Catalog',
               'description' => "The entire Marmot catalog.",
 			);
 		}

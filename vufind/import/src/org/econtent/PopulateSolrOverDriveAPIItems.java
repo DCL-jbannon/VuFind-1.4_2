@@ -80,13 +80,18 @@ public class PopulateSolrOverDriveAPIItems
 	
 	public void addNote(String note)
 	{
-		if(this.processorResults!=null)
+		this.addNote(note, false);
+	}
+	
+	public void addNote(String note, Boolean onlySystemOut)
+	{
+		if ( (this.processorResults!=null) && !onlySystemOut)
 		{
 			this.processorResults.addNote(note);
 		}
-		else
+		if(onlySystemOut && this.processorResults!= null)
 		{
-			//System.out.println(note);
+			System.out.println(note);
 		}
 	}
 
@@ -116,7 +121,7 @@ public class PopulateSolrOverDriveAPIItems
 			for (int i = 0; i < items.size(); i++) 
 			{
 				j++;
-				this.addNote("\rProcessing OverDrive API Item: " + j + "/" + totalItems);
+				this.addNote("\rProcessing OverDrive API Item: " + j + "/" + totalItems, true);
 				
 				JSONObject item = (JSONObject) items.get(i);
 				

@@ -1,6 +1,6 @@
 <?php
-
 require_once dirname(__FILE__).'/../../web/sys/eContent/EContentRecord.php';
+require_once dirname(__FILE__).'/../Utils/ThreeMUtils.php';
 
 class ThreeMCovers
 {
@@ -24,8 +24,7 @@ class ThreeMCovers
 			throw new DomainException("ThreeMCovers::getImageUrl The Record with id ".$id.",  is not a 3M record");
 		}
 		
-		$sourceUrlParts = explode("-", $eContentRecord->sourceUrl);
-		$ThreeMId =  $sourceUrlParts[count($sourceUrlParts)-1];
+		$ThreeMId =  ThreeMUtils::get3MId($eContentRecord);
 		return str_replace("<documentID>", $ThreeMId, self::base3MImageUrl);
 	}
 }

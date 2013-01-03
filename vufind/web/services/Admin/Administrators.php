@@ -73,7 +73,7 @@ class Administrators extends ObjectEditor
 		$login = $_REQUEST['login'];
 		$newAdmin = new User();
 		$barcodeProperty = $configArray['Catalog']['barcodeProperty'];
-		
+
 		$newAdmin->$barcodeProperty = $login;
 		$newAdmin->find();
 		if ($newAdmin->N == 1){

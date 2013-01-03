@@ -218,6 +218,7 @@ class Home extends Action{
 			{
 				$interface->assign('staffDetails', $this->getStaffView($eContentRecord));
 				$interface->assign('hasMarcRecord', true);
+				$this->loadNotes($eContentRecord);
 			}
 
 			// Display Page
@@ -378,5 +379,38 @@ class Home extends Action{
 			}
 			$timer->logTime('Got next/previous links');
 		}
+	}
+	
+	function loadNotes($eContentRecord) {
+		global $interface;
+		$marc = new File_MARC($eContentRecord->getNormalizedMarcRecord(), File_MARC::SOURCE_STRING);
+		if (!($marcRecord = $marc->next())) {
+			PEAR::raiseError(new PEAR_Error('Could not load marc record for record ' . $record['id']));
+		}
+		$notes = array();
+		
+		$marcFields500 = $marcRecord->getFields('500');
+		$marcFields504 = $marcRecord->getFields('504');
+		$marcFields505 = $marcRecord->getFields('505');
+		$marcFields511 = $marcRecord->getFields('511');
+		$marcFields518 = $marcRecord->getFields('518');
+		$marcFields520 = $marcRecord->getFields('520');
+		if ($marcFields500 || $marcFields504 || $marcFields505 || $marcFields511 || $marcFields518 || $marcFields520){
+			$allFields = array_merge($marcFields500, $marcFields504, $marcFields505, $marcFields511, $marcFields518, $marcFields520);
+			foreach ($allFields as $marcField){
+				foreach ($marcField->getSubFields() as $subfield){
+					$note = $subfield->getData();
+					if ($subfield->getCode() == 't'){
+						$note = "&nbsp;&nbsp;&nbsp;" . $note;
+					}
+					$note = trim($note);
+					if (strlen($note) > 0){
+						$notes[] = $note;
+					}
+				}
+		
+			}
+		}
+		$interface->assign('notes', $notes);
 	}
 }

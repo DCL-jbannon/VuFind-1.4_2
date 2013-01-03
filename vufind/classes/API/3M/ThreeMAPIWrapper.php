@@ -1,10 +1,11 @@
 <?php
+interface IThreeMAPIWrapper{}
 require_once dirname(__FILE__).'/ThreeMApiUtils.php';
 
-
-class ThreeMAPIWrapper
+class ThreeMAPIWrapper implements IThreeMAPIWrapper
 {
 	const apiVersion = "1.0";
+	const baseUriPath = "/cirrus/library/";
 	
 	const uriPathGetItemDetails = "/item";
 	const uriPathGetItemsDetails = "/items";
@@ -15,6 +16,8 @@ class ThreeMAPIWrapper
 	const uriPathCirculationItem = "/circulation/item";
 	const uriPathCirculationItems = "/circulation/items";
 	const uriPathPatronCirculation = "/circulation/patron";
+	
+	private $libraryId;
 	private $baseLibraryUrl;
 	private $accesKey;
 	private $ch;
@@ -22,11 +25,14 @@ class ThreeMAPIWrapper
 	//For CheckOut Method
 	private $putBodyRead = false;
 	
-	public function __construct($baseLibraryUrl, $accesKey)
+	public function __construct()
 	{
-		$this->baseLibraryUrl = $baseLibraryUrl;
-		$this->accesKey = $accesKey;
+		global $configArray;
+		$this->libraryId = $configArray['3MAPI']['libraryId'];
+		$this->baseLibraryUrl = $configArray['3MAPI']['url'].self::baseUriPath.$this->libraryId;
+		$this->accesKey = $configArray['3MAPI']['accesKey'];
 	}
+	
 	
 	public function getItemDetails($itemId)
 	{
@@ -44,24 +50,40 @@ class ThreeMAPIWrapper
 		return $this->executeGetCall($uriPath);
 	}
 	
-	public function checkout($checkOutData)
+	public function checkout($itemId, $patronId)
 	{
-		return $this->executePutCall(self::uriPathCheckOutItem, $checkOutData);
+		$requestBody  = "<CheckoutRequest>";
+		$requestBody .= "<ItemId>".$itemId."</ItemId>";
+		$requestBody .= "<PatronId>".$patronId."</PatronId>";
+		$requestBody .= "</CheckoutRequest>";
+		return $this->executePutCall(self::uriPathCheckOutItem, $requestBody);
 	}
 	
-	public function placeHold($placeHoldData)
+	public function placeHold($itemId, $patronId)
 	{
-		return $this->executePutCall(self::uriPathPlaceHoldItem, $placeHoldData);
+		$requestBody  = "<PlaceHoldRequest>";
+		$requestBody .= "<ItemId>".$itemId."</ItemId>";
+		$requestBody .= "<PatronId>".$patronId."</PatronId>";
+		$requestBody .= "</PlaceHoldRequest>";
+		return $this->executePutCall(self::uriPathPlaceHoldItem, $requestBody);
 	}
 	
-	public function cancelHold($cancelHoldData)
+	public function cancelHold($itemId, $patronId)
 	{
-		return $this->executeCallReturnHttpCode($cancelHoldData, self::uriPathCancelHoldItem);
+		$requestBody  = "<CancelHoldRequest>";
+		$requestBody .= "<ItemId>".$itemId."</ItemId>";
+		$requestBody .= "<PatronId>".$patronId."</PatronId>";
+		$requestBody .= "</CancelHoldRequest>";
+		return $this->executeCallReturnHttpCode($requestBody, self::uriPathCancelHoldItem);
 	}
 	
-	public function checkin($checkInData)
+	public function checkin($itemId, $patronId)
 	{
-		return $this->executeCallReturnHttpCode($checkInData, self::uriPathCheckInItem);
+		$requestBody  = "<CheckinRequest>";
+		$requestBody .= "<ItemId>".$itemId."</ItemId>";
+		$requestBody .= "<PatronId>".$patronId."</PatronId>";
+		$requestBody .= "</CheckinRequest>";
+		return $this->executeCallReturnHttpCode($requestBody, self::uriPathCheckInItem);
 	}
 	
 	public function getItemCirculation($itemId)
@@ -100,7 +122,6 @@ class ThreeMAPIWrapper
 		return $this->exec();
 	}
 	
-	
 	private function executeCallReturnHttpCode($data, $uriPath)
 	{
 		$threeMheaders = $this->getThreeMHeaders($uriPath, ThreeMAPIUtils::postRequest);
@@ -134,7 +155,7 @@ class ThreeMAPIWrapper
 	
 	private function getThreeMHeaders($uriPath, $requestType)
 	{
-		return ThreeMAPIUtils::getHeadersArray($this->accesKey, $requestType, $uriPath, self::apiVersion);
+		return ThreeMAPIUtils::getHeadersArray($this->accesKey, $requestType, $this->getBaseUriPath().$uriPath, self::apiVersion);
 	}
 	
 	
@@ -155,7 +176,8 @@ class ThreeMAPIWrapper
 	
 	private function setCommonOptions($threeMheaders, $uriPath)
 	{
-		$url = $this->baseLibraryUrl.$uriPath;//var_dump($url);
+		$url = $this->baseLibraryUrl.$uriPath;
+		//var_dump($url);
 		curl_setopt($this->ch, CURLOPT_HTTPHEADER, $threeMheaders);
 		
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
@@ -173,14 +195,16 @@ class ThreeMAPIWrapper
 	private function exec()
 	{
 		$result = curl_exec($this->ch);	
+		//var_dump($result);
 		$this->closeChannel();
 		return simplexml_load_string($result);
 	}
 	
 	private function execReturnHttpCode()
 	{
-		curl_exec($this->ch);
+		$resultBody = curl_exec($this->ch);
 		$result = curl_getinfo($this->ch,CURLINFO_HTTP_CODE);
+		//var_dump($resultBody);
 		$this->closeChannel();
 		return $result;
 	}
@@ -188,8 +212,12 @@ class ThreeMAPIWrapper
 	private function closeChannel()
 	{
 		curl_close($this->ch);
-	}
+	}	
 	
+	
+	public function getBaseUriPath()
+	{
+		return self::baseUriPath.$this->libraryId;
+	}
 }
-
 ?>

@@ -346,7 +346,6 @@ class SearchObject_SolrAuth extends SearchObject_Base
                 }
             }
         }
-
         // If we are only searching one field use the DisMax handler
         //    for that field. If left at null let solr take care of it
         if (count($search) == 1 && isset($search[0]['index'])) {

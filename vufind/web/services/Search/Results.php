@@ -36,6 +36,7 @@ class Results extends Action {
 		global $configArray;
 		global $timer;
 		global $user;
+		global $analytics;
 
 		$searchSource = isset($_REQUEST['searchSource']) ? $_REQUEST['searchSource'] : 'local';
 
@@ -169,7 +170,6 @@ class Results extends Action {
 		
 		// Process Search
 		$result = $searchObject->processSearch(true, true);
-		//die(print_r($result)); //Real query to Sol)
 		if (PEAR::isError($result)) {
 			PEAR::raiseError($result->getMessage());
 		}
@@ -232,6 +232,9 @@ class Results extends Action {
 		$interface->assign('showRatings', $showRatings);
 
 		$numProspectorTitlesToLoad = 0;
+		$allSearchSources = SearchSources::getSearchSources();
+		$translatedSearch = $allSearchSources[$searchSource]['name'];
+		$analytics->addSearch($translatedSearch, $searchObject->displayQuery(), $searchObject->isAdvanced(), $searchObject->getFullSearchType(), $searchObject->hasAppliedFacets(), $searchObject->getResultTotal());
 		if ($searchObject->getResultTotal() < 1) {
 			
 			//Var for the IDCLREADER TEMPLATE

@@ -4,7 +4,7 @@
  */
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
-require_once 'sys/SolrDataObject.php';
+require_once dirname(__FILE__).'/../SolrDataObject.php';
 
 interface IEContentItem{}
 

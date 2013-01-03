@@ -1,5 +1,5 @@
 <?php
-
+//http://ebook.3m.com/library/DouglasCountyLibraries-query-go-not_in_stock_items-exclude-physical_items-exclude-not_loanable_items-include-sort-year_of_publication-page-1-search/
 require_once dirname(__FILE__).'/../../../vufind/classes/API/3M/ThreeMAPIWrapper.php';
 
 class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
@@ -8,19 +8,33 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	const accesKey = "zJyecxf45LQjJelZ";
 	const patronId = "23025006182976";
 	
-	//private $baseLibraryUrl = "http://localhost:9090/";
-	private $baseLibraryUrl = "https://cloudlibraryapi.3m.com/cirrus/library/";
+	//private $base3MUrl = "http://localhost:9090";
+	private $base3MUrl = "https://cloudlibraryapi.3m.com";
 	private $service;
-	private $itemId = "ff3r9";
-	private $itemPlaceHoldId = "gn9r9";
+	private $itemId = "bevug9";
+	private $itemPlaceHoldId = "eb85z9";
 	private $itemIdCanNOTCHECK = "uwfz9";
 	
 	public function setUp()
 	{
-		
-		$this->baseLibraryUrl .= self::libraryId;
-		$this->service = new ThreeMAPIWrapper($this->baseLibraryUrl, self::accesKey);
+		global $configArray;
+		$configArray['3MAPI']['url'] = $this->base3MUrl;
+		$configArray['3MAPI']['libraryId'] = self::libraryId;
+		$configArray['3MAPI']['accesKey'] = self::accesKey;
+		$this->service = new ThreeMAPIWrapper();
 		parent::setUp();		
+	}
+	
+	/**
+	* method getBaseUriPath 
+	* when called
+	* should returnCorrectString
+	*/
+	public function test_getBaseUriPath_called_returnCorrectString()
+	{
+		$expected = ThreeMAPIWrapper::baseUriPath.self::libraryId;
+		$actual = $this->service->getBaseUriPath();
+		$this->assertEquals($expected, $actual);
 	}
 	
 	/**
@@ -55,7 +69,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	public function test_getItemsDetails_called_executesCorrectly()
 	{
 		$expected[0] = $this->itemId;
-		$expected[1] = "gn9r8";
+		$expected[1] = $this->itemPlaceHoldId;
 		$actual = $this->service->getItemsDetails($expected[0].",".$expected[1]);
 		$this->assertEquals($expected[0], (string)$actual->Item[0]->ItemId);
 		$this->assertEquals($expected[1], (string)$actual->Item[1]->ItemId);
@@ -69,9 +83,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	public function test_checkout_canBeCheckOut_executesCorrectly()
 	{
 		$expected = $this->itemId;
-		$requestBody = $this->getBodyCheckOut($expected);
-		
-		$actual = $this->service->checkout($requestBody);
+		$actual = $this->service->checkout($this->itemId, self::patronId);
 		$this->assertEquals($expected, (string)$actual->ItemId);
 		$this->assertNotEmpty((string)$actual->DueDateInUTC);
 	}
@@ -84,20 +96,8 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	public function test_checkout_canNOTBeCheckOut_executesCorrectly()
 	{
 		$expected = "Error";
-		$requestBody = $this->getBodyCheckOut($this->itemIdCanNOTCHECK);
-			
-		$actual = $this->service->checkout($requestBody);
+		$actual = $this->service->checkout($this->itemIdCanNOTCHECK, self::patronId);
 		$this->assertEquals($expected, (string)$actual->getName());
-	}
-	
-	
-	private function getBodyCheckOut($itemId)
-	{
-		$requestBody  = "<CheckoutRequest>";
-		$requestBody .= "<ItemId>".$itemId."</ItemId>";
-		$requestBody .= "<PatronId>".self::patronId."</PatronId>";
-		$requestBody .= "</CheckoutRequest>";
-		return $requestBody;
 	}
 	
 	
@@ -108,14 +108,8 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	 */
 	public function test_checkin_canBeCheckIn_executesCorrectly()
 	{
-		$expected = 200;
-	
-		$requestBody  = "<CheckinRequest>";
-		$requestBody .= "<ItemId>".$this->itemId."</ItemId>";
-		$requestBody .= "<PatronId>".self::patronId."</PatronId>";
-		$requestBody .= "</CheckinRequest>";
-	
-		$actual = $this->service->checkin($requestBody);
+		$expected = 200;	
+		$actual = $this->service->checkin($this->itemId, self::patronId);
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -127,13 +121,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	public function test_checkin_canNOTBeCheckIn_executesCorrectly()
 	{
 		$expected = 404;
-	
-		$requestBody  = "<CheckinRequest>";
-		$requestBody .= "<ItemId>".$this->itemIdCanNOTCHECK."</ItemId>";
-		$requestBody .= "<PatronId>".self::patronId."</PatronId>";
-		$requestBody .= "</CheckinRequest>";
-	
-		$actual = $this->service->checkin($requestBody);
+		$actual = $this->service->checkin($this->itemId, self::patronId);
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -147,14 +135,21 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	{
 		$expected = $this->itemPlaceHoldId;
 		
-		$requestBody  = "<PlaceHoldRequest>";
-		$requestBody .= "<ItemId>".$this->itemPlaceHoldId."</ItemId>";
-		$requestBody .= "<PatronId>".self::patronId."</PatronId>";
-		$requestBody .= "</PlaceHoldRequest>";
-		
-		$actual = $this->service->placeHold($requestBody);
+		$actual = $this->service->placeHold($this->itemPlaceHoldId, self::patronId);
 		$this->assertEquals($expected, (string)$actual->ItemId);
 		$this->assertNotEmpty((string)$actual->AvailabilityDateInUTC);
+	}
+	
+	/**
+	 * method placeHold
+	 * when calledAgain
+	 * should returnError
+	 */
+	public function test_placeHold_calledAgain_returnError()
+	{
+		$expected = "Error";
+		$actual = $this->service->placeHold($this->itemPlaceHoldId, self::patronId);
+		$this->assertEquals($expected, (string)$actual->getName());
 	}
 	
 	/**
@@ -164,17 +159,23 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	 */
 	public function test_cancelHold_called_executesCorrectly()
 	{
-		$expected = 200;
-	
-		$requestBody  = "<CancelHoldRequest>";
-		$requestBody .= "<ItemId>".$this->itemPlaceHoldId."</ItemId>";
-		$requestBody .= "<PatronId>".self::patronId."</PatronId>";
-		$requestBody .= "</CancelHoldRequest>";
-	
-		$actual = $this->service->cancelHold($requestBody);
+		$expected = 200;	
+		$actual = $this->service->cancelHold($this->itemPlaceHoldId, self::patronId);
 		$this->assertEquals($expected, $actual);
 	}
 	
+	
+	/**
+	 * method getItemCirculation
+	 * when doesNotExists
+	 * should returnErrorMessage
+	 */
+	public function test_getItemCirculationa_doesNotExists_executesCorrectly()
+	{
+		$expected = "Error";
+		$actual = $this->service->getItemCirculation("IdDoesNotExists");
+		$this->assertEquals($expected, (string)$actual->getName());
+	}
 	
 	/**
 	* method getItemCirculation 
@@ -188,6 +189,18 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, (string)$actual->ItemId);
 		$this->assertTrue(isset($actual->TotalCopies), "TotalCopies property");
 		$this->assertTrue(isset($actual->AvailableCopies), "AvailableCopies property");
+	}
+	
+	/**
+	 * method getItemsCirculation
+	 * when oneOrMoreItemIdIsNotValid
+	 * should executesCorrectly
+	 */
+	public function test_getItemsCirculation_oneOrMoreItemIdIsNotValid_executesCorrectly()
+	{
+		$expected = "Error";
+		$actual = $this->service->getItemsCirculation($this->itemPlaceHoldId.",ThisItemIdIsNotValid");
+		$this->assertEquals($expected, (string)$actual->getName());
 	}
 	
 	/**
@@ -215,6 +228,16 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected ,(string)$actual->PatronId);
 	}	
 	
+	/**
+	 * method getPatronCirculation
+	 * when wrongPatronId
+	 * should executesCorrectly
+	 */
+	public function test_getPatronCirculation_wrongPatronId_executesCorrectly()
+	{
+		$expected = $patronId = "aNonValidPatronId";
+		$actual = $this->service->getPatronCirculation($patronId);
+		$this->assertEquals($expected ,(string)$actual->PatronId);//Return Empty Lists, but Do not give a error message! :(
+	}	
 }
-
 ?>

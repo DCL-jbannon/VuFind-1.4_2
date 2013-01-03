@@ -4,9 +4,12 @@
  */
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
+require_once dirname(__FILE__).'/EContentItem.php';
 require_once dirname(__FILE__).'/../SolrDataObject.php';
 require_once dirname(__FILE__).'/../../../classes/interfaces/IEContentRecord.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/RegularExpressions.php';
+require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
+
 
 class EContentRecord extends SolrDataObject implements IEContentRecord{
 	public $__table = 'econtent_record';    // table name
@@ -986,13 +989,38 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		$formats = array();
 		//Load itmes for the record
 		$items = $this->getItems(false);
-		if (strcasecmp($this->source, 'OverDrive') == 0){
-			foreach ($items as $item){
-				$formatValue = translate((isset($item->format) ? $item->format : ''));
-				$formats[$formatValue] = $formatValue;
+		
+		$detailsEcontent = EcontentDetailsFactory::get($this);
+		if($detailsEcontent !== false)
+		{
+			return array($detailsEcontent->getFormats());
+		}
+		elseif ($this->isOverDrive())
+		{
+			foreach ($items as $item)
+			{
+				if(isset($item->links))
+				{
+					foreach($item->links as $link)
+					{
+						if (!empty($formats[0]))
+						{
+							$formats[0] .= ", ";
+						}
+						else
+						{
+							$formats[0] = "";
+						}
+						$formats[0] .= $link['format'];
+					}
+				}
+				
 			}
-		}else{
-			foreach ($items as $item){
+		}
+		else
+		{
+			foreach ($items as $item)
+			{
 				$formatValue = translate($item->item_type);
 				$formats[$formatValue] = $formatValue;
 			}
@@ -1084,11 +1112,17 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 	}
 
 	private $items = null;
-	function getItems($reload = false){
+	function getItems($reload = false)
+	{
+		if ($this->isOverDrive())
+		{
+			$this->items = $this->_getOverDriveItems($reload);
+			return $this->items;
+		}
 		if ($this->items == null || $reload){
 			$this->items = array();
 
-			require_once 'sys/eContent/EContentItem.php';
+			
 			$eContentItem = new EContentItem();
 			$eContentItem->recordId = $this->id;
 			$eContentItem->find();
@@ -1096,10 +1130,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 				$this->items[] = clone $eContentItem;
 			}
 
-			if ($this->isOverDrive())
-			{
-				$this->items = $this->_getOverDriveItems($reload);
-			}
+			
 		}
 		return $this->items;
 	}

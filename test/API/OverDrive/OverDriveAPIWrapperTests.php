@@ -81,6 +81,7 @@ class OverDriveAPIWrapperTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($itemId,$result->id);
 		$this->assertNotEmpty($result->mediaType);
 	}
+
 	
 }
 

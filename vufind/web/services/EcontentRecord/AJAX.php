@@ -12,6 +12,8 @@ class AJAX extends Action {
 	}
 
 	function launch() {
+		global $analytics;
+		$analytics->disableTracking();
 		$method = $_GET['method'];
 		if (in_array($method, array('RateTitle', 'GetSeriesTitles', 'GetComments', 'DeleteItem', 'SaveComment', 'CheckoutOverDriveItem', 'PlaceOverDriveHold', 'AddOverDriveRecordToWishList', 'RemoveOverDriveRecordFromWishList', 'CancelOverDriveHold'))){
 			header('Content-type: text/plain');
@@ -59,20 +61,43 @@ class AJAX extends Action {
 		$holdings = $driver->getHolding($id);
 		$showEContentNotes = false;
 		$showSize = false;
-		foreach ($holdings as $holding){
+		
+		foreach ($holdings as $holding)
+		{
 			if (strlen($holding->notes) > 0){
 				$showEContentNotes = true;
 			}
-			if ($holding instanceof OverdriveItem){
-			if (is_numeric($holding->size)){
+			
+			if(isset($holding->size))
+			{
+				$showSize=true;
+			}
+			elseif ($holding instanceof OverdriveItem)
+			{
+				if (is_numeric($holding->size))
+				{
 					$showSize = true;
 				}
-			}else{
-				if ($holding->getSize() != 'Unknown'){
+			}
+			else
+			{
+				if ($holding->getSize() != 'Unknown')
+				{
 					$showSize = true;
 				}
 			}
 		}
+
+		$interface->assign('showAddItemButton',true);
+		
+		$detailsEcontent = EcontentDetailsFactory::get($eContentRecord);
+		if($detailsEcontent !== false)
+		{
+			$interface->assign('showAddItemButton', $detailsEcontent->showAddItemButton());
+		}
+		
+		
+		$interface->assign('isOverDrive', $eContentRecord->isOverDrive());
 		$interface->assign('source', $eContentRecord->source);
 		$interface->assign('showEContentNotes', $showEContentNotes);
 		$interface->assign('showSize', $showSize);

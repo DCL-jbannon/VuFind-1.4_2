@@ -1,6 +1,5 @@
 <?php
 
-
 class EContentFormatType
 {
 	const eVideo = 'eVideo';

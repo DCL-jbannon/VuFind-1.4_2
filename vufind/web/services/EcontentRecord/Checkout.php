@@ -18,13 +18,15 @@
  *
  */
 
-require_once 'Drivers/EContentDriver.php';
-
 require_once 'Action.php';
+require_once 'Drivers/EContentDriver.php';
+require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
 
-class Checkout extends Action{
+class Checkout extends Action
+{
 	
-	function launch(){
+	function launch()
+	{
 		global $interface;
 		global $configArray;
 		global $user;
@@ -38,48 +40,84 @@ class Checkout extends Action{
 		//Get title information for the record.
 		$eContentRecord = new EContentRecord();
 		$eContentRecord->id = $id;
-		if (!$eContentRecord->find(true)){
+		if (!$eContentRecord->find(true))
+		{
 			PEAR::raiseError("Unable to find eContent record for id: $id");
 		}
 		
-		if (isset($_POST['submit']) || $user) {
-			if (isset($_REQUEST['username']) && isset($_REQUEST['password'])){
+		if (isset($_POST['submit']) || $user) 
+		{
+			if (isset($_REQUEST['username']) && isset($_REQUEST['password']))
+			{
 				//Log the user in
 				$user = UserAccount::login();
 			}
 
-			if (!PEAR::isError($user) && $user){
-				//The user is already logged in
-				$return = $driver->checkoutRecord($id, $user);
-				$interface->assign('result', $return['result']);
-				$message = $return['message'];
-				$interface->assign('message', $message);
-				$showMessage = true;
-			} else {
+			if (!PEAR::isError($user) && $user)
+			{
+				$econtentDetails = EcontentDetailsFactory::get($eContentRecord);
+				
+				if($econtentDetails !== false)
+				{
+					$result = $econtentDetails->checkout($user->getBarcode());
+					if($result === false)
+					{
+						$return = false;
+						$interface->assign('result', $return);
+						$interface->assign('message', "The item could not be checked out.");
+						$showMessage = true;
+					}
+					else
+					{
+						$return = true;
+						$interface->assign('result', $return);
+						$interface->assign('message', "The item has been checked out.");
+						$showMessage = true;
+					}
+				}
+				else
+				{
+					//The user is already logged in
+					$return = $driver->checkoutRecord($id, $user);
+					$interface->assign('result', $return['result']);
+					$message = $return['message'];
+					$interface->assign('message', $message);
+					$showMessage = true;
+				}
+			} 
+			else
+			{
 				$message = 'Incorrect Patron Information';
 				$interface->assign('message', $message);
 				$interface->assign('focusElementId', 'username');
 				$showMessage = true;
 			}
-		} else{
+		}
+		else
+		{
 			//Get the referrer so we can go back there.
-			if (isset($_SERVER['HTTP_REFERER'])){
+			if (isset($_SERVER['HTTP_REFERER']))
+			{
 				$referer = $_SERVER['HTTP_REFERER'];
 				$_SESSION['checkout_referrer'] = $referer;
 			}
 
 			//Showing checkout form.
-			if (!PEAR::isError($user) && $user){
+			if (!PEAR::isError($user) && $user)
+			{
 				//set focus to the submit button if the user is logged in since the campus will be correct most of the time.
 				$interface->assign('focusElementId', 'submit');
-			}else{
+			}
+			else
+			{
 				//set focus to the username field by default.
 				$interface->assign('focusElementId', 'username');
 			}
 
 		}
 		
-		if (isset($return) && $showMessage) {
+		if (isset($return) && $showMessage)
+		{
 			$hold_message_data = array(
               'successful' => $return['result'] ? 'all' : 'none',
               'error' => isset($return['error']) ? $return['error'] : null,
@@ -87,9 +125,10 @@ class Checkout extends Action{
 			$return,
 			),
 			);
-
+			
 			$_SESSION['checkout_message'] = $hold_message_data;
-			if (isset($_SESSION['checkout_referrer'])){
+			if (isset($_SESSION['checkout_referrer']))
+			{
 				$logger->log('Checkout Referrer is set, redirecting to there.  type = ' . $_REQUEST['type'], PEAR_LOG_INFO);
 
 				header("Location: " . $_SESSION['checkout_referrer']);
@@ -98,12 +137,15 @@ class Checkout extends Action{
 					unset($_SESSION['autologout']);
 					UserAccount::softLogout();
 				}
-				
-			}else{
+			}
+			else
+			{
 				$logger->log('No referrer set, but there is a message to show, go to the main eContent page', PEAR_LOG_INFO);
 				header("Location: " . $configArray['Site']['url'] . '/MyResearch/EContentCheckedOut');
 			}
-		} else {
+		}
+		else
+		{
 			//Var for the IDCLREADER TEMPLATE
 			$interface->assign('ButtonBack',true);
 			$interface->assign('ButtonHome',true);
@@ -117,5 +159,4 @@ class Checkout extends Action{
 			$interface->display('layout.tpl', 'RecordHold' . $_GET['id']);
 		}
 	}
-
 }

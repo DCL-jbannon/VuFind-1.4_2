@@ -357,4 +357,9 @@ class User extends DB_DataObject
 			return false;
 		}
 	}
+	
+	public function getBarcode()
+	{
+		return $this->cat_username;
+	}
 }

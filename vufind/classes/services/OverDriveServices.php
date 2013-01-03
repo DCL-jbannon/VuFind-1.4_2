@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__).'/../Utils/EContentFormatType.php';
 require_once dirname(__FILE__).'/../Utils/RegularExpressions.php';
 require_once dirname(__FILE__).'/../FileMarc/FileMarc.php';

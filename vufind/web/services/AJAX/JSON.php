@@ -29,6 +29,9 @@ class JSON extends Action {
 
 	function launch()
 	{
+		global $analytics;
+		$analytics->disableTracking();
+
 		//header('Content-type: application/json');
 		header('Content-type: text/html');
 		header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1

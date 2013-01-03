@@ -8,17 +8,33 @@ class ThreeMAPIUtilsTests extends PHPUnit_Framework_TestCase
 	
 	private $service;
 	const timestamp = "1351876249";
-	const authStringGet = "MTE2N2I1MzkzNmQwNzk1OGM0MjNlMjMwNzhlYzZjMDU4YWJjZjhhZDlkYzY4NWI1MDM2YjJjNjI0MTJkNDg0MQ==";
-	const authStringPost = "YjM3ZDYyZDZmNTRkZmM2MTkwZDg0OWExMWY5YzQwMGZiY2QzMjEwMWY0NjczOWQyMmUxY2UwMDIwNDIyZGRiYg==";
-	const authStringPut = "YWM5OWFiZjIxMzhiMDBmOWVmNDc3NTJlODgzYzU1YWFkOTI3Yzc4ODJkYTQ2NzFkZGI2MGE3Njc5ZjA2NTYzMA==";
-	const authStringDelete = "MTU2YmFiYTM3NGJiY2U2MjQzODQwMTM4Y2Q1YjAyYTU0MTBiZTI1ZTc1YmUwZGRkMTYyZTlmNmYzN2MwMTcxZg==";
-	const datetime = "Fri, 02 Nov 2012 17:10:49 GMT";
+	const authStringGet = "EWe1OTbQeVjEI+IweOxsBYq8+K2dxoW1A2ssYkEtSEE=";
+	const authStringPost = "s31i1vVN/GGQ2EmhH5xAD7zTIQH0ZznSLhzgAgQi3bs=";
+	const authStringPut = "rJmr8hOLAPnvR3UuiDxVqtknx4gtpGcd22CnZ58GVjA=";
+	const authStringDelete = "FWuro3S7zmJDhAE4zVsCpUEL4l51vg3dFi6fbzfAFx8=";
+	const datetime = "Fri, 02 Nov 2012 17:10:49 GMT";	
 	
 	/**
-	* method getDatetime
+	* method getAuthorization 
 	* when called
-	* should returnCorrectDate
+	* should returnExpectedStringAs3MExample
 	*/
+	public function test_getAuthorization_called_returnExpectedStringAs3MExample()
+	{
+		$expected = "mTFTtgDEu4Ewg4TuQVlNt2Pdej2tVi+3kNzytLRhKwM=";
+		$requestType = ThreeMAPIUtils::putRequest;
+		$uriPath = "/checkout";
+		$realSecretKey = "zJyecxf45LQjJelZ";
+		$timestamp = gmmktime(17, 01, 57, 12, 6, 2012);
+		$actual = ThreeMAPIUtils::getAuthorization($realSecretKey, $requestType, $uriPath, $timestamp);
+		$this->assertEquals($expected, $actual);
+	}
+	
+	/**
+	 * method getDatetime
+	 * when called
+	 * should returnCorrectDate
+	 */
 	public function test_getDatetime_called_returnCorrectDate()
 	{
 		$expected = self::datetime;
@@ -39,8 +55,9 @@ class ThreeMAPIUtilsTests extends PHPUnit_Framework_TestCase
 		$uriPath = "a Dummy URI path";
 		$secretKey = "a Dummy Secret Key";
 	
-		$actual = ThreeMAPIUtils::getAuthorization($secretKey, $requestType, $uriPath,self::timestamp);
+		$actual = ThreeMAPIUtils::getAuthorization($secretKey, $requestType, $uriPath, self::timestamp);
 		$this->assertEquals($expected, $actual, self::timestamp);
+		
 	}
 	
 	/**
@@ -132,6 +149,19 @@ class ThreeMAPIUtilsTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 	
+	/**
+	* method getUTCDaysDiference 
+	* when called
+	* should returnCorrectly
+	*/
+	public function test_getDaysDiference_called_returnCorrectly()
+	{
+		$expected = "6";
+		$dateStart = "2012-05-23T13:23:34";
+		$dateEnd = "2012-05-29T14:25:39";
+		$actual = ThreeMAPIUtils::getUTCDaysDiference($dateStart, $dateEnd);
+		$this->assertEquals($expected, $actual);
+	}
+		
 }
-
 ?>

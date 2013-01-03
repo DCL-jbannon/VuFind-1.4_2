@@ -38,6 +38,7 @@ if ( (count($_GET) === 0) || ( !isset($_GET['id']) || empty($_GET['id']) ) )
 $size = ((isset($_GET['size']) ? $_GET['size'] : "large"));
 $id = $_GET['id'];
 $nameFile = (isEcontentBookCover() ? "eContent" : "").$id;
+
 $localFile = $bookCoverPath.'/'.$size.'/'.$nameFile.'.jpg';
 
 if(!isset($_GET['reload']))

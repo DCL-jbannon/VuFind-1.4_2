@@ -135,5 +135,4 @@ class SolrDriver implements ISolrDriver
 	}
 	
 }
-
 ?>

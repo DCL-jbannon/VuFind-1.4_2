@@ -547,6 +547,8 @@ StrandsTrack.push({
    event:"visited",
    item: "{/literal}{$id|escape}{literal}"
 });
+
+
 </script>
 {/literal}
 {if $chiliFreshAccount}

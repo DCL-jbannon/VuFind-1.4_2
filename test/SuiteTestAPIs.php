@@ -10,6 +10,7 @@ require_once dirname(__FILE__).'/API/Freegal/FreegalAPIWrapperTests.php';
 require_once dirname(__FILE__).'/API/Freegal/FreegalAPIServicesTests.php';
 require_once dirname(__FILE__).'/API/3M/ThreeMAPIUtilsTests.php';
 require_once dirname(__FILE__).'/API/3M/ThreeMAPIWrapperTests.php';
+require_once dirname(__FILE__).'/API/3M/ThreeMAPITests.php';
 
 class SuiteAPIsTests
 {
@@ -26,6 +27,7 @@ class SuiteAPIsTests
 		$suite->addTestSuite('FreegalAPIServicesTests');
 		$suite->addTestSuite('ThreeMAPIUtilsTests');
 		$suite->addTestSuite('ThreeMAPIWrapperTests');
+		$suite->addTestSuite('ThreeMAPITests');
 		return $suite;
 	}
 }

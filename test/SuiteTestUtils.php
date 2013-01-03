@@ -21,13 +21,13 @@ require_once dirname(__FILE__).'/classes/covers/SyndeticsCoversTests.php';
 require_once dirname(__FILE__).'/classes/covers/OverDriveCoversTests.php';
 require_once dirname(__FILE__).'/classes/covers/AttachedEcontentCoversTests.php';
 require_once dirname(__FILE__).'/classes/covers/ThreeMCoversTests.php';
+require_once dirname(__FILE__).'/Utils/ThreeMUtilsTests.php';
 
 class SuiteUtilsTests
 {
 	public static function suite()
 	{
 		$suite = new PHPUnit_Framework_TestSuite('Util-Tests');
-
 		$suite->addTestSuite('ArrayUtilsTests');
 		$suite->addTestSuite('CheckArgsTests');
 		$suite->addTestSuite('ObjectUtilsTests');
@@ -49,6 +49,7 @@ class SuiteUtilsTests
 		$suite->addTestSuite('AttachedEcontentCoversTests');
 		$suite->addTestSuite('DateTimeUtilsTests');
 		$suite->addTestSuite('ThreeMCoversTests');
+		$suite->addTestSuite('ThreeMUtilsTests');
 		return $suite;
 	}
 }

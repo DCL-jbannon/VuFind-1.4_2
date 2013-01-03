@@ -1,1 +1,1 @@
-c:\xampp\php\phpunit.bat c:\projects\VuFind-Plus\test\SuiteTests.php
+c:\xampp\php\phpunit.bat %CD%\test\SuiteTests.php

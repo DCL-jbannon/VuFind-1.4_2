@@ -51,7 +51,6 @@ class OverdriveItem extends EContentItem {
 	 */
 	public $usageLink;
 	
-
 	function getUsageNotes(){
 		$notes = '';
 		if ($this->libraryId == -1){

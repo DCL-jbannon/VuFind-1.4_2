@@ -31,6 +31,8 @@ class AJAX extends Action {
 
 	function launch() {
 		global $timer;
+		global $analytics;
+		$analytics->disableTracking();
 		$method = $_GET['method'];
 		$timer->logTime("Starting method $method");
 		if (in_array($method, array('RateTitle', 'GetSeriesTitles', 'GetComments', 'SaveComment', 'SaveTag', 'SaveRecord'))){

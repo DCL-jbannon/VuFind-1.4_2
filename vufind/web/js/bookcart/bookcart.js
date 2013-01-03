@@ -3,13 +3,17 @@
 var bookBag = new Array();
 var bagErrors = new Array();
 var BAG_COOKIE = "book_BAG_COOKIE_vufind";
+var bookBagTop = 197;
 
-$(document).ready(function() { 
+$(document).ready(function() {	
 	// if bag not used on current page, then don't do anything
 	if ($("#book_bag #bag_items").length == 0) {
 		return;
 	}
-	
+
+	// capture "top" of the book bag
+	bookBagTop = $('#book_bag').offset().top;
+
 	// if we are printing, ignore update bag
 	var url = window.location.href;
 	if(url.indexOf('?' + 'print' + '=') != -1  || url.indexOf('&' + 'print' + '=') != -1) {
@@ -148,13 +152,13 @@ function toggleBagActionItems(show) {
 
 function toggleBagCanvas() {
  
-  /* $("#book_bag_canvas").animate({ 
+  /* $("#bag_content").animate({ 
 	  width: "600px",	 
 	}, 500 );
 	 */
 
 	/// for now just toggle, later animate
-	$('#book_bag_canvas').slideToggle('fast');
+	$('#bag_content').slideToggle('fast');
 	
 }
 
@@ -166,10 +170,16 @@ function toggleInBag(id, title, checkBox) {
 	book.id = id;
 	book.title = title; 
 	
-	if ($(checkBox).is(':checked')) {
+	if ($(checkBox).hasClass('add_to_cart')) {
 		_addToBag(book);
+		$(checkBox).removeClass('add_to_cart').addClass('in_cart');
+		$(checkBox).children('span.in_cart').show();
+		$(checkBox).children('span.add_to_cart').hide();
 	} else {
 		_removeFromBag(book);	
+		$(checkBox).removeClass('in_cart').addClass('add_to_cart');
+		$(checkBox).children('span.in_cart').hide();
+		$(checkBox).children('span.add_to_cart').show();
 	}
 	
 	_saveBagAsCookie();
@@ -243,6 +253,9 @@ function _removeFromBag(book) {
 		
 		if (current_book.id == book.id) {
 			bookBag.splice(j, 1);
+			$('#add_to_cart_' + book.id).children('span.in_cart').hide();
+			$('#add_to_cart_' + book.id).children('span.add_to_cart').show();
+			$('#add_to_cart_' + book.id).addClass('add_to_cart');
 		} else { j++; }
 
 	} 
@@ -259,6 +272,9 @@ function removeFromBagById(bookid) {
 		
 		if (current_book.id == bookid) {
 			bookBag.splice(j, 1);
+			$('#add_to_cart_' + bookid).children('span.in_cart').hide();
+			$('#add_to_cart_' + bookid).children('span.add_to_cart').show();
+			$('#add_to_cart_' + bookid).addClass('add_to_cart');
 		} else { j++; }
 
 	} 
@@ -318,10 +334,16 @@ function updateBag(){
 			current_book = bookBag[j];
 			$("#export" + current_book.id).attr("checked", "checked");
 			j++;
-		
+			
+			var recordPath = '/Record/';
+			var recordId = current_book.id;
+			if (recordId.indexOf('econtentRecord') != -1) {
+				recordPath = '/EcontentRecord/';
+				recordId = recordId.substring(14);
+			}
 			// update the list of bag items
 			var bagItem = "<div class=\"bag_book_title\">" +
-					"<a href ='" + path + "/Record/" + current_book.id + "' class=\"bag_title_link\">#" + j + ". " + current_book.title + "</a></div>" +
+					"<a href ='" + path + recordPath + recordId + "' class=\"bag_title_link\">#" + j + ". " + current_book.title + "</a></div>" +
 					"<div class=\"deleteIcon\">" + "<a href=\"#\" onClick=\"removeFromBagById('" + current_book.id + "');return false;\"><img src='" + path + "/images/silk/delete.png' alt='Remove' title='Remove from book cart'></a>"
 					"</div><br />";
 			$("#bag_items").append(bagItem);
@@ -329,25 +351,30 @@ function updateBag(){
 		
 		
 	} else {	
-		$("#bag_summary").text("0 items");
-		$("#bag_summary_header").text("0 items");
+		_updateBookCount();
 		$("#bag_items").empty();
-		$("#book_bag, #book_bag_canvas").hide();
+		$("#bag_content").hide();
 		$(".save_export_checkboxes").removeAttr("checked");
 	}
-
 	//checkItemSaveStatuses();
+	
+	// update "Add to cart" or "remove from cart" buttons
+	for (var i = 0; i < bookBag.length; i++) {
+		var recordId = bookBag[i].id;
+		$('#add_to_cart_' + recordId).children('span.in_cart').show();
+		$('#add_to_cart_' + recordId).children('span.add_to_cart').hide();
+	}
 }
 
 /** Checks the number of books in the bag and updates the count */
 function _updateBookCount() {
 	// update summary
-	var item_text = "items in book cart";
+	var item_text = "items";
 	if (bookBag.length == 1) 
-		item_text = "item in book cart";
-		
-	$("#bag_summary").text(bookBag.length + " " + item_text);	
-	$("#bag_summary_header").text(bookBag.length + " " + item_text);
+		item_text = "item";
+	var text = "Your book cart (" + bookBag.length + " " + item_text + ")";	
+	$("#bag_summary").text(text);	
+	$("#bag_summary_header").text(text);
 }
 
 function _displayBagErrors() {
@@ -502,3 +529,20 @@ function checkEmail(address){
 		return false;
 	}
 }
+
+$(window).scroll(function(event) {
+	// if bag not used on current page, then don't do anything
+	if ($("#book_bag #bag_items").length == 0) {
+		return;
+	}
+    var y = $(this).scrollTop();
+    if (y >= bookBagTop) {
+        if (!$('#fixed_container').hasClass('cling')) {
+            $('#fixed_container').addClass('cling');
+            $('#book_bag').addClass('cling');
+        }
+    } else {
+        $('#fixed_container').removeClass('cling');
+        $('#book_bag').removeClass('cling');
+    }
+});

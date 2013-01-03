@@ -3,7 +3,7 @@ var GetEContentRatingsList = new Array();
 var GetSaveStatusList = new Array();
 var GetStatusList = new Array();
 var GetEContentStatusList = new Array();
-var GetOverDriveStatusList = new Array();
+var GetEcontentUniqueStatusList = new Array();
 
 function createRequestObject() {	
 	// find the correct xmlHTTP, works with IE, FF and Opera
@@ -58,14 +58,20 @@ function getThumbnail(id, imgname) {
 }
 
 function addIdToStatusList(id, type) {
-	if (type == undefined){
+	if (type == undefined)
+	{
 		type = 'VuFind';
 	}
-	if (type.toUpperCase() === 'VUFIND'){
+	if (type.toUpperCase() === 'VUFIND')
+	{
 		GetStatusList[GetStatusList.length] = id;
-	}else if (type.toUpperCase() == 'OVERDRIVE'){
-		GetOverDriveStatusList[GetOverDriveStatusList.length] = id;
-	}else{
+	}
+	else if (type.toUpperCase() == 'UNIQUE')
+	{
+		GetEcontentUniqueStatusList[GetEcontentUniqueStatusList.length] = id;
+	}
+	else
+	{
 		GetEContentStatusList[GetEContentStatusList.length] = id;
 	}
 }
@@ -259,13 +265,15 @@ function doGetStatusSummaries()
 		});
 	}
 	
-	// Get OverDrive status summaries one at a time since they take several
+	// Get econtent Unique status summaries one at a time since they take several
 	// seconds to load
-	for (var j=0; j<GetOverDriveStatusList.length; j++) {
-		var overDriveUrl = path + "/Search/AJAX?method=GetEContentStatusSummaries";
-		overDriveUrl += "&id[]=" + encodeURIComponent(GetOverDriveStatusList[j]);
+	for (var j=0; j<GetEcontentUniqueStatusList.length; j++) 
+	{	
+		var econtentUniqueUrl = path + "/Search/AJAX?method=GetEContentStatusSummaries";
+		econtentUniqueUrl += "&id[]=" + encodeURIComponent(GetEcontentUniqueStatusList[j]);
+		
 		$.ajax({
-			url: overDriveUrl, 
+			url: econtentUniqueUrl, 
 			success: function(data){
 				var items = $(data).find('item');
 				$(items).each(function(index, item){
@@ -306,7 +314,7 @@ function doGetStatusSummaries()
 	//Clear the status lists so we don't reprocess later if we need more status summaries.. 
 	GetStatusList = new Array();
 	GetEContentStatusList = new Array();
-	GetOverDriveStatusList = new Array();
+	GetEcontentUniqueStatusList = new Array();
 }
 
 function addRatingId(id, type){

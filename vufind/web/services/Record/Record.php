@@ -4,13 +4,9 @@
  * Copyright (C) Villanova University 2007.
  *
  */
-
 require_once 'Action.php';
-
 require_once 'File/MARC.php';
-
 require_once 'sys/Language.php';
-
 require_once 'services/MyResearch/lib/User.php';
 require_once 'services/MyResearch/lib/Resource.php';
 require_once 'services/MyResearch/lib/Resource_tags.php';

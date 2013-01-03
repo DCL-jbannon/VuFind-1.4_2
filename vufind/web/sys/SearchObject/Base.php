@@ -70,6 +70,7 @@ abstract class SearchObject_Base
 	protected $savedSearch = false;
 	protected $searchType  = 'basic';
 	// Possible values of $searchType:
+	protected $isAdvanced = false;
 	protected $basicSearchType = 'basic';
 	protected $advancedSearchType = 'advanced';
 	// Flag for logging/search history
@@ -184,7 +185,7 @@ abstract class SearchObject_Base
 			$this->filterList[$field][] = $value;
 		}
 	}
-	
+
 	/**
 	 * Remove a filter from the list.
 	 *
@@ -221,12 +222,16 @@ abstract class SearchObject_Base
 		return isset($this->facetConfig[$field]) ?
 		$this->facetConfig[$field] : ucwords(str_replace("_"," ",$field));
 	}
-	
+
 	/**
 	 * Clear all facets which will speed up searching if we won't be using the facets.
 	 */
 	public function clearFacets(){
 		$this->facetConfig = array();
+	}
+
+	public function hasAppliedFacets(){
+		return count($this->filterList) > 0;
 	}
 
 	/**
@@ -442,6 +447,10 @@ abstract class SearchObject_Base
 		return true;
 	}
 
+	public function isAdvanced(){
+		return $this->isAdvanced;
+	}
+
 	/**
 	 * Initialize the object's search settings for an advanced search found in the
 	 * $_REQUEST superglobal.  Advanced searches have numeric subscripts on the
@@ -452,6 +461,7 @@ abstract class SearchObject_Base
 	 */
 	protected function initAdvancedSearch()
 	{
+		$this->isAdvanced = true;
 		//********************
 		// Advanced Search logic
 		//  'lookfor0[]' 'type0[]'
@@ -471,7 +481,7 @@ abstract class SearchObject_Base
 					} else {
 						$type = $this->defaultIndex;
 					}
-					
+
 					//Marmot - search both ISBN-10 and ISBN-13
 					//Check to see if the search term looks like an ISBN10 or ISBN13
 					$lookfor = strip_tags($_REQUEST['lookfor'.$groupCount][$i]);
@@ -602,7 +612,7 @@ abstract class SearchObject_Base
 				$this->sort = $this->defaultSort;
 			}
 		}
-		//Validate the sort to make sure it is corrct.  
+		//Validate the sort to make sure it is corrct.
 		if (!array_key_exists($this->sort, $this->sortOptions)){
 			$this->sort = $this->defaultSort;
 		}
@@ -679,7 +689,7 @@ abstract class SearchObject_Base
 		if (isset($_REQUEST['searchSource'])){
 			$params[] = "searchSource=" . urlencode(strip_tags($_REQUEST['searchSource']));
 		}
-		
+
 		// Join all parameters with an escaped ampersand,
 		//   add to the base url and return
 		return $url . join("&", $params);
@@ -841,7 +851,7 @@ abstract class SearchObject_Base
 		}
 		return $list;
 	}
-	
+
 	/**
 	 * Basic 'getters'
 	 *
@@ -860,6 +870,13 @@ abstract class SearchObject_Base
 	public function getSearchId()       {return $this->searchId;}
 	public function getSearchTerms()    {return $this->searchTerms;}
 	public function getSearchType()     {return $this->searchType;}
+	public function getFullSearchType() {
+		if ($this->isAdvanced){
+			return $this->searchType;
+		}else{
+			return $this->searchType . ' - ' . $this->getSearchIndex();
+		}
+	}
 	public function getStartTime()      {return $this->initTime;}
 	public function getTotalSpeed()     {return $this->totalTime;}
 	public function getView()           {return $this->view;}
@@ -900,7 +917,7 @@ abstract class SearchObject_Base
 	{
 		return isset($this->limitOptions) ? $this->limitOptions : array();
 	}
-	
+
 	/**
 	 * Reset a simple query against the default index.
 	 *
@@ -929,6 +946,10 @@ abstract class SearchObject_Base
 	public function setLimit($limit)
 	{
 		$this->limit = $limit;
+	}
+
+	public function setSearchSource($searchSource){
+		$this->searchSource = $searchSource;
 	}
 
 	/**
@@ -1265,7 +1286,7 @@ abstract class SearchObject_Base
 	 *                              false if no search to restore, returns
 	 *                              PEAR_Error object in case of trouble.
 	 */
-	public function restoreSavedSearch($searchId = null, $redirect = true)
+	public function restoreSavedSearch($searchId = null, $redirect = true, $forceReload = false)
 	{
 		global $user;
 

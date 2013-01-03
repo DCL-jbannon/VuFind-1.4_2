@@ -75,7 +75,7 @@ public class OverDriveAPIWrapper implements IOverDriveAPIWrapper
 	private JSONObject execCallToAPIAndReturnResults(String accessToken, String Url) throws Exception
 	{
 		HttpURLConnection conn = this.getConnection(Url);
-		System.out.println(Url);
+		//System.out.println(Url);
 		conn.setRequestProperty("Authorization", "Bearer " + accessToken);
 		return this.getResults(conn);
 	}

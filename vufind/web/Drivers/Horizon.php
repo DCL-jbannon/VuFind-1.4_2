@@ -67,7 +67,6 @@ class Horizon implements DriverInterface{
 		global $configArray;
 	
 		$allItems = array();
-
 		$sipInitialized = $mysip != null;
 
 		global $locationSingleton;
@@ -79,7 +78,8 @@ class Horizon implements DriverInterface{
 
 		require_once 'sys/MarcLoader.php';
 		$marcRecord = MarcLoader::loadMarcRecordByILSId($id);
-		if ($marcRecord) {
+		if ($marcRecord) 
+		{
 			$timer->logTime('Loaded MARC record from search object');
 			if (!$configArray['Catalog']['itemLevelCallNumbers']){
 				$callNumber = '';
@@ -178,7 +178,7 @@ class Horizon implements DriverInterface{
 						if ($forSummary && $firstItemWithSIPdata != null ){
 							$itemData = array_merge($firstItemWithSIPdata, $itemData);
 						}else{
-							$itemSip2Data = $this->_loadItemSIP2Data($itemData['barcode'], $itemData['status'], $forSummary);
+							$itemSip2Data = $this->_loadItemSIP2Data($itemData['barcode'], $itemData['status']);
 							if ($firstItemWithSIPdata == null){
 								$firstItemWithSIPdata = $itemSip2Data;
 							}
@@ -233,7 +233,8 @@ class Horizon implements DriverInterface{
 			}
 		}
 		$timer->logTime("Finished loading status information");
-
+		//echo "BEFORE";
+		//print_r($allItems);
 		return $allItems;
 	}
 
@@ -247,7 +248,11 @@ class Horizon implements DriverInterface{
 
 	public function getStatus($id, $record = null, $mysip = null, $forSummary = false)
 	{
-		return $this->getHolding($id, $record, $mysip, $forSummary);
+		
+		$a = $this->getHolding($id, $record, $mysip, $forSummary);
+		//echo "AFTER";
+		//print_r($a);
+		return $a;
 	}
 
 	public function getStatuses($idList, $record = null, $mysip = null, $forSummary = false)
@@ -724,7 +729,8 @@ public function getMyHoldsViaDB($patron)
 	 * @param string $id the id of the bid to load holdings for
 	 * @return array an associative array with a summary of the holdings.
 	 */
-	public function getStatusSummary($id, $record = null, $mysip = null){
+	public function getStatusSummary($id, $record = null, $mysip = null)
+	{
 		global $timer;
 		global $library;
 		global $locationSingleton;
@@ -754,7 +760,7 @@ public function getMyHoldsViaDB($patron)
 		}else{
 			$locationId = $location->locationId;
 		}
-		$summaryInformation = $memcache->get("holdings_summary_{$id}_{$locationId}" );
+		$summaryInformation = $memcache->get("aholdings_summary_{$id}_{$locationId}" );
 		if ($summaryInformation == false){
 	
 			$canShowHoldButton = true;
@@ -765,7 +771,8 @@ public function getMyHoldsViaDB($patron)
 				$canShowHoldButton = false;
 			}
 	
-			$holdings = $this->getStatus($id, $record, $mysip, true);
+			$holdings = $this->getStatus($id, $record, $mysip, false);
+			
 			$timer->logTime('Retrieved Status of holding');
 	
 			$counter = 0;
@@ -778,6 +785,7 @@ public function getMyHoldsViaDB($patron)
 			//Check to see if we are getting issue summaries or actual holdings
 			$isIssueSummary = false;
 			$numSubscriptions = 0;
+			
 			if (count($holdings) > 0){
 				$lastHolding = end($holdings);
 				if (isset($lastHolding['type']) && ($lastHolding['type'] == 'issueSummary' || $lastHolding['type'] == 'issue')){
@@ -805,7 +813,7 @@ public function getMyHoldsViaDB($patron)
 				}
 			}
 			$timer->logTime('Processed for subscriptions');
-	
+			
 			//Valid statuses are:
 			//Available by Request
 			//  - not at the user's home branch or preferred location, but at least one copy is not checked out
@@ -889,7 +897,10 @@ public function getMyHoldsViaDB($patron)
 					}
 					$summaryInformation['class'] = 'available';
 				}
-				if ($holding['holdQueueLength'] > $summaryInformation['holdQueueLength']){
+				
+				if ($holding['holdQueueLength'] > $summaryInformation['holdQueueLength'])
+				{
+					
 					$summaryInformation['holdQueueLength'] = $holding['holdQueueLength'];
 				}
 				if ($firstAvailableBarcode == '' && $holding['availability'] == true){
@@ -2272,7 +2283,7 @@ public function renewItem($patronId, $itemId){
 	public function placeHold($recordId, $patronId, $comment, $type){
 		//Self registered cards need to use HIP to place holds 
 		if (preg_match('/^\\d{12}-\\d$/', $patronId)){
-			$result = $this->placeHoldViaHIP($recordId, $patronId, $comment, $type);
+			$result = $this->placeHoldViaSIP($recordId, $patronId, $comment, $type);
 		}else{
 			$result = $this->placeHoldViaSIP($recordId, $patronId, $comment, $type);
 		}

@@ -34,7 +34,7 @@
 .resultActions{
 	display: inline-block;
 	vertical-align: top;
-	width: 125px;	
+	width: 135px;	
 	zoom: 1;
 	*display: inline;
 	position: relative;
@@ -69,4 +69,3 @@
   margin-left:20px;
   list-style-type:disc
   }
-

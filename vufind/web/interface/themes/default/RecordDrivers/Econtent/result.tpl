@@ -146,7 +146,7 @@
 
 <script type="text/javascript">
 	addRatingId('{$summId|escape:"javascript"}', 'eContent');
-	addIdToStatusList('{$summId|escape:"javascript"}', {if strcasecmp($source, 'OverDrive') == 0}'OverDrive'{else}'eContent'{/if});
+	addIdToStatusList('{$summId|escape:"javascript"}', '{$methodToLoadStatusSummaries}');
 	$(document).ready(function(){literal} { {/literal}
 		resultDescription('{$summId}','{$summId}', 'eContent');
 	{literal} }); {/literal}

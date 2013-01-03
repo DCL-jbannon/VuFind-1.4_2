@@ -40,7 +40,7 @@ if ($configArray['System']['debug']) {
 	error_reporting(E_ALL & ~E_DEPRECATED);
 }
 
-global $memcache;
+global $memcache, $logger;
 // Set defaults if nothing set in config file.
 $host = isset($configArray['Caching']['memcache_host']) ? $configArray['Caching']['memcache_host'] : 'localhost';
 $port = isset($configArray['Caching']['memcache_port']) ? $configArray['Caching']['memcache_port'] : 11211;
@@ -225,6 +225,11 @@ $interface->assign('largeLogo', $configArray['Site']['largeLogo']);
 //Set focus to the search box by default.
 $interface->assign('focusElementId', 'lookfor');
 
+require_once 'sys/Analytics.php';
+//Define tracking to be done
+global $analytics;
+global $active_ip;
+$analytics = new Analytics($active_ip, $startTime);
 //Get the name of the active instance
 if ($locationSingleton->getActiveLocation() != null){
 	$interface->assign('librarySystemName', $locationSingleton->getActiveLocation()->displayName);
@@ -235,8 +240,10 @@ if ($locationSingleton->getActiveLocation() != null){
 }
 if ($locationSingleton->getIPLocation() != null){
 	$interface->assign('inLibrary', true);
+	$physicalLocation = $locationSingleton->getIPLocation()->displayName;
 }else{
 	$interface->assign('inLibrary', false);
+	$physicalLocation = 'Home';
 }
 
 $productionServer = $configArray['Site']['isProduction'];
@@ -376,6 +383,25 @@ $action = preg_replace('/[^\w]/', '', $action);
 //Set these initially in case user login fails, we will need the module to be set.
 $interface->assign('module', $module);
 $interface->assign('action', $action);
+
+if ($analytics){
+	$analytics->setModule($module);
+	$analytics->setAction($action);
+	$analytics->setObjectId(isset($_REQUEST['id']) ? $_REQUEST['id'] : null);
+	$analytics->setMethod(isset($_REQUEST['method']) ? $_REQUEST['method'] : null);
+	$analytics->setLanguage($interface->getLanguage());
+	$analytics->setTheme($interface->getPrimaryTheme());
+	$analytics->setMobile($interface->isMobile() ? 1 : 0);
+	$analytics->setDevice(get_device_name());
+	$analytics->setPhysicalLocation($physicalLocation);
+	if ($user){
+		$analytics->setPatronType($user->patronType);
+		$analytics->setHomeLocationId($user->homeLocationId);
+	}else{
+		$analytics->setPatronType('logged out');
+		$analytics->setHomeLocationId(-1);
+	}
+}
 
 //Determine whether or not materials request functionality should be enabled
 require_once 'sys/MaterialsRequest.php';
@@ -801,7 +827,7 @@ function handlePEARError($error, $method = null){
 	4 => $baseError . $detailedServer . $basicBacktrace,
 	5 => $baseError . $detailedServer . $detailedBacktrace
 	);
-
+	
 	$logger = new Logger();
 	$logger->log($errorDetails, PEAR_LOG_ERR);
 
