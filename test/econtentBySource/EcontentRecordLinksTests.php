@@ -81,10 +81,10 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 	
 	/**
 	* method getLinksAvailableHolds 
-	* when called
+	* when showCancelHoldButtonisTrue
 	* should returnCorrectly
 	*/
-	public function test_getLinksAvailableHolds_called_returnCorrectly()
+	public function test_getLinksAvailableHolds_showCancelHoldButtonisTrue_returnCorrectly()
 	{
 		
 		$expected[] = array(
@@ -97,16 +97,46 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 		);
 		
 		$this->econtentRecordDetailsMock->expects($this->once())
+										->method("showCancelHoldLinkAvailableHolds")
+										->will($this->returnValue(true));
+
+		$this->econtentRecordDetailsMock->expects($this->once())
 										->method("getCancelHoldUrls")
 										->will($this->returnValue(self::cancelHoldUrl));
-		
+
 		$this->econtentRecordDetailsMock->expects($this->once())
 										->method("getCheckOutUrls")
 										->will($this->returnValue(self::checkOutUrl));
 		
 		$actual = $this->service->getLinksAvailableHolds();
 		$this->assertEquals($expected, $actual);
-		
+	}
+	
+	/**
+	 * method getLinksAvailableHolds
+	 * when showCancelHoldButtonisFalse
+	 * should returnCorrectly
+	 */
+	public function test_getLinksAvailableHolds_showCancelHoldButtonisFalse_returnCorrectly()
+	{
+		$expected[] = array(
+				'text' => 'Check Out',
+				'url' => self::checkOutUrl,
+		);
+	
+		$this->econtentRecordDetailsMock->expects($this->once())
+										->method("showCancelHoldLinkAvailableHolds")
+										->will($this->returnValue(false));
+	
+		$this->econtentRecordDetailsMock->expects($this->never())
+										->method("getCancelHoldUrls");
+	
+		$this->econtentRecordDetailsMock->expects($this->once())
+										->method("getCheckOutUrls")
+										->will($this->returnValue(self::checkOutUrl));
+	
+		$actual = $this->service->getLinksAvailableHolds();
+		$this->assertEquals($expected, $actual);
 	}
 	
 	//PRIVATES!!!

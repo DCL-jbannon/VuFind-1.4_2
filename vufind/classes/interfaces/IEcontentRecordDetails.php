@@ -150,5 +150,11 @@
 		 * @return boolean
 		 */
 		public function showAddItemButton();
+		
+		/**
+		 * Return if on the Available Holds Page has to show the button Cancel Hold for this EcontentRecord type
+		 * @return boolean
+		 */
+		public function showCancelHoldLinkAvailableHolds();
 	}
 ?>

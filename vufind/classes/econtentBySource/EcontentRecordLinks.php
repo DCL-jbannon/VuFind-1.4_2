@@ -47,13 +47,16 @@ class EcontentRecordLinks extends BaseEcontentRecordHelpers
 	
 	public function getLinksAvailableHolds($patronId = NULL)
 	{
-		$cancelUrls = $this->econtentRecordDetails->getCancelHoldUrls($patronId);
-		$checkOutUrls = $this->econtentRecordDetails->getCheckOutUrls($patronId);
+		if ($this->econtentRecordDetails->showCancelHoldLinkAvailableHolds())
+		{
+			$cancelUrls = $this->econtentRecordDetails->getCancelHoldUrls($patronId);
+			$links[] = array(
+					'text' => 'Cancel&nbsp;Hold',
+					'onclick' => "if (confirm('Are you sure you want to cancel this title?')){cancelEContentHold('".$cancelUrls."')};return false;"
+			);
+		}
 		
-		$links[] = array(
-				'text' => 'Cancel&nbsp;Hold',
-				'onclick' => "if (confirm('Are you sure you want to cancel this title?')){cancelEContentHold('".$cancelUrls."')};return false;"
-		);
+		$checkOutUrls = $this->econtentRecordDetails->getCheckOutUrls($patronId);
 		$links[] = array(
 				'text' => 'Check Out',
 				'url' => $checkOutUrls

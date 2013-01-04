@@ -17,7 +17,7 @@ abstract class BaseHelperClassesTests extends PHPUnit_Framework_TestCase
 															  "getMsgCheckedOut", "getMsgCheckedOutToYou",
 															  "getMethodLoadStatusSummaries", "getFormats",
 															  "checkout","checkin", "placeHold", "cancelHold",
-															  "getAccessUrls","getRecordId", "showAddItemButton",
+															  "getAccessUrls","getRecordId", "showAddItemButton", "showCancelHoldLinkAvailableHolds",
 															  "getCancelHoldUrls", "getSize", "getUsageNotesMessage", "getCheckOutUrls"));
 		parent::setUp();
 	}

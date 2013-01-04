@@ -404,7 +404,18 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	}
 	
 		
+	/**
+	* method showCancelHoldLinkAvailableHolds 
+	* when called
+	* should returnAlwaysFalse
+	*/
+	public function test_showCancelHoldLinkAvailableHolds_called_returnAlwaysFalse()
+	{
+		$actual = $this->service->showCancelHoldLinkAvailableHolds();
+		$this->assertFalse($actual);
+	}
 	
+		
 		
 	
 	//***** PRIVATES!
