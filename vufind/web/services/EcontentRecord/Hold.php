@@ -57,37 +57,12 @@ class Hold extends Action
 				$user = UserAccount::login();
 			}
 			if (!PEAR::isError($user) && $user)
-			{
-				
-				$econtentDetails = EcontentDetailsFactory::get($eContentRecord);
-				if($econtentDetails !== false)
-				{
-					
-					$result = $econtentDetails->placeHold($user->getBarcode());
-					if($result === false)
-					{
-						$interface->assign('result', false);
-						$return['result'] = false;
-						$interface->assign('message', "The item could not be placed hold.");
-						$showMessage = true;
-					}
-					else
-					{
-						$interface->assign('result', true);
-						$return['result'] = true;
-						$interface->assign('message', "The item has been placed hold.");
-						$showMessage = true;
-					}
-					$return['title'] = $eContentRecord->gettitle();
-				}
-				else
-				{
-					$return = $driver->placeHold($id, $user);
-					$interface->assign('result', $return['result']);
-					$message = $return['message'];
-					$interface->assign('message', $message);
-					$showMessage = true;
-				}
+			{				
+				$return = $driver->placeHold($id, $user);
+				$interface->assign('result', $return['result']);
+				$message = $return['message'];
+				$interface->assign('message', $message);
+				$showMessage = true;
 			}
 			else
 			{

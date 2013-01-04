@@ -753,7 +753,8 @@ public function getStatusSummaries($ids){
 		return $links;
 	}
 
-	public function placeHold($id, $user){
+	public function placeHold($id, $user)
+	{
 		$id = str_ireplace("econtentrecord", "", $id);
 		$return = array();
 		$eContentRecord = new EContentRecord();
@@ -764,8 +765,22 @@ public function getStatusSummaries($ids){
 		}else{
 			$return['title'] = $eContentRecord->title;
 			
-			//If the source is overdrive, process it as an overdrive title
-			if (strcasecmp($eContentRecord->source, 'OverDrive') == 0){
+			$econtentDetails = EcontentDetailsFactory::get($eContentRecord);
+			if($econtentDetails !== false)
+			{	
+				$result = $econtentDetails->placeHold($user->getBarcode());
+				if($result === false)
+				{
+					$return['result'] = false;
+					$return['message'] = "The item could not be placed hold.";
+				}
+				else
+				{
+					$return['result'] = true;
+					$return['message'] = "The item has been placed hold successfully";
+				}
+			}elseif ($eContentRecord->isOverDrive())
+			{
 				require_once 'Drivers/OverDriveDriver.php';
 				$overDriveDriver = new OverDriveDriver();
 				$overDriveId = substr($eContentRecord->sourceUrl, -36);
@@ -776,35 +791,46 @@ public function getStatusSummaries($ids){
 				$overDriveResult = $overDriveDriver->placeOverDriveHold($overDriveId, $format, $user);
 				$return['result'] = $overDriveResult['result'];
 				$return['message'] = $overDriveResult['message'];
-			}else{
+			}
+			else
+			{
 				//Check to see if the user already has a hold placed
 				$holds = new EContentHold();
 				$holds->userId = $user->id;
 				$holds->recordId = $id;
 				$holds->whereAdd("(status = 'active' or status = 'suspended' or status ='available')");
 				$holds->find();
-				if ($holds->N > 0){
+				if ($holds->N > 0)
+				{
 					$return['result'] = false;
 					$return['message'] = "That record is already on hold for you, unable to place a second hold.";
-				}else{
+				}
+				else
+				{
 					//Check to see if the user already has the record checked out
 					$checkouts = new EContentCheckout();
 					$checkouts->userId = $user->id;
 					$checkouts->status = 'out';
 					$checkouts->recordId = $id;
 					$checkouts->find();
-					if ($checkouts->N > 0){
+					if ($checkouts->N > 0)
+					{
 						$return['result'] = false;
 						$return['message'] = "That record is already checked out to you, unable to place a hold.";
-					}else{
+					}
+					else
+					{
 						//Check to see if there are any available copies and then checkout the record rather than placing a hold
 						$holdings = $this->getHolding($id);
 						$holdingsSummary = $this->getStatusSummary($id, $holdings);
-						if ($holdingsSummary['availableCopies'] > 0 || $eContentRecord->accessType == 'free'){
+						if ($holdingsSummary['availableCopies'] > 0 || $eContentRecord->accessType == 'free')
+						{
 							//The record can be checked out directly
 							$ret = $this->checkoutRecord($id, $user);
 							return $ret;
-						}else{
+						}
+						else
+						{
 							//Place the hold for the user
 							$hold = new EContentHold();
 							$hold->userId = $user->id;
@@ -812,7 +838,8 @@ public function getStatusSummaries($ids){
 							$hold->status = 'active';
 							$hold->datePlaced = time();
 							$hold->dateUpdated = time();
-							if ($hold->insert()){
+							if ($hold->insert())
+							{
 								$return['result'] = true;
 								$holdPosition = $this->_getHoldPosition($hold);
 								$return['message'] = "Your hold was successfully placed, you are number {$holdPosition} in the queue.";

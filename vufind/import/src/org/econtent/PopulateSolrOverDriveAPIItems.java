@@ -191,7 +191,8 @@ public class PopulateSolrOverDriveAPIItems
 		
 		this.addNote("Updating Solr with " + collection.size() + " documents");
 		this.solrWrapper.addCollectionDocuments(collection);
-		this.addNote("Added " + j + " new items from OverDrive API");
+		this.addNote("Added / Updated " + collection.size() + " new items from OverDrive API");
+		this.addNote("Processed " + j + " items from OverDrive API");
 		this.addNote("Finished getting OverDrive API Collection");
 	}
 }
