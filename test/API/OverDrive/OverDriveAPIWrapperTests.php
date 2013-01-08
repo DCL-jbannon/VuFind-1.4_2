@@ -69,6 +69,31 @@ class OverDriveAPIWrapperTests extends PHPUnit_Framework_TestCase
 	}
 	
 	/**
+	* method getItemAvailability 
+	* when itemIdIsEmpty
+	* should returnFalse
+	*/
+	public function test_getItemAvailability_itemIdIsEmpty_returnFalse()
+	{
+		$itemId="";
+		$actual = $this->service->getItemAvailability(self::$accessToken, self::$productsUrl, $itemId);
+		$this->assertFalse($actual);
+	}
+	
+	/**
+	 * method getItemMetadata
+	 * when itemIdIsEmpty
+	 * should returnFalse
+	 */
+	public function test_getItemMetadata_itemIdIsEmpty_returnFalse()
+	{
+		$itemId="";
+		$actual = $this->service->getItemMetadata(self::$accessToken, self::$productsUrl, $itemId);
+		$this->assertFalse($actual);
+	}
+		
+	
+	/**
 	* method getItemMetadata
 	* when called
 	* should executesCorrectly

@@ -170,6 +170,37 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 		$this->assertTrue($actual);
 	}	
 	
+
+	/**
+	* method getSourceUrl 
+	* when sourceUrlFieldIsNotEmpty
+	* should returnCorrectly
+	*/
+	public function test_getSourceUrl_sourceUrlFieldIsNotEmpty_returnCorrectly()
+	{
+		$expected = "aDummySourcelUrl";
+		$this->service->sourceUrl = $expected;
+		$actual = $this->service->getsourceurl();
+		$this->assertEquals($expected, $actual);
+	}
+	
+	/**
+	 * method getSourceUrl
+	 * when sourceUrlFieldIsEmpty
+	 * should getTheValueFromMarcRecord
+	 */
+	public function test_getSourceUrl_sourceUrlFieldIsEmpty_getTheValueFromMarcRecord()
+	{
+		$expected = "http://www.emedia2go.org/ContentDetails.htm?ID=0EA036C9-C4DB-4A87-A741-5CC03BF9D96E";
+		
+		$marcRecord = $this->marcRecordMother->getMarcRecord();
+		$this->service->marcRecord = $marcRecord;
+		$this->service->sourceUrl = "";
+		
+		$actual = $this->service->getsourceurl();
+		$this->assertEquals($expected, $actual);
+	}
+	
 		
 		
 

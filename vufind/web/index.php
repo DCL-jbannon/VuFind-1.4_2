@@ -41,6 +41,9 @@ if ($configArray['System']['debug']) {
 }
 
 global $memcache, $logger;
+
+$logger = new Logger();
+
 // Set defaults if nothing set in config file.
 $host = isset($configArray['Caching']['memcache_host']) ? $configArray['Caching']['memcache_host'] : 'localhost';
 $port = isset($configArray['Caching']['memcache_port']) ? $configArray['Caching']['memcache_port'] : 11211;

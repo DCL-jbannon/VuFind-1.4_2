@@ -100,9 +100,12 @@ class Home extends Action{
 		$eContentRecord = new EContentRecord();
 		$this->id = strip_tags($_REQUEST['id']);
 		$eContentRecord->id = $this->id;
-		if (!$eContentRecord->find(true)){
+		if (!$eContentRecord->find(true))
+		{
 			//TODO: display record not found error
-		}else{
+		}
+		else
+		{
 	
 			if ($eContentRecord->isGutenberg())
 			{
@@ -153,7 +156,8 @@ class Home extends Action{
 			$bookCoverUrl = $configArray['Site']['coverUrl'] . "/bookcover.php?id={$eContentRecord->id}&amp;econtent=true&amp;isn={$eContentRecord->getIsbn()}&amp;size=large&amp;upc={$eContentRecord->getUpc()}&amp;category=" . urlencode($eContentRecord->format_category()) . "&amp;format=" . urlencode($eContentRecord->getFirstFormat())."&t=".DateTimeUtils::getTSBookCover();
 			$interface->assign('bookCoverUrl', $bookCoverUrl);
 
-			if (isset($_REQUEST['detail'])){
+			if (isset($_REQUEST['detail']))
+			{
 				$detail = strip_tags($_REQUEST['detail']);
 				$interface->assign('defaultDetailsTab', $detail);
 			}
@@ -163,9 +167,11 @@ class Home extends Action{
 			$timer->logTime('Got More Like This');
 
 			// Find Other Editions
-			if ($configArray['Content']['showOtherEditionsPopup'] == false){
+			if ($configArray['Content']['showOtherEditionsPopup'] == false)
+			{
 				$editions = OtherEditionHandler::getEditions($eContentRecord->solrId(), $eContentRecord->getIsbn(), null);
-				if (!PEAR::isError($editions)) {
+				if (!PEAR::isError($editions))
+				{
 					$interface->assign('editions', $editions);
 				}
 				$timer->logTime('Got Other editions');

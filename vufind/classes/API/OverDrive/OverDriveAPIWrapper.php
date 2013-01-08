@@ -64,17 +64,34 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 	public function getItemMetadata($accessToken, $productsUrl, $itemId)
 	{
 		$result = $this->getItemAction($accessToken, $productsUrl, $itemId, "metadata", "getItemMetadata");
-		$result->id = strtoupper($result->id);
+		if($result !== false)
+		{
+			$result->id = strtoupper($result->id);
+		}
 		return $result;
 	}
 	
 	private function getItemAction($accessToken, $productsUrl, $itemId, $action, $methodName)
 	{
+		global $logger;
+		
 		$this->ch = curl_init();
 		$url = $productsUrl.'/'.$itemId.'/'.$action;
 		$this->setOptionsCallWithAccesToken($accessToken);
 		curl_setopt($this->ch, CURLOPT_URL, $url);
-		return $this->exec($methodName);
+		
+		try
+		{
+			return $this->exec($methodName);
+		}
+		catch(OverDriveHttpResponseException $e)
+		{
+			if($logger)
+			{
+				$logger->log("OverDriveApiWrapper::getItemAction Method:".$methodName.". Error getting the item information on the OverDrive with ID: ".$itemId, PEAR_LOG_ERR);
+			}
+			return false;
+		}
 	}
 	
 	

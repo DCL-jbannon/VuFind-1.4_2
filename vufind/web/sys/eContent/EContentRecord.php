@@ -9,6 +9,8 @@ require_once dirname(__FILE__).'/../SolrDataObject.php';
 require_once dirname(__FILE__).'/../../../classes/interfaces/IEContentRecord.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/RegularExpressions.php';
 require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
+require_once dirname(__FILE__).'/../../../classes/FileMarc/FileMarc.php';
+require_once dirname(__FILE__).'/../../../classes/FileMarc/MarcSubField.php';
 
 
 class EContentRecord extends SolrDataObject implements IEContentRecord{
@@ -1152,8 +1154,8 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		$marRecord = $this->getNormalizedMarcRecord();
 		
 		$regularExpressions = new RegularExpressions();
-		$overDriveId = $regularExpressions->getFieldValueFromURL($this->sourceUrl, "ID");
 		
+		$overDriveId = $regularExpressions->getFieldValueFromURL($this->getsourceurl(), "ID");
 		$availability = $overDriveServicesAPI->getItemAvailability($overDriveId);
 		
 		$item = new OverdriveItem();
@@ -1210,9 +1212,9 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 				}
 				
 				
-				$i++;
+					$i++;
+				}
 			}
-		}
 		
 		$item->links = $links;
 		$item->samples = $samples;
@@ -1221,12 +1223,16 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		return array($item);
 	}
 
-	function getNumItems(){
+	function getNumItems()
+	{
 		if ($this->items == null){
 			$this->items = array();
-			if (strcasecmp($this->source, 'OverDrive') == 0){
+			if ($this->isOverDrive() == 0)
+			{
 				return -1;
-			}else{
+			}
+			else
+			{
 				require_once 'sys/eContent/EContentItem.php';
 				$eContentItem = new EContentItem();
 				$eContentItem->recordId = $this->id;
@@ -1305,7 +1311,8 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		}
 		return $ret;
 	}
-	private function clearCachedCover(){
+	private function clearCachedCover()
+	{
 		global $configArray;
 
 		//Clear the cached bookcover if one has been added.
@@ -1319,6 +1326,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 			$logger->log("Record {$this->id} does not have cover ({$this->cover}), not clearing cache", PEAR_LOG_DEBUG );
 		}
 	}
+	
 	public function getPropertyArray($propertyName){
 		$propertyValue = $this->$propertyName;
 		if (strlen($propertyValue) == 0){
@@ -1376,7 +1384,8 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 	public function time_since_added(){
 		return '';
 	}
-	public function getOverDriveId(){
+	public function getOverDriveId()
+	{
 		$overdriveUrl = $this->sourceUrl;
 		if ($overdriveUrl == null || strlen($overdriveUrl) < 36){
 			return null;
@@ -1661,12 +1670,22 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		$this->source = $source;
 	}
 
-	public function getsourceurl(){
-		return $this->sourceurl;
+	public function getsourceurl()
+	{		
+		if(!empty($this->sourceUrl))
+		{
+			return $this->sourceUrl;
+		}
+		
+		$fileMarc = new FileMarc($this->getNormalizedMarcRecord(), File_Marc::SOURCE_STRING);
+		$fileMarcRecord = $fileMarc->next();
+		$marcSubField = new MarcSubField($fileMarcRecord);
+		return $marcSubField->getCode("856", "u", 1, 1);
+		
 	}
 
 	public function setsourceurl($sourceurl){
-		$this->sourceurl = $sourceurl;
+		$this->sourceUrl = $sourceurl;
 	}
 
 	public function getpurchaseurl(){
