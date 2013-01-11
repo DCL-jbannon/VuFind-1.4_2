@@ -1456,6 +1456,10 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 				return false;
 				break;
 			default:
+				if(empty($this->marcRecord))
+				{
+					return false;
+				}
 				return true;
 				break;
 		}

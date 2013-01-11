@@ -115,11 +115,11 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 		
 	/**
 	* method hasMarcRecord 
-	* when itHasNot
+	* when itHasNotBySource
 	* should returnfalse
 	* @dataProvider DP_hasMarcRecordAttached_itHasNot
 	*/
-	public function test_hasMarcRecord_itHasNot_returnfalse($source)
+	public function test_hasMarcRecord_itHasNotBySource_returnfalse($source)
 	{
 		$this->service->source = $source;
 		$actual = $this->service->hasMarcRecord();
@@ -133,6 +133,27 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 				array("OverDriveAPI")
 		);
 	}
+	
+	/**
+	 * method hasMarcRecord
+	 * when marcRecordFieldIsNotValid
+	 * should returnfalse
+	 * @dataProvider DP_hasMarcRecordAttached_marcRecordFieldIsNotValid_returnfalse
+	 */
+	public function test_hasMarcRecord_itHasNot_returnfalse($contentMarcRecordField)
+	{
+		$this->service->marcRecord = $contentMarcRecordField;
+		$actual = $this->service->hasMarcRecord();
+		$this->assertFalse($actual);
+	}
+	
+	public function DP_hasMarcRecordAttached_marcRecordFieldIsNotValid_returnfalse()
+	{
+		return array(
+				array(""),
+				array(NULL)
+		);
+	}
 		
 	/**
 	 * method hasMarcRecord
@@ -142,6 +163,7 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 	public function test_hasMarcRecord_itHas_returnfalse()
 	{
 		$this->service->source = "aDummyRecordShouldHaveMarcRecord";
+		$this->service->marcRecord = "ADummyCoontentMarcRecord";
 		$actual = $this->service->hasMarcRecord();
 		$this->assertTrue($actual);
 	}
@@ -205,5 +227,4 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 		
 
 }
-
 ?>
