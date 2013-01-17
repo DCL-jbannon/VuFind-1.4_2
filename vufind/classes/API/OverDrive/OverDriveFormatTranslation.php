@@ -62,6 +62,9 @@ class OverDriveFormatTranslation {
 			case "audiobook-mp3":
 				return 425;
 				break;
+			case "ebook-overdrive":
+				return -1;
+				break;
 			default:
 				throw new OverDriveAPIException("OverDriveFormatTranslation::getFormatIdFromString No format found: ".$formatString);
 				break;

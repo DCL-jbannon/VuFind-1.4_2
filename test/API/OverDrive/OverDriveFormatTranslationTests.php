@@ -37,7 +37,8 @@ class OverDriveFormatTranslationTests extends PHPUnit_Framework_TestCase
 						array("ebook-kindle", 420),
 						array("ebook-pdf-open", 450),
 						array("ebook-epub-open", 810),
-						array("audiobook-mp3", 425)
+						array("audiobook-mp3", 425),
+						array("ebook-overdrive", -1)
 					);
 	}
 	
@@ -62,7 +63,6 @@ class OverDriveFormatTranslationTests extends PHPUnit_Framework_TestCase
 						array("http://excerpts.contentreserve.com/FormatType-35/1240-1/111926-TheScreamingSkull.epub", OverDriveFormatTranslation::MediaEPUB)
 					);
 	}
-	
+		
 }
-
 ?>

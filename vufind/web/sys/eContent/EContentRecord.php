@@ -1174,48 +1174,48 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 			$i=0;
 			$j=0;
 			foreach ($metadata->formats as $format)
-			{
+			{				
 				$formatId = OverDriveFormatTranslation::getFormatIdFromString($format->id);
-				if($item->available)
+				if($formatId != -1)
 				{
-					$links[$i] = array(
-							'onclick' => "return checkoutOverDriveItem('".$overDriveId."','".$formatId."' );",
-							'text' => 'Check Out',
-							'action' => 'CheckOut'
-							);
-				}
-				else
-				{
-					$links[$i] = array(
-							'onclick' => "return placeOverDriveHold('".$overDriveId."','".$formatId."' );",
-							'text' => 'Place Hold',
-							'action' => 'Hold'
-							);
-				}
-				
-				$links[$i]['overDriveId'] = $overDriveId;
-				$links[$i]['formatId'] = $format->id;
-				$links[$i]['format'] = $format->name;
-				$links[$i]['fileSize'] = $format->fileSize;
-				
-				if(!empty($format->samples))
-				{
-					$i=0;
-					foreach ($format->samples as $sample)
+					if($item->available)
 					{
-						$samples[$j]['title'] = $sample->source;
-						$samples[$j]['url'] = $sample->url;
-						$samples[$j]['type'] = OverDriveFormatTranslation::getMediaTypeFromUrl($sample->url);
-				
-						$j++;
+						$links[$i] = array(
+								'onclick' => "return checkoutOverDriveItem('".$overDriveId."','".$formatId."' );",
+								'text' => 'Check Out',
+								'action' => 'CheckOut'
+								);
 					}
-				}
+					else
+					{
+						$links[$i] = array(
+								'onclick' => "return placeOverDriveHold('".$overDriveId."','".$formatId."' );",
+								'text' => 'Place Hold',
+								'action' => 'Hold'
+								);
+					}
 				
+					$links[$i]['overDriveId'] = $overDriveId;
+					$links[$i]['formatId'] = $format->id;
+					$links[$i]['format'] = $format->name;
+					$links[$i]['fileSize'] = $format->fileSize;
 				
+					if(!empty($format->samples))
+					{
+						$i=0;
+						foreach ($format->samples as $sample)
+						{
+							$samples[$j]['title'] = $sample->source;
+							$samples[$j]['url'] = $sample->url;
+							$samples[$j]['type'] = OverDriveFormatTranslation::getMediaTypeFromUrl($sample->url);
+					
+							$j++;
+						}
+					}
 					$i++;
 				}
 			}
-		
+		}
 		$item->links = $links;
 		$item->samples = $samples;
 		$item->libraryId = -1;
