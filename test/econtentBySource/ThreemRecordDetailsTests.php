@@ -415,6 +415,19 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 		$this->assertFalse($actual);
 	}
 	
+	/**
+	* method canSuspendHolds 
+	* when called
+	* should returnFalse
+	*/
+	public function test_canSuspendHolds_called_returnFalse()
+	{
+		$actual = $this->service->canSuspendHolds();
+		$this->assertFalse($actual);
+	}
+	
+		
+	
 		
 		
 	

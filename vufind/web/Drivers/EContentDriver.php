@@ -557,6 +557,7 @@ public function getStatusSummaries($ids){
 						'links' => $this->getOnHoldEContentLinks($unavailableHolds),
 						'frozen' => $unavailableHolds->status == 'suspended',
 						'reactivateDate' => $unavailableHolds->reactivateDate,
+						'canSuspendHolds' => true
 				);
 			}
 		}
@@ -584,6 +585,7 @@ public function getStatusSummaries($ids){
 						'links' => $details->getLinksInfo()->getCancelHoldsLinks(),
 						'frozen' => false,
 						'reactivateDate' => '',
+						'canSuspendHolds' => $details->canSuspendHolds()
 				);
 			}
 		}		
@@ -772,12 +774,12 @@ public function getStatusSummaries($ids){
 				if($result === false)
 				{
 					$return['result'] = false;
-					$return['message'] = "The item could not be placed hold.";
+					$return['message'] = "The item could not be placed on hold.";
 				}
 				else
 				{
 					$return['result'] = true;
-					$return['message'] = "The item has been placed hold successfully";
+					$return['message'] = "The item has been placed on hold successfully";
 				}
 			}elseif ($eContentRecord->isOverDrive())
 			{

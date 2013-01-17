@@ -78,7 +78,11 @@
 	    	</thead><tbody>
 		    {foreach from=$holds.unavailable item=record}
 		    	<tr>
-		    		<td><input type="checkbox" class="unavailableHoldSelect" name="unavailableHold[{$record.id}]" /></td>
+		    		<td>
+		    			{if $record.canSuspendHolds}
+		    				<input type="checkbox" class="unavailableHoldSelect" name="unavailableHold[{$record.id}]" />
+		    			{/if}
+		    		</td>
 	        	<td><a href="{$path}/EcontentRecord/{$record.id}/Home">{$record.title}</a></td>
 	        	<td>{$record.source}</td>
 	        	<td>{$record.createTime|date_format}</td>

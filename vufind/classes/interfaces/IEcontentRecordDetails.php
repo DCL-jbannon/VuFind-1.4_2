@@ -156,5 +156,11 @@
 		 * @return boolean
 		 */
 		public function showCancelHoldLinkAvailableHolds();
+		
+		/**
+		 * Return if the record can be suspended when the patron has placed on hold the item
+		 * @return boolean
+		 */
+		public function canSuspendHolds();
 	}
 ?>

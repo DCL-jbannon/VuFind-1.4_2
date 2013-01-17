@@ -178,6 +178,11 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 		return false;
 	}
 	
+	public function canSuspendHolds()
+	{
+		return false;
+	}
+	
 	//Private Methods
 	private function itIsTrueValue($value)
 	{
