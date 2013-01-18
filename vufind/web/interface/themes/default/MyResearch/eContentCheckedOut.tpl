@@ -132,8 +132,34 @@
   				<img alt="iDCL eBook Reader" src="http://douglascountylibraries.org/files/images/idcl114.png" title="iDCL Reader" class="idclreader-leftimg">
   			</p>
 			<p>The iDCL Reader is an eReader app that gives you FREE access to ePub and PDF eBooks in and outside the library.</p><p>With this simple-to-use app, reading is now possible wherever, and whenever, you want, without being tethered to a specific product or vendor.  It allows you to read eBooks in ePub and PDF formats, and has support for Adobe DRM, including our <a href="http://douglascountylibraries.org/epublishers">eContent Publishers</a>.  It also allows you to transfer books from different libraries and booksellers between your reading devices and personal computers, has different settings to customize your reading experience, and offers a one-stop Get Books feature to browse and search books from a variety of online sources.</p><p>Enhance your eBook reading experience with the iDCL Reader and share our passion for the freedom and versatility of eReading.</p>
-			<div id="ipad"><a href="http://douglascountylibraries.org/content/idcl-reader-for-apple"><img alt="iDCL Reader for Apple devices" src="http://douglascountylibraries.org/files/images/ipad150.jpg"></a><div class="idcltext"><a href="http://douglascountylibraries.org/content/idcl-reader-for-apple">How to Install iDCL Reader on an Apple device</a></div></div> 
-			<div id="android"><a href="http://douglascountylibraries.org/content/idcl-reader-for-android"><img alt="iDCL Reader for Android devices" src="http://douglascountylibraries.org/files/images/android_tablet150.jpg"></a><div class="idcltext"><a href="http://douglascountylibraries.org/content/idcl-reader-for-android">How to Install iDCL Reader on an Android device</a></div></div></div>
+			<div class="ipad ipadFirst">
+				<a href="http://douglascountylibraries.org/content/idcl-reader-for-apple">
+					<img alt="iDCL Reader for Apple devices" src="http://douglascountylibraries.org/files/images/ipad150.jpg">
+				</a>
+				<div class="idcltext">
+					<a href="http://douglascountylibraries.org/content/idcl-reader-for-apple">How to Install iDCL Reader on an Apple device</a>
+				</div>
+			</div> 
+			<div class="ipad">
+				<a href="http://douglascountylibraries.org/content/idcl-reader-for-android">
+					<img alt="iDCL Reader for Android devices" src="http://douglascountylibraries.org/files/images/android_tablet150.jpg">
+				</a>
+				<div class="idcltext">
+					<a href="http://douglascountylibraries.org/content/idcl-reader-for-android">How to Install iDCL Reader on an Android device</a>
+				</div>
+			</div>
+			<div class="ipad">
+				<a href="#">
+					<img alt="iDCL Reader for Android devices" src="/interface/themes/dcl/images/3m.jpg">
+				</a>
+				<div class="idcltext">
+					<a href="http://douglascountylibraries.org/content/3m-cloud-ereader-help">Help downloading to eReaders</a>
+				</div>
+				<div class="idcltext">
+					<a href="http://douglascountylibraries.org/content/3m-cloud-tablet-help">Help downloading to tablets and smartphones</a>
+				</div>
+			</div>
+		</div>
   			<div class="clear-block clear"></div> 
 		</div>
 	    

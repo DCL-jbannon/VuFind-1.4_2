@@ -202,18 +202,20 @@ div.idcltext a
     width: 175px;
 }
 
-div#ipad
+div.ipad
 {
 	float: left;
-    margin: 10px;
-    padding: 10px 0 0 117px;
-    width: 155px;
+    width: 230px;
+    text-align:center;
 }
 
-div#android
+div.ipad a img
 {
-	float: left;
-    margin: 10px;
-    padding: 10px 0 0 117px;
-    width: 155px;
+	height: 80px;
+}
+
+div.ipadFirst
+{
+    margin-left:15px;
+    padding-left:10px;
 }
