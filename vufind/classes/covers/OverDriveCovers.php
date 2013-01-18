@@ -2,9 +2,9 @@
 require_once dirname(__FILE__).'/../../web/sys/eContent/EContentRecord.php';
 require_once dirname(__FILE__).'/../API/OverDrive/OverDriveServicesAPI.php';
 require_once dirname(__FILE__).'/../Utils/RegularExpressions.php';
+require_once dirname(__FILE__).'/../interfaces/IEcontentCovers.php';
 
-
-class OverDriveCovers 
+class OverDriveCovers  implements IEcontentCovers
 {
 	private $regularExpressions;
 	private $overDriveServices;

@@ -22,7 +22,6 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 		parent::setUp();		
 	}
 	
-	
 	/**
 	* method getImageUrl
 	* when idNotFound
@@ -138,5 +137,4 @@ class OverDriveCoversTests extends PHPUnit_Framework_TestCase
 	}
 
 }
-
 ?>

@@ -2,8 +2,9 @@
 require_once dirname(__FILE__).'/../../web/sys/eContent/EContentRecord.php';
 require_once dirname(__FILE__).'/../services/FreegalServices.php';
 require_once dirname(__FILE__).'/../API/Freegal/FreegalAPIServices.php';
+require_once dirname(__FILE__).'/../interfaces/IEcontentCovers.php';
 
-class FreeGalCovers
+class FreeGalCovers implements IEcontentCovers
 {
 	private $freegalServices;
 	private $freegalApiServices;

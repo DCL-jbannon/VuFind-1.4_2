@@ -222,9 +222,6 @@ class EContentRecordTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->getsourceurl();
 		$this->assertEquals($expected, $actual);
 	}
-	
-		
-		
 
 }
 ?>

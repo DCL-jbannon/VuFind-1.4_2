@@ -7,14 +7,15 @@
  */
 require_once dirname(__FILE__).'/../classes/services/EContentRecordServices.php';
 require_once dirname(__FILE__).'/../classes/covers/AttachedEcontentCovers.php';
+require_once dirname(__FILE__).'/../classes/covers/OriginalFolderCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/LibraryThingCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/GoogleBooksCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/OpenLibraryCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/SyndeticsCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/OverDriveCovers.php';
+require_once dirname(__FILE__).'/services/MyResearch/lib/Resource.php';
 require_once dirname(__FILE__).'/../classes/covers/FreeGalCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/ThreeMCovers.php';
-require_once dirname(__FILE__).'/services/MyResearch/lib/Resource.php';
 require_once dirname(__FILE__).'/../classes/covers/CoversType.php';
 require_once dirname(__FILE__).'/sys/eContent/EContentRecord.php';
 require_once 'sys/ConfigArray.php';
@@ -75,14 +76,16 @@ if(isEcontentBookCover())
 	$libraryId = $configArray['FreeGal']['libraryId'];
 	$patronID = $configArray['FreeGal']['patronId'];
 	
-	$eContentCoversProcessors[0]['name'] = "AttachedEcontentCovers";
-	$eContentCoversProcessors[0]['instance'] = new AttachedEcontentCovers($basePathOriginalCovers);
-	$eContentCoversProcessors[1]['name'] = "OverDriveCovers";
-	$eContentCoversProcessors[1]['instance'] = new OverDriveCovers();
-	$eContentCoversProcessors[2]['name'] = "FreeGalCovers";
-	$eContentCoversProcessors[2]['instance'] = new FreeGalCovers($baseFreeGalUrl, $apiKey, $libraryId, $patronID);
-	$eContentCoversProcessors[3]['name'] = "ThreeMCovers";
-	$eContentCoversProcessors[3]['instance'] = new ThreeMCovers();
+	$eContentCoversProcessors[0]['name'] = "OriginalFolderCovers";
+	$eContentCoversProcessors[0]['instance'] = new OriginalFolderCovers($basePathOriginalCovers);
+	$eContentCoversProcessors[1]['name'] = "AttachedEcontentCovers";
+	$eContentCoversProcessors[1]['instance'] = new AttachedEcontentCovers($basePathOriginalCovers);
+	$eContentCoversProcessors[2]['name'] = "OverDriveCovers";
+	$eContentCoversProcessors[2]['instance'] = new OverDriveCovers();
+	$eContentCoversProcessors[3]['name'] = "FreeGalCovers";
+	$eContentCoversProcessors[3]['instance'] = new FreeGalCovers($baseFreeGalUrl, $apiKey, $libraryId, $patronID);
+	$eContentCoversProcessors[4]['name'] = "ThreeMCovers";
+	$eContentCoversProcessors[4]['instance'] = new ThreeMCovers();
 	
 	foreach ($eContentCoversProcessors as $processor)
 	{
@@ -102,7 +105,7 @@ if(isEcontentBookCover())
 		}
 		catch(DomainException $e)
 		{
-			$logger->log("OverDrive Cover Not Found ".$e->getMessage(), PEAR_LOG_INFO);
+			$logger->log($processor['name']." Cover Not Found ".$e->getMessage(), PEAR_LOG_INFO);
 		}
 	}
 }

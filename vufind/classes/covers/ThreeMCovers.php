@@ -1,8 +1,9 @@
 <?php
 require_once dirname(__FILE__).'/../../web/sys/eContent/EContentRecord.php';
 require_once dirname(__FILE__).'/../Utils/ThreeMUtils.php';
+require_once dirname(__FILE__).'/../interfaces/IEcontentCovers.php';
 
-class ThreeMCovers
+class ThreeMCovers implements IEcontentCovers
 {
 	const base3MImageUrl = "http://ebook.3m.com/delivery/img?type=DOCUMENTIMAGE&documentID=<documentID>&size=LARGE";
 	
