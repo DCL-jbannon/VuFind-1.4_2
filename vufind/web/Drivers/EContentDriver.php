@@ -726,6 +726,11 @@ public function getStatusSummaries($ids){
 					//Links to read the title online or checkout from ACS server
 					if ($item->item_type == 'pdf'){
 						$links = array_merge($links, $this->_getACSPdfLinks($item, $eContentCheckout));
+						if($links[0]['url']==null)
+						{
+							unset($links[0]);
+							$links = array_merge($links, $this->getDefaultEContentLinks($eContentRecord, $item));
+						}
 					}elseif ($item->item_type == 'epub'){
 						$links = array_merge($links, $this->_getACSEpubLinks($item, $eContentCheckout));
 					}
