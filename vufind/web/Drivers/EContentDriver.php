@@ -1499,15 +1499,15 @@ public function getStatusSummaries($ids){
 			$totalUnAvailableHolds = 0;
 			
 			//3M??
-			$threeMAPI = new ThreeMAPI();
+			/*$threeMAPI = new ThreeMAPI();
 			$results = $threeMAPI->getPatronCirculation($user->getBarcode());
 			$totalCheckOuts = count($results->Checkouts[0]);
 			$totalUnAvailableHolds = count($results->Holds[0]);
-			$totalAvailableHolds = count($results->Reserves[0]);
+			$totalAvailableHolds = count($results->Reserves[0]);*/
 			
-			/*$totalCheckOuts = 0;
+			$totalCheckOuts = 0;
 			$totalUnAvailableHolds = 0;
-			$totalAvailableHolds = 0;*/
+			$totalAvailableHolds = 0;
 			
 			//Get a count of checked out items
 			$eContentCheckout = new EContentCheckout();
