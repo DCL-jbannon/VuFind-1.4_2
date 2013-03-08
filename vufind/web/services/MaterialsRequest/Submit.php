@@ -24,6 +24,7 @@
 require_once "Action.php";
 require_once "sys/MaterialsRequest.php";
 require_once "sys/MaterialsRequestStatus.php";
+require_once dirname(__FILE__).'/../../../classes/Utils/StringUtils.php';
 
 /**
  * MaterialsRequest Submission processing, processes a new request for the user and
@@ -37,6 +38,8 @@ class Submit extends Action
 		global $configArray;
 		global $interface;
 		global $user;
+		
+		$stringUtils = new StringUtils();
 
 		//Make sure that the user is valid
 		$processForm = true;
@@ -85,14 +88,14 @@ class Submit extends Action
 					$materialsRequest = new MaterialsRequest();
 					$materialsRequest->phone = isset($_REQUEST['phone']) ? strip_tags($_REQUEST['phone']) : '';
 					$materialsRequest->email = strip_tags($_REQUEST['email']);
-					$materialsRequest->title = strip_tags($_REQUEST['title']);
+					$materialsRequest->title = $stringUtils->convert_ascii(strip_tags($_REQUEST['title']));
 					$materialsRequest->season = isset($_REQUEST['season']) ? strip_tags($_REQUEST['season']) : '';
 					$materialsRequest->magazineTitle = isset($_REQUEST['magazineTitle']) ? strip_tags($_REQUEST['magazineTitle']) : '';
 					$materialsRequest->magazineDate = isset($_REQUEST['magazineDate']) ? strip_tags($_REQUEST['magazineDate']) : '';
 					$materialsRequest->magazineVolume = isset($_REQUEST['magazineVolume']) ? strip_tags($_REQUEST['magazineVolume']) : '';
 					$materialsRequest->magazineNumber = isset($_REQUEST['magazineNumber']) ? strip_tags($_REQUEST['magazineNumber']) : '';
 					$materialsRequest->magazinePageNumbers = isset($_REQUEST['magazinePageNumbers']) ? strip_tags($_REQUEST['magazinePageNumbers']) : '';
-					$materialsRequest->author = strip_tags($_REQUEST['author']);
+					$materialsRequest->author = $stringUtils->convert_ascii(strip_tags($_REQUEST['author']));
 					$materialsRequest->format = strip_tags($_REQUEST['format']);
 					if ($materialsRequest->format == 'ebook' && isset($_REQUEST['ebookFormat'])){
 						$materialsRequest->subFormat = strip_tags($_REQUEST['ebookFormat']);
