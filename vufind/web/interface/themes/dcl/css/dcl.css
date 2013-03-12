@@ -219,3 +219,14 @@ div.ipadFirst
     margin-left:15px;
     padding-left:10px;
 }
+
+div.message-alert
+{
+	display:block;
+	color:red;
+	text-align: center;
+	margin: 0 auto;
+	clear:both;
+	width: 590px;
+	
+}

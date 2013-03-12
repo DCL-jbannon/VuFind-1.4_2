@@ -99,7 +99,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-
+		<div class='message-alert' >Please note that catalog search results might return an error screen. <a target="_blank" href="http://hip.douglascountylibraries.org/ipac20/ipac.jsp?forcelogout=true&amp;profile=rem&amp;lang=eng">Click here to go to the classic catalog</a>. To fix the problem we will be performing maintenance of the main catalog tonight from 9pm to midnight.</div>
         <div class="clearer">&nbsp;</div>
       </div>
     </div>
