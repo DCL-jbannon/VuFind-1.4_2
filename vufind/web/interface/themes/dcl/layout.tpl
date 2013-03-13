@@ -99,7 +99,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-	
+
         <div class="clearer">&nbsp;</div>
       </div>
     </div>
