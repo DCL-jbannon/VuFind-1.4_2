@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="VuFind+ Import/Reindexer.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/VuFind+ Import/Reindexer.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/VuFind+ Import/Reindexer.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="false" mainClassHandleIdentifier="=VuFind+ Import/src&lt;org.vufind{ReindexProcess.java[ReindexProcess" manifestLocation="/VuFind+ Import/Reindexer.manifest" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
@@ -10,7 +10,8 @@
             <packagesToUnSeal/>
         </sealing>
     </manifest>
-    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/VuFind+ Import/log4j.properties"/>
         <javaElement handleIdentifier="=VuFind+ Import/src"/>
     </selectedElements>
 </jardesc>
