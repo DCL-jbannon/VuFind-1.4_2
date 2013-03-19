@@ -648,7 +648,7 @@ public function getStatusSummaries($ids){
 			}
 		}
 
-		//3M??
+		//3M
 		$threeMAPI = new ThreeMAPI();
 		$results = $threeMAPI->getPatronCirculation($user->getBarcode());
 		if ($results !== false)
@@ -657,21 +657,25 @@ public function getStatusSummaries($ids){
 			{
 				$id = $item->ItemId;
 				$eContentRecord = ThreeMUtils::getEcontentRecordFrom3MId($id);
-				$details = EcontentDetailsFactory::get($eContentRecord);
-				$daysUntilDue = (strtotime($item->EventEndDateInUTC) - strtotime($item->EventStartDateInUTC)) / (24 * 60 * 60);
 				
-				$return['transactions'][] = array(
-						'id' => $eContentRecord->id,
-						'recordId' => 'econtentRecord' . $eContentRecord->id,
-						'source' => $eContentRecord->source,
-						'title' => $eContentRecord->title,
-						'author' => $eContentRecord->author,
-						'duedate' => $item->EventEndDateInUTC,
-						'checkoutdate' => $item->EventStartDateInUTC,
-						'daysUntilDue' => $daysUntilDue,
-						'holdQueueLength' => $details->getHoldLength(),
-						'links' => $details->getLinksInfo()->getLinksItemChekedOut($user->getBarcode())
-				);
+        if($eContentRecord !== false)
+        {
+          $details = EcontentDetailsFactory::get($eContentRecord);
+  				$daysUntilDue = (strtotime($item->EventEndDateInUTC) - strtotime($item->EventStartDateInUTC)) / (24 * 60 * 60);
+  				
+  				$return['transactions'][] = array(
+  						'id' => $eContentRecord->id,
+  						'recordId' => 'econtentRecord' . $eContentRecord->id,
+  						'source' => $eContentRecord->source,
+  						'title' => $eContentRecord->title,
+  						'author' => $eContentRecord->author,
+  						'duedate' => $item->EventEndDateInUTC,
+  						'checkoutdate' => $item->EventStartDateInUTC,
+  						'daysUntilDue' => $daysUntilDue,
+  						'holdQueueLength' => $details->getHoldLength(),
+  						'links' => $details->getLinksInfo()->getLinksItemChekedOut($user->getBarcode())
+  				);
+        }
 			}
 		}
 		return $return;
