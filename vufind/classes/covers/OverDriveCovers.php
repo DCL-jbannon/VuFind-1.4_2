@@ -13,10 +13,7 @@ class OverDriveCovers  implements IEcontentCovers
 								 IRegularExpressions $regularExpressions = NULL)
 	{
 		global $configArray;
-		if(!$overDriveServices) $overDriveServices = new OverDriveServicesAPI($configArray['OverDriveAPI']['clientKey'],
-																			  $configArray['OverDriveAPI']['clientSecret'],
-																			  $configArray['OverDriveAPI']['libraryId']
-																			  );
+		if(!$overDriveServices) $overDriveServices = new OverDriveServicesAPI();
 		$this->overDriveServices = $overDriveServices;
 		
 		if(!$regularExpressions) $regularExpressions = new RegularExpressions();

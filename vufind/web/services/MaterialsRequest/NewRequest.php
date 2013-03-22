@@ -37,7 +37,8 @@ class NewRequest extends Action
 		global $user;
 		global $locationSingleton;
 		
-		if ($user){
+		if ($user)
+		{
 			$interface->assign('defaultPhone', $user->phone);
 			$interface->assign('defaultEmail', $user->email);
 			$locations = $locationSingleton->getPickupBranches($user, $user->homeLocationId);

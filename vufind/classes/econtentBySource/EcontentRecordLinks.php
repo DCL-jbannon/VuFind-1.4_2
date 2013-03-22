@@ -4,10 +4,10 @@ require_once dirname(__FILE__).'/BaseEcontentRecordHelpers.php';
 class EcontentRecordLinks extends BaseEcontentRecordHelpers
 {
 	
-	public function getLinksItemChekedOut($patronId = NULL, $returnLink = true)
+	public function getLinksItemChekedOut(IUser $user, $returnLink = true)
 	{
-		$urls = $this->econtentRecordDetails->getAccessUrls($patronId);
-
+		$urls = $this->econtentRecordDetails->getAccessUrls($user);
+		
 		$i = 0;
 		if(is_string($urls))
 		{

@@ -157,18 +157,9 @@ function materialsRequestLogin(){
 				$('.loginOptions').hide();
         $('.logoutOptions').show();
 				$('#myAccountNameLink').html(response.result.name);
-				if (response.result.enableMaterialsRequest){
-					$('#materialsRequestLogin').hide();
-					$('.materialsRequestLoggedInFields').show();
-					if (response.result.phone){
-						$('#phone').val(response.result.phone);
-					}
-					if (response.result.email){
-						$('#email').val(response.result.email);
-					}
-					if (response.result.homeLocation){
-						$("#pickupLocation").val(response.result.homeLocation);
-					}
+				if (response.result.enableMaterialsRequest)
+				{
+				   document.location = '/MaterialsRequest/NewRequest';
 				}else{
 					alert("Sorry, materials request functionality is only available to residents at this time.");
 				}

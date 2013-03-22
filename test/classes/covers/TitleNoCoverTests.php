@@ -259,7 +259,7 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	 */
 	public function test_maxAuthorLineLength_called_returnCorrectly()
 	{
-		$title = "Juan Bautista Giménez Sendiu";
+		$title = "Juan Bautista Gimenez Sendiu";
 		$expected = 14;
 		$actual = $this->service->maxAuthorLineLength($title);
 		$this->assertEquals($expected, $actual);
@@ -268,7 +268,7 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	public function tearDown()
 	{
 		// http://www.php.net/manual/en/function.unlink.php#109971
-		array_map('unlink', glob($this->baseFolderGenerateImages.'\*.png'));
+		array_map('unlink', glob($this->baseFolderGenerateImages.'*.png'));
 	}
 }
 

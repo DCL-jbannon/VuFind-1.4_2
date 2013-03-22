@@ -101,10 +101,10 @@ class OverDriveAPIWrapperTests extends PHPUnit_Framework_TestCase
 	public function test_getItemMetadata_called_executesCorrectly()
 	{
 		$itemId="EAF3F85A-C3BF-4B77-9E90-B64CE20672F8";
-		//$itemId = "FCD82636-1A43-4B06-9977-B17250A6E9E1";
-		$result = $this->service->getItemMetadata(self::$accessToken, self::$productsUrl, $itemId);
-		$this->assertEquals($itemId,$result->id);
-		$this->assertNotEmpty($result->mediaType);
+		$actual = $this->service->getItemMetadata(self::$accessToken, self::$productsUrl, $itemId);
+		$this->assertEquals($itemId,$actual->id);
+		$this->assertNotEmpty($actual->mediaType);
+		//print_r($actual->formats);
 	}
 
 	

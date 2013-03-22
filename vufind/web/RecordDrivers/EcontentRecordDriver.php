@@ -84,10 +84,6 @@ class EcontentRecordDriver extends IndexRecord
 		{
 			$interface->assign('methodToLoadStatusSummaries', $detailsEcontent->getMethodLoadStatusSummaries());
 		}
-		elseif($this->eContentRecord->isOverDrive())
-		{
-			$interface->assign('methodToLoadStatusSummaries', EcontentRecordConstants::MethodUniqueToLoadStatusSummaries);
-		}
 		
 		$interface->assign('source', $this->eContentRecord->source);		
 		$searchResultTemplate = parent::getSearchResult();

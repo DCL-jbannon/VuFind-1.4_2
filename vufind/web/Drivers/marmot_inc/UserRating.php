@@ -20,6 +20,8 @@ class UserRating extends DB_DataObject
         return array('id', 'userid', 'resourceid');
     }
     
-    
-
+    public function setResourceId($resourceId)
+    {
+    	$this->resourceid = $resourceId;
+    }
 }

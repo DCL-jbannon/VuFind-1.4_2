@@ -1,6 +1,7 @@
 <?php
-
+require_once dirname(__FILE__).'/../memcache/MemcacheServices.php';
 require_once dirname(__FILE__).'/ThreemRecordDetails.php';
+require_once dirname(__FILE__).'/OverDriveRecordDetails.php';
 
 class EcontentDetailsFactory
 {
@@ -13,9 +14,15 @@ class EcontentDetailsFactory
 	 */
 	public static function get(IEContentRecord $econtentRecord)
 	{
+		global $configArray;
+			
 		if($econtentRecord->is3M())
 		{
 			return new ThreemRecordDetails($econtentRecord);
+		}
+		if($econtentRecord->isOverDrive())
+		{
+			return new OverDriveRecordDetails($econtentRecord); //OverDrive Screen Scraping Config Values
 		}
 		return false;
 	}

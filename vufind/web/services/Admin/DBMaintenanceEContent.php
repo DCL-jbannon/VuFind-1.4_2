@@ -640,9 +640,33 @@ class DBMaintenanceEContent extends Admin {
 				'description' => 'Change from text to Medium Text',
 				'dependencies' => array(),
 				'sql' => array('ALTER TABLE `econtent_attach` CHANGE `notes` `notes` LONGTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;'),
+		),
+		'briefRecordReviewStatus' => array(
+				'title' => 'Add a new review status: \'Brief Record\'',
+				'description' => '',
+				'dependencies' => array(),
+				'sql' => array(
+						'ALTER TABLE `econtent_record` CHANGE `reviewStatus` `reviewStatus` ENUM( \'Not Reviewed\', \'Approved\', \'Rejected\', \'Brief Record\' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT \'Not Reviewed\''
+				),
+		),
+				
+		'econtent_attach_sourceField' =>array
+				(
+					'title'=>"Add source field to econtent_attach table",
+					'description'=>'',
+					'dependencies'=>array(),
+					'sql' => array('ALTER TABLE `econtent_attach` ADD `source` VARCHAR( 254 ) NOT NULL AFTER `sourcePath`')
+				),
+		'econtent_attach_numCovers' =>array
+		(
+				'title'=>"Add numCovers field to econtent_attach table",
+				'description'=>'',
+				'dependencies'=>array(),
+				'sql' => array('ALTER TABLE `econtent_attach` ADD `numCovers` INT NOT NULL AFTER `recordsProcessed` ')
 		)
 				
 		);
+		
 	}
 	
 	public function addDateAddIndexToEContentRecord()

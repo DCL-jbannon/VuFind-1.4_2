@@ -9,7 +9,7 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	private $threeMUtilsMock;
 	private $threemAPIMock;
 	private $threeMResultsMother;
-	
+	private $memcacheServicesMock;
 	
 	const threemId = "aDummy3MId";
 	const patrondId = "aDummyPatronId";
@@ -22,9 +22,12 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 		$this->threeMUtilsMock = $this->getMock("IThreeMUtils", array("get3MId"));
 		$this->econtentRecordStatusTextMock = $this->getMock("IEcontentRecordStatusText", array("getString"));
 		$this->threemAPIMock = $this->getMock("IThreeMAPI", array("getItemDetails","getPatronCirculation","checkout", "checkin", "placeHold", "cancelHold"));
+		$this->memcacheServicesMock = $this->getMock("IMemcacheServices", array("call"));
 		
-		$this->service = new ThreemRecordDetails($this->econtentRecordMock, $this->threemAPIMock, 
-												 $this->threeMUtilsMock);		
+		$this->service = new ThreemRecordDetails($this->econtentRecordMock,
+												 $this->threemAPIMock,
+												 $this->threeMUtilsMock,
+												 $this->memcacheServicesMock);
 	}
 	
 	/**
@@ -120,11 +123,12 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	 */
 	public function test_isCancelHoldAvailable_userHasNoItemsPlacedHold_returnFalse()
 	{
-		$patronId = "aDummyPatronId";
+		$this->prepareGetUserId();
+		
 		$resultPatronCirculation = $this->threeMResultsMother->getPatronCirculationResults(self::threemId);
 		$this->exercisecallGetIPatronCirculation($resultPatronCirculation, "3MIdPatronHasNotPlacedHold");
 		
-		$actual = $this->service->isCancelHoldAvailable(self::patrondId);
+		$actual = $this->service->isCancelHoldAvailable($this->userMock);
 		$this->assertFalse($actual);	
 	}
 	
@@ -135,11 +139,11 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	*/
 	public function test_isCancelHoldAvailable_userHasNotPlacedHoldTheItem_returnFalse()
 	{
-		$patronId = "aDummyPatronId";
+		$this->prepareGetUserId();
 		$resultPatronCirculation = $this->threeMResultsMother->getPatronCirculationResults(self::threemId, true);
 		$this->exercisecallGetIPatronCirculation($resultPatronCirculation, "3MIdPatronHasNotPlacedHold");
 		
-		$actual = $this->service->isCancelHoldAvailable(self::patrondId);
+		$actual = $this->service->isCancelHoldAvailable($this->userMock);
 		$this->assertFalse($actual);		
 	}
 	
@@ -150,10 +154,11 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	 */
 	public function test_isCancelHoldAvailable_userHasPlacedHoldTheItem_returnFalse()
 	{
+		$this->prepareGetUserId();
 		$resultPatronCirculation = $this->threeMResultsMother->getPatronCirculationResults(self::threemId);
 		$this->exercisecallGetIPatronCirculation($resultPatronCirculation, self::threemId);
 	
-		$actual = $this->service->isCancelHoldAvailable(self::patrondId);
+		$actual = $this->service->isCancelHoldAvailable($this->userMock);
 		$this->assertTrue($actual);
 	}
 	
@@ -214,24 +219,26 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	*/
 	public function test_isCheckedOutByPatron_NotCheckedOutByPatron_returnFalse()
 	{
+		$this->prepareGetUserId();
 		$resultPatronCirculation = $this->threeMResultsMother->getPatronCirculationResults(self::threemId, false, false);
 		$this->exercisecallGetIPatronCirculation($resultPatronCirculation, self::threemId);
 		
-		$actual = $this->service->isCheckedOutByPatron(self::patrondId);
+		$actual = $this->service->isCheckedOutByPatron($this->userMock);
 		$this->assertFalse($actual);
 	}
 	
 	/**
 	 * method isCheckedOutByPatron
 	 * when CheckedOutByPatron
-	 * should returnFalse
+	 * should returnTrue
 	 */
-	public function test_isCheckedOutByPatron_CheckedOutByPatron_returnFalse()
+	public function test_isCheckedOutByPatron_CheckedOutByPatron_returnTrue()
 	{
+		$this->prepareGetUserId();
 		$resultPatronCirculation = $this->threeMResultsMother->getPatronCirculationResults(self::threemId, false, true);
 		$this->exercisecallGetIPatronCirculation($resultPatronCirculation, self::threemId."_2");
 		
-		$actual = $this->service->isCheckedOutByPatron(self::patrondId);
+		$actual = $this->service->isCheckedOutByPatron($this->userMock);
 		$this->assertTrue($actual);
 	}
 	
@@ -242,10 +249,11 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	 */
 	public function test_isCheckedOutByPatron_CheckedOutByPatronNotFirtsOnTheList_returnFalse()
 	{
+		$this->prepareGetUserId();
 		$resultPatronCirculation = $this->threeMResultsMother->getPatronCirculationResults(self::threemId, false, true);
 		$this->exercisecallGetIPatronCirculation($resultPatronCirculation, self::threemId);
 	
-		$actual = $this->service->isCheckedOutByPatron(self::patrondId);
+		$actual = $this->service->isCheckedOutByPatron($this->userMock);
 		$this->assertTrue($actual);
 	}
 	
@@ -325,8 +333,11 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	public function test_getAccessUrls_called_returnCorrectly()
 	{
 		$expected = "aDummyUrl";
-		$this->econtentRecordMock->sourceUrl = $expected;
-		$actual = $this->service->getAccessUrls();
+		$this->econtentRecordMock->expects($this->once())
+									->method("getSourceUrl")
+									->will($this->returnValue($expected));
+		
+		$actual = $this->service->getAccessUrls($this->userMock);
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -341,6 +352,7 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	*/
 	public function test_checkout_fails_returnFalse($methodNameToTest)
 	{
+		$this->prepareGetUserId();
 		$expected = "aDummyResult";
 		$this->prepareMockGet3MIdFromEContentRecord();
 		$this->threemAPIMock->expects($this->once())
@@ -348,7 +360,7 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 							->with($this->equalTo(self::threemId), $this->equalTo(self::patrondId))
 							->will($this->returnValue($expected));
 		
-		$actual =  $this->service->$methodNameToTest(self::patrondId, self::threemId);		
+		$actual =  $this->service->$methodNameToTest($this->userMock, self::threemId);		
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -372,10 +384,7 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 		$expected = "1.9 MB";
 		$result = $this->threeMResultsMother->getItemDetails();
 		$this->prepareMockGet3MIdFromEContentRecord();
-		$this->threemAPIMock->expects($this->once())
-							->method("getItemDetails")
-							->with($this->equalTo(self::threemId))
-							->will($this->returnValue($result));
+		$this->prepareGetItemDetailsAPIMethod($result);
 		
 		$actual = $this->service->getSize();
 		$this->assertEquals($expected, $actual);
@@ -426,6 +435,51 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 		$this->assertFalse($actual);
 	}
 	
+	/**
+	* method canBeCheckIn 
+	* when called
+	* should returnAlwaysTrue
+	*/
+	public function test_canBeCheckIn_called_returnAlwaysTrue()
+	{
+		$actual = $this->service->canBeCheckIn();
+		$this->assertTrue($actual);
+	}
+	
+	/**
+	* method getNumItems 
+	* when called
+	* should returnAlwaysOne
+	*/
+	public function test_getNumItems_called_returnAlwaysOne()
+	{
+		$expected = 1;
+		$actual = $this->service->getNumItems();
+		$this->assertEquals($expected, $actual);
+	}
+	
+	/**
+	* method removeWishList 
+	* when called
+	* should returnAlwaysFalse
+	*/
+	public function test_removeWishList_called_returnAlwaysFalse()
+	{
+		$actual = $this->service->removeWishList($this->userMock);
+		$this->assertFalse(false);
+	}
+	
+	/**
+	 * method addWishList
+	 * when called
+	 * should returnAlwaysFalse
+	 */
+	public function test_addWishList_called_returnAlwaysFalse()
+	{
+		$actual = $this->service->addWishList($this->userMock);
+		$this->assertFalse(false);
+	}
+	
 		
 	
 		
@@ -439,11 +493,11 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	}
 	
 	private function prepareCallGetPatronCirculation($resultPatronCirculation)
-	{
-		$this->threemAPIMock->expects($this->once())
-							->method("getPatronCirculation")
-							->with($this->equalTo(self::patrondId))
-							->will($this->returnValue($resultPatronCirculation));
+	{		
+		$this->memcacheServicesMock->expects($this->once())
+									->method("call")
+									->with($this->equalTo($this->threemAPIMock), $this->equalTo("getPatronCirculation"), $this->equalTo(array(self::patrondId)))
+									->will($this->returnValue($resultPatronCirculation));	
 	}
 	
 	private function exerciseCallCanBeCheckOut($results)
@@ -477,10 +531,17 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	
 	private function prepareGetItemDetailsAPIMethod($resultToReturn)
 	{
-		$this->threemAPIMock->expects($this->once())
-						->method("getItemDetails")
-						->with($this->equalTo(self::threemId))
-						->will($this->returnValue($resultToReturn));
+		$this->memcacheServicesMock->expects($this->once())
+								   ->method("call")
+								   ->with($this->equalTo($this->threemAPIMock), $this->equalTo("getItemDetails"), $this->equalTo(array(self::threemId)))
+								   ->will($this->returnValue($resultToReturn));
+	}
+	
+	private function prepareGetUserId()
+	{
+		$this->userMock->expects($this->once())
+						->method("getId")
+						->will($this->returnValue(self::patrondId));
 	}
 }
 ?>

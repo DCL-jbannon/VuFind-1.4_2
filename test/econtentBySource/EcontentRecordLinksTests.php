@@ -5,14 +5,17 @@ require_once dirname(__FILE__).'/../../vufind/classes/econtentBySource/EcontentR
 class EcontentRecordLinksTests extends BaseHelperClassesTests
 {
 
-	const econtentRecordId = "aDummyEcontentRecordId";
-	
+	const econtentRecordId = "aDummyEcontentRecordId";	
 	const accessUrl = "aDummyAccessUrl";
 	const cancelHoldUrl = "aDummyCancelHoldUrl";
 	const checkOutUrl = "aDummyCheckOutUrl";
 	
+	protected $userMock;
+	
 	public function setUp()
 	{
+		$this->userMock = $this->getMock("IUser");
+		
 		parent::setUp();
 		$this->service = new EcontentRecordLinks($this->econtentRecordDetailsMock);
 	}
@@ -26,7 +29,7 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 	{
 		$expected = $this->prepareGetCheckOutsLinks(self::accessUrl);
 		
-		$actual = $this->service->getLinksItemChekedOut();
+		$actual = $this->service->getLinksItemChekedOut($this->userMock);
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -39,7 +42,7 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 	{
 		$expected = $this->prepareGetCheckOutsLinks(array(self::accessUrl));
 
-		$actual = $this->service->getLinksItemChekedOut();
+		$actual = $this->service->getLinksItemChekedOut($this->userMock);
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -53,7 +56,7 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 		$returnLink = false;
 		$expected = $this->prepareGetCheckOutsLinks(array(self::accessUrl), $returnLink);
 	
-		$actual = $this->service->getLinksItemChekedOut(NULL, false);
+		$actual = $this->service->getLinksItemChekedOut($this->userMock, false);
 		$this->assertEquals($expected, $actual);
 	}
 	
@@ -145,6 +148,7 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 		
 		$this->econtentRecordDetailsMock->expects($this->once())
 										->method("getAccessUrls")
+										->with($this->equalTo($this->userMock))
 										->will($this->returnValue($return));
 								
 		$expected[0]['url'] = self::accessUrl;

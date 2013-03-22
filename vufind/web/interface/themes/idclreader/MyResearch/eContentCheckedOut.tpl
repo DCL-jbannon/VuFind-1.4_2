@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/services/MyResearch/ajax.js"></script>
+<script type="text/javascript" src="/services/MyResearch/ajax.js?t=03182013"></script>
 {if $user}
 	{if count($checkedOut) > 0}
 		<div data-role="collapsible-set" data-theme="a" data-content-theme="c">

@@ -27,6 +27,24 @@ class BookCoverURLTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 	
+	/**
+	* method getBookCoverUrl 
+	* when setBaseUrlIsNotCalled
+	* should getValueFromConfigArray
+	*/
+	public function test_getBookCoverUrl_setBaseUrlIsNotCalled_getValueFromConfigArray()
+	{
+		global $configArray;
+		
+		$configArray['Site']['url'] = "http://aDummyUrl";
+		
+		$expected = $configArray['Site']['url']."/bookcover.php?id=40830&econtent=true&isn=9781570618048&size=large&category=EMedia";
+		$actual = $this->service->getBookCoverUrl('large', '9781570618048', '40830', true);
+		$this->assertEquals($expected, $actual);
+	}
+	
+		
+	
 
 }
 

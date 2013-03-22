@@ -854,45 +854,10 @@ public class MarcProcessor {
 			results.addNote("Number of eContent records to suppress is LOWER than threshold of " + threshold + "%. Proceeding with record suppression.");
 			try {
 				PreparedStatement suppressEContentRecordStmt = econtentConn.prepareStatement("UPDATE econtent_record SET status='deleted' WHERE id=?");
-				int reindexCount = 0;
 				for (String id : ids) {
 					suppressEContentRecordStmt.setString(1, id);
 					int updated = suppressEContentRecordStmt.executeUpdate();
 					results.addNote("setting status='deleted' for eContent record with id=" + id + ". " + updated + " record(s) updated.");
-					if (updated == 1) {
-						try {
-							URL url = new URL(configIni.get("Site", "url") + "/EcontentRecord/" + id + "/Reindex?quick=true");
-							results.addNote("Getting URL:  " + url.toString());
-							Object reindexResultRaw = url.getContent();
-							if (reindexResultRaw instanceof InputStream) {
-								String updateIndexResponse = Util.convertStreamToString((InputStream) reindexResultRaw);
-								results.addNote("Got response: " + updateIndexResponse);
-								reindexCount++;
-							}
-						} catch (Exception e) {
-							logger.error("Unable to suppress eContent record " + id, e);
-							results.addNote("Unable to suppress eContent record " + id + ". " + e.getMessage());
-							results.incErrors();
-						}
-					}
-				}
-				if (reindexCount > 0) {
-					String eContentShard = configIni.get("IndexShards", "eContent");
-					if (eContentShard == null || eContentShard.length() == 0) {
-						eContentShard = "http://localhost:8080/solr/econtent";
-					} else {
-						if (!eContentShard.startsWith("http://")) {
-							eContentShard = "http://" + eContentShard;
-						}
-					}
-					results.addNote("Posting commit message to " + eContentShard);
-					URLPostResponse response = Util.postToURL(eContentShard + "/update/", "<commit />", logger);
-					if (!response.isSuccess()){
-						logger.error("Error committing changes to econtent solr core. " + response.getMessage());
-						results.addNote("Error committing changes to econtent solr core. " + response.getMessage());
-						results.incErrors();
-					}
-					results.addNote("Got response: " + response.getResponseCode());
 				}
 			} catch (SQLException e) {
 				logger.error("Unable set status='deleted' for eContent record.", e);

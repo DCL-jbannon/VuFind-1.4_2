@@ -1,3 +1,4 @@
+<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js?t=03182013"></script>
 <div id="catalogHome">
 	<div id="homePageLists">
     {include file='API/listWidgetTabs.tpl'}

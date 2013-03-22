@@ -39,7 +39,8 @@ function readConfig()
 	while (count($serverParts) > 0){
 		$tmpServername = join('.', $serverParts);
 		$configFile = "../../sites/$tmpServername/conf/config.ini";
-		if (file_exists($configFile)){
+		if (file_exists($configFile))
+		{
 			$serverArray = parse_ini_file($configFile, true);
 			$mainArray = ini_merge($mainArray, $serverArray);
 			$servername = $tmpServername;

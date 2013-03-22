@@ -60,9 +60,6 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 	
 	public ProcessorResults results;
 	
-	private int numReindexingThreadsRunning;
-	//private long lastThreadStartTime; 
-	
 	public boolean init(Ini configIni, String serverName, long reindexLogId, Connection vufindConn, Connection econtentConn, Logger logger) {
 		this.logger = logger;
 		//Import a marc record into the eContent core. 
@@ -91,7 +88,7 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 			//Connect to the vufind database
 			doesIlsIdExist = econtentConn.prepareStatement("SELECT id from econtent_record WHERE ilsId = ?");
 			createEContentRecord = econtentConn.prepareStatement("INSERT INTO econtent_record (ilsId, cover, source, title, subTitle, author, author2, description, contents, subject, language, publisher, edition, isbn, issn, upc, lccn, topic, genre, region, era, target_audience, sourceUrl, purchaseUrl, publishDate, marcControlField, accessType, date_added, marcRecord) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-			updateEContentRecord = econtentConn.prepareStatement("UPDATE econtent_record SET ilsId = ?, cover = ?, source = ?, title = ?, subTitle = ?, author = ?, author2 = ?, description = ?, contents = ?, subject = ?, language = ?, publisher = ?, edition = ?, isbn = ?, issn = ?, upc = ?, lccn = ?, topic = ?, genre = ?, region = ?, era = ?, target_audience = ?, sourceUrl = ?, purchaseUrl = ?, publishDate = ?, marcControlField = ?, accessType = ?, date_updated = ?, marcRecord = ? WHERE id = ?");
+			updateEContentRecord = econtentConn.prepareStatement("UPDATE econtent_record SET ilsId = ?, source = ?, title = ?, subTitle = ?, author = ?, author2 = ?, description = ?, contents = ?, subject = ?, language = ?, publisher = ?, edition = ?, isbn = ?, issn = ?, upc = ?, lccn = ?, topic = ?, genre = ?, region = ?, era = ?, target_audience = ?, sourceUrl = ?, purchaseUrl = ?, publishDate = ?, marcControlField = ?, accessType = ?, date_updated = ?, marcRecord = ? WHERE id = ?");
 			deleteEContentItem = econtentConn.prepareStatement("DELETE FROM econtent_item where id = ?");
 			
 			doesGutenbergItemExist = econtentConn.prepareStatement("SELECT id from econtent_item WHERE recordId = ? AND item_type = ? and notes = ?");
@@ -244,39 +241,38 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 					//Update the record
 					//logger.info("Updating ilsId " + ilsId + " recordId " + eContentRecordId);
 					updateEContentRecord.setString(1, recordInfo.getId());
-					updateEContentRecord.setString(2, "");
-					updateEContentRecord.setString(3, source);
-					updateEContentRecord.setString(4, Util.trimTo(255, recordInfo.getFirstFieldValueInSet("title_short")));
-					updateEContentRecord.setString(5, Util.trimTo(255, recordInfo.getFirstFieldValueInSet("title_sub")));
-					updateEContentRecord.setString(6, recordInfo.getFirstFieldValueInSet("author"));
-					updateEContentRecord.setString(7, Util.getCRSeparatedString(recordInfo.getMappedField("author2")));
-					updateEContentRecord.setString(8, recordInfo.getDescription());
-					updateEContentRecord.setString(9, Util.getCRSeparatedString(recordInfo.getMappedField("contents")));
-					updateEContentRecord.setString(10, Util.getCRSeparatedString(recordInfo.getMappedField("topic_facet")));
-					updateEContentRecord.setString(11, recordInfo.getFirstFieldValueInSet("language"));
-					updateEContentRecord.setString(12, recordInfo.getFirstFieldValueInSet("publisher"));
-					updateEContentRecord.setString(13, recordInfo.getFirstFieldValueInSet("edition"));
-					updateEContentRecord.setString(14, Util.trimTo(500, Util.getCRSeparatedString(recordInfo.getMappedField("isbn"))));
-					updateEContentRecord.setString(15, Util.getCRSeparatedString(recordInfo.getMappedField("issn")));
-					updateEContentRecord.setString(16, recordInfo.getFirstFieldValueInSet("upc"));
-					updateEContentRecord.setString(17, recordInfo.getFirstFieldValueInSet("lccn"));
-					updateEContentRecord.setString(18, Util.getCRSeparatedString(recordInfo.getMappedField("topic")));
-					updateEContentRecord.setString(19, Util.getCRSeparatedString(recordInfo.getMappedField("genre")));
-					updateEContentRecord.setString(20, Util.getCRSeparatedString(recordInfo.getMappedField("geographic")));
-					updateEContentRecord.setString(21, Util.getCRSeparatedString(recordInfo.getMappedField("era")));
-					updateEContentRecord.setString(22, Util.getCRSeparatedString(recordInfo.getMappedField("target_audience")));
+					updateEContentRecord.setString(2, source);
+					updateEContentRecord.setString(3, Util.trimTo(255, recordInfo.getFirstFieldValueInSet("title_short")));
+					updateEContentRecord.setString(4, Util.trimTo(255, recordInfo.getFirstFieldValueInSet("title_sub")));
+					updateEContentRecord.setString(5, recordInfo.getFirstFieldValueInSet("author"));
+					updateEContentRecord.setString(6, Util.getCRSeparatedString(recordInfo.getMappedField("author2")));
+					updateEContentRecord.setString(7, recordInfo.getDescription());
+					updateEContentRecord.setString(8, Util.getCRSeparatedString(recordInfo.getMappedField("contents")));
+					updateEContentRecord.setString(9, Util.getCRSeparatedString(recordInfo.getMappedField("topic_facet")));
+					updateEContentRecord.setString(10, recordInfo.getFirstFieldValueInSet("language"));
+					updateEContentRecord.setString(11, recordInfo.getFirstFieldValueInSet("publisher"));
+					updateEContentRecord.setString(12, recordInfo.getFirstFieldValueInSet("edition"));
+					updateEContentRecord.setString(13, Util.trimTo(500, Util.getCRSeparatedString(recordInfo.getMappedField("isbn"))));
+					updateEContentRecord.setString(14, Util.getCRSeparatedString(recordInfo.getMappedField("issn")));
+					updateEContentRecord.setString(15, recordInfo.getFirstFieldValueInSet("upc"));
+					updateEContentRecord.setString(16, recordInfo.getFirstFieldValueInSet("lccn"));
+					updateEContentRecord.setString(17, Util.getCRSeparatedString(recordInfo.getMappedField("topic")));
+					updateEContentRecord.setString(18, Util.getCRSeparatedString(recordInfo.getMappedField("genre")));
+					updateEContentRecord.setString(19, Util.getCRSeparatedString(recordInfo.getMappedField("geographic")));
+					updateEContentRecord.setString(20, Util.getCRSeparatedString(recordInfo.getMappedField("era")));
+					updateEContentRecord.setString(21, Util.getCRSeparatedString(recordInfo.getMappedField("target_audience")));
 					String sourceUrl = "";
 					if (recordInfo.getSourceUrls().size() == 1){
 						sourceUrl = recordInfo.getSourceUrls().get(0).getUrl();
 					}
-					updateEContentRecord.setString(23, sourceUrl);
-					updateEContentRecord.setString(24, recordInfo.getPurchaseUrl());
-					updateEContentRecord.setString(25, recordInfo.getFirstFieldValueInSet("publishDate"));
-					updateEContentRecord.setString(26, recordInfo.getFirstFieldValueInSet("ctrlnum"));
-					updateEContentRecord.setString(27, accessType);
-					updateEContentRecord.setLong(28, new Date().getTime() / 1000);
-					updateEContentRecord.setString(29, recordInfo.toString());
-					updateEContentRecord.setLong(30, eContentRecordId);
+					updateEContentRecord.setString(22, sourceUrl);
+					updateEContentRecord.setString(23, recordInfo.getPurchaseUrl());
+					updateEContentRecord.setString(24, recordInfo.getFirstFieldValueInSet("publishDate"));
+					updateEContentRecord.setString(25, recordInfo.getFirstFieldValueInSet("ctrlnum"));
+					updateEContentRecord.setString(26, accessType);
+					updateEContentRecord.setLong(27, new Date().getTime() / 1000);
+					updateEContentRecord.setString(28, recordInfo.toString());
+					updateEContentRecord.setLong(29, eContentRecordId);
 					int rowsInserted = updateEContentRecord.executeUpdate();
 					if (rowsInserted != 1){
 						logger.error("Could not insert row into the database");
@@ -300,7 +296,6 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 						setupExternalLinks(recordInfo, eContentRecordId, detectionSettings, logger);
 					}
 					logger.info("Record processed successfully.");
-					reindexRecord(eContentRecordId, logger);
 				}else{
 					logger.info("Record NOT processed successfully.");
 				}
@@ -512,26 +507,6 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 		}
 	}
 
-	private void reindexRecord(final long eContentRecordId, final Logger logger) {
-		//reindex the new record
-		Thread reindexThread = new EContentReindexThread(this, eContentRecordId, logger);
-		while (numReindexingThreadsRunning > 5){
-			logger.info("There are more than 5 reindex threads running, waiting for some to finish, " + numReindexingThreadsRunning + " remain open");
-			try {
-				Thread.yield();
-				Thread.sleep(250);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				logger.error("The thread was interrupted");
-				break;
-			}
-		}
-		numReindexingThreadsRunning++;
-		//lastThreadStartTime = new Date().getTime();
-		reindexThread.start();
-	}
-
 	protected boolean loadConfig(Ini configIni, Logger logger) {
 		
 		econtentDBConnectionInfo = Util.cleanIniValue(configIni.get("Database", "database_econtent_jdbc"));
@@ -595,21 +570,6 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 
 	@Override
 	public void finish() {
-		//Wait a maximum of 5 minutes for all threads to finish indexing.
-		long now = new Date().getTime();
-		while (numReindexingThreadsRunning > 0 &&  (now + 300 > new Date().getTime()) )
-		{
-			logger.info("Waiting for all reindex threads to finish, " + numReindexingThreadsRunning + " remain open");
-			try {
-				Thread.yield();
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				logger.error("The thread was interrupted");
-				break;
-			}
-		}
 		results.addNote("Finished eContent extraction");
 		results.saveResults();
 	}
@@ -621,12 +581,5 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 
 	public String getVufindUrl() {
 		return vufindUrl;
-	}
-
-	public int getNumReindexingThreadsRunning() {
-		return numReindexingThreadsRunning;
-	}
-	public void decrementReindexingThreadsRunning() {
-		numReindexingThreadsRunning--;
 	}
 }

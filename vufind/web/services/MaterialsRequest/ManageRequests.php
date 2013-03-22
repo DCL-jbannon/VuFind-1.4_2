@@ -98,9 +98,10 @@ class ManageRequests extends Admin {
 					}
 				}
 			}
+		} else if (isset($_REQUEST['printSelected']) && isset($_REQUEST['select'])) {
+			$this->printSelectedRequests();
+			exit; // done
 		}
-
-		
 		
 		$availableFormats = MaterialsRequest::getFormats();
 		$interface->assign('availableFormats', $availableFormats);
@@ -146,15 +147,25 @@ class ManageRequests extends Admin {
 			}
 
 			//Add filtering by date as needed
-			if (isset($_REQUEST['startDate']) && strlen($_REQUEST['startDate']) > 0){
-				$startDate = strtotime($_REQUEST['startDate']);
-				$materialsRequests->whereAdd("dateCreated >= $startDate");
-				$interface->assign('startDate', $_REQUEST['startDate']);
+			if(  ((isset($_REQUEST['startDate']) && strlen($_REQUEST['startDate']) > 0)) ||  (isset($_REQUEST['endDate']) && strlen($_REQUEST['endDate']) > 0) )
+			{
+				if (isset($_REQUEST['startDate']) && strlen($_REQUEST['startDate']) > 0)
+				{
+					$startDate = strtotime($_REQUEST['startDate']);
+					$materialsRequests->whereAdd("dateCreated >= $startDate");
+					$interface->assign('startDate', $_REQUEST['startDate']);
+				}
+				if (isset($_REQUEST['endDate']) && strlen($_REQUEST['endDate']) > 0)
+				{
+					$endDate = strtotime($_REQUEST['endDate']);
+					$materialsRequests->whereAdd("dateCreated <= $endDate");
+					$interface->assign('endDate', $_REQUEST['endDate']);
+				}
 			}
-			if (isset($_REQUEST['endDate']) && strlen($_REQUEST['endDate']) > 0){
-				$endDate = strtotime($_REQUEST['endDate']);
-				$materialsRequests->whereAdd("dateCreated <= $endDate");
-				$interface->assign('endDate', $_REQUEST['endDate']);
+			else
+			{
+				$dateCreated = mktime()-15552000; //Around 6 months				
+				$materialsRequests->whereAdd("dateCreated > $dateCreated");
 			}
 
 			$materialsRequests->find();
@@ -321,7 +332,7 @@ class ManageRequests extends Admin {
 		// Rename sheet
 		$activeSheet->setTitle('Materials Requests');
 
-		// Redirect output to a client’s web browser (Excel5)
+		// Redirect output to a clientï¿½s web browser (Excel5)
 		header('Content-Type: application/vnd.ms-excel');
 		header('Content-Disposition: attachment;filename=MaterialsRequests.xls');
 		header('Cache-Control: max-age=0');
@@ -333,5 +344,74 @@ class ManageRequests extends Admin {
 
 	function getAllowableRoles(){
 		return array('cataloging');
+	}
+	
+	function printSelectedRequests($name='MaterialsRequests.pdf', $dest='D') {
+		global $interface;
+
+		require_once dirname(__FILE__).'/../../../classes/DCLTCPDF.php';
+		
+		// create new PDF document
+		$pdf = new DCLTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+		
+		// remove default header/footer
+		$pdf->setPrintHeader(false);
+		$pdf->setPrintFooter(false);
+		
+		// set default monospaced font
+		$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+		
+		//set margins
+		$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+		
+		//set auto page breaks
+		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+		
+		//set image scale factor
+		$pdf->setImageScale(0.47);
+		
+		// set font to helvetica 10pt
+		$pdf->SetFont('helvetica', '', 10);
+		
+		$pdf->SetCellPadding(0);
+		//$pdf->setCellHeightRatio(1.25);
+		
+		// gather selected requests and create pdf pages
+		$selectedRequests = $_REQUEST['select'];
+		$count = 0;
+		foreach ($selectedRequests as $requestId => $selected) {
+			$materialsRequest = new MaterialsRequest();
+			$materialsRequest->id = $requestId;
+			$statusQuery = new MaterialsRequestStatus();
+			$materialsRequest->joinAdd($statusQuery);
+			$locationQuery = new Location();
+			$materialsRequest->joinAdd($locationQuery, "LEFT");
+			$materialsRequest->selectAdd();
+			$materialsRequest->selectAdd('materials_request.*, description as statusLabel, location.displayName as location');
+			
+			if ($materialsRequest->find(true)) {
+				// add a new "page" on the "odd numbered" requests
+				if ((++$count % 2) == 1) {
+					$pdf->AddPage();
+				}
+				
+				$interface->assign('materialsRequest', $materialsRequest);
+				
+				// Load user information
+				$requestUser = new User();
+				$requestUser->id = $materialsRequest->createdBy;
+				if ($requestUser->find(true)){
+					$interface->assign('requestUser', $requestUser);
+				}
+				
+				// fetch HTML
+				$html = $interface->fetch('MaterialsRequest/print-request-details.tpl');
+				
+				// output the HTML content
+				$pdf->writeHTML($html, true, false, true, false, '');
+			}
+		}
+		// output the PDF pages 
+		return $pdf->Output($name, $dest);
 	}
 }

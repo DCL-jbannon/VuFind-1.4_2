@@ -23,6 +23,7 @@ require_once 'services/MyResearch/lib/Suggestions.php';
 require_once 'services/MyResearch/lib/User_resource.php';
 require_once 'services/MyResearch/lib/User_list.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
+require_once dirname(__FILE__).'/../../drivers/EContentDriver.php';
 
 class AJAX extends Action {
 
@@ -43,7 +44,14 @@ class AJAX extends Action {
 			header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
 			echo $this->$method();
-		}else{
+		}
+		elseif(in_array($method, array('GetEcontentSummary')))
+		{
+			header('Content-type: application/json');
+			header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
+			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+			echo $this->$method();
+	    }else{
 			header ('Content-type: text/xml');
 			header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
@@ -60,6 +68,12 @@ class AJAX extends Action {
 		}
 	}
 
+	public function GetEcontentSummary()
+	{
+		$ed = new EContentDriver();
+		return json_encode($ed->getAccountSummary());
+	}
+	
 	// Create new list
 	function AddList()
 	{

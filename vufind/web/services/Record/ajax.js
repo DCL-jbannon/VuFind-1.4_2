@@ -27,7 +27,8 @@ function SendSMS(id, to, provider, strings) {
 
 
 
-function SaveComment(id, shortId, strings) {
+function SaveComment(id, shortId, strings) 
+{
 	if (loggedIn){
 		if (shortId == null || shortId == ''){
 			shortId = id;

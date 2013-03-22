@@ -176,16 +176,22 @@ public class Cron {
 					// Update that the process was run.
 					currentTime = new Date();
 					
-				} catch (InstantiationException e) {
-					logger.error("Could not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " could not be be instantiated.");
+				} catch (InstantiationException e){
+					logger.error("aCould not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " could not be be instantiated.");
 					cronEntry.addNote("Could not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " could not be be instantiated.");
 				} catch (IllegalAccessException e) {
-					logger.error("Could not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " generated an Illegal Access Exception.");
+					logger.error("bCould not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " generated an Illegal Access Exception.");
 					cronEntry.addNote("Could not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " generated an Illegal Access Exception.");
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 			} catch (ClassNotFoundException e) {
-				logger.error("Could not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " could not be be found.");
+				logger.error("cCould not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " could not be be found.");
 				cronEntry.addNote("Could not run process " + processToRun.getProcessName() + " because the handler class " + processToRun.getProcessClass() + " could not be be found.");
 			}
 		}

@@ -15,7 +15,7 @@ class OverDriveServices
 		
 	}
 	
-	public function getOverDriveIdFromMarcRecord($stringMarcRecord, IFileMarc $fileMarc = NULL, IMarcSubfieldMock $marcSubField = NULL )
+	public function getOverDriveIdFromMarcRecord($stringMarcRecord, IFileMarc $fileMarc = NULL, IMarcSubfield $marcSubField = NULL )
 	{
 		if(!$fileMarc) $fileMarc = new FileMarc($stringMarcRecord, File_Marc::SOURCE_STRING);
 		$fileMarcRecord = $fileMarc->next();

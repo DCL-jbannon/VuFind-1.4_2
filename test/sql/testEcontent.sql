@@ -60,3 +60,25 @@ CREATE TABLE IF NOT EXISTS `econtent_record_detection_settings` (
   PRIMARY KEY (`id`),
   KEY `source` (`source`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `econtent_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'The id of the eContent item',
+  `filename` varchar(255) NOT NULL DEFAULT '' COMMENT 'The filename of the eContent item if any',
+  `folder` varchar(100) NOT NULL DEFAULT '' COMMENT 'A folder containing a group of files for mp-3 files',
+  `acsId` varchar(128) DEFAULT NULL COMMENT 'The uid of the book within the Adobe Content Server.',
+  `recordId` int(11) NOT NULL COMMENT 'The id of the record to attach the item to.',
+  `item_type` enum('epub','pdf','jpg','gif','mp3','plucker','kindle','externalLink','externalMP3','interactiveBook','overdrive') NOT NULL,
+  `notes` varchar(255) NOT NULL DEFAULT '',
+  `addedBy` int(11) NOT NULL DEFAULT '-1' COMMENT 'The id of the user who added the item or -1 if it was added automatically',
+  `date_added` longtext NOT NULL COMMENT 'The date the item was added',
+  `date_updated` longtext NOT NULL COMMENT 'The last time the item was changed',
+  `reviewdBy` int(11) NOT NULL DEFAULT '-1' COMMENT 'The id of the user who added the item or -1 if not reviewed',
+  `reviewStatus` enum('Not Reviewed','Approved','Rejected') NOT NULL DEFAULT 'Not Reviewed',
+  `reviewDate` longtext COMMENT 'When the review took place.',
+  `reviewNotes` mediumtext COMMENT 'Notes about the review',
+  `link` varchar(500) DEFAULT NULL,
+  `libraryId` int(11) NOT NULL DEFAULT '-1',
+  `overDriveId` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `RecordId` (`recordId`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='EContent files that can be viewed within VuFind.';

@@ -19,8 +19,8 @@
  */
 
 require_once 'Interface.php';
-require_once 'sys/SIP2.php';
-require_once 'Drivers/Horizon.php';
+require_once dirname(__FILE__).'/../sys/SIP2.php';
+require_once dirname(__FILE__).'/Horizon.php';
 
 class DCL extends Horizon {
 	function __construct(){

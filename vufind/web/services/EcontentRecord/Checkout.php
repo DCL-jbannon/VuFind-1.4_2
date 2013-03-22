@@ -1,88 +1,82 @@
 <?php
-/**
- *
- * Copyright (C) Villanova University 2007.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2,
- * as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- */
-
 require_once 'Action.php';
 require_once 'Drivers/EContentDriver.php';
 require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
+require_once dirname(__FILE__).'/../../../classes/Utils/BookCoverURL.php';
 
 class Checkout extends Action
 {
 	
-	function launch()
+	protected $chooseFormat = false;
+	
+	public function launch()
 	{
 		global $interface;
 		global $configArray;
 		global $user;
-
+	
 		$driver = new EContentDriver();
 		$id = strip_tags($_REQUEST['id']);
 		$interface->assign('id', $id);
 		
 		$logger = new Logger();
-		
-		//Get title information for the record.
-		$eContentRecord = new EContentRecord();
-		$eContentRecord->id = $id;
-		if (!$eContentRecord->find(true))
-		{
-			PEAR::raiseError("Unable to find eContent record for id: $id");
-		}
-		
+				
 		if (isset($_POST['submit']) || $user) 
 		{
 			if (isset($_REQUEST['username']) && isset($_REQUEST['password']))
 			{
-				//Log the user in
 				$user = UserAccount::login();
 			}
 
 			if (!PEAR::isError($user) && $user)
 			{
-				$econtentDetails = EcontentDetailsFactory::get($eContentRecord);
 				
-				if($econtentDetails !== false)
+				$econtentRecord = new EContentRecord();
+				$econtentRecord->id = $id;
+				if($econtentRecord->find(true))
 				{
-					$result = $econtentDetails->checkout($user->getBarcode());
-					if($result === false)
+					$formatId = RequestUtils::getGet("formatId");
+					if($econtentRecord->isOverDrive() && $formatId == '' )
 					{
-						$return = false;
-						$interface->assign('result', $return);
-						$interface->assign('message', "The item could not be checked out.");
-						$showMessage = true;
+						$bookCoverUrl = new BookcoverURL();
+						
+						$econtentDetails = EcontentDetailsFactory::get($econtentRecord);
+						$formats = $econtentDetails->getFormatsInfo();
+						$interface->assign("action", ($this->chooseFormat ? "CFormat" : "Checkout"));
+						$interface->assign("title", $econtentRecord->getTitle());
+						$interface->assign("formats", $formats);
+						$interface->assign("econtentRecordId", $econtentRecord->id);
+						$interface->assign("bookCoverUrl", $bookCoverUrl->getBookCoverUrl('large', $econtentRecord->getISSN(), $econtentRecord->id, true));
+						
+						//Var for the IDCLREADER TEMPLATE
+						$interface->assign('ButtonBack',true);
+						$interface->assign('ButtonHome',true);
+						$interface->assign('MobileTitle','&nbsp;');
+						
+						$interface->setTemplate('checkout-overdrive.tpl');
+						$interface->display('layout.tpl', 'RecordHold' . $_GET['id']);
+						return true;
 					}
 					else
 					{
-						$return = true;
-						$interface->assign('result', $return);
-						$interface->assign('message', "The item has been checked out.");
-						$showMessage = true;
+						if(!$this->chooseFormat)
+						{
+							$return = $driver->checkoutRecord($econtentRecord, $user, $formatId);
+							$interface->assign('result', $return['result']);
+							$message = $return['message'];
+							$interface->assign('message', $message);
+							$showMessage = true;
+						}
+						else
+						{
+							$details = EcontentDetailsFactory::get($econtentRecord);
+							$details->chooseFormat($user, $formatId);
+							$interface->assign('result', true);
+							$interface->assign('message', "The item has been checked out.");
+							$showMessage = true;
+							$return = "";
+						}
 					}
-				}
-				else
-				{
-					//The user is already logged in
-					$return = $driver->checkoutRecord($id, $user);
-					$interface->assign('result', $return['result']);
-					$message = $return['message'];
-					$interface->assign('message', $message);
-					$showMessage = true;
 				}
 			} 
 			else
@@ -95,7 +89,6 @@ class Checkout extends Action
 		}
 		else
 		{
-			//Get the referrer so we can go back there.
 			if (isset($_SERVER['HTTP_REFERER']))
 			{
 				$referer = $_SERVER['HTTP_REFERER'];

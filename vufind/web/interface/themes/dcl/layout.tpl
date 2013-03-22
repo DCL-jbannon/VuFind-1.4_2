@@ -42,7 +42,7 @@
 	    <script type="text/javascript" src="{$path}/js/jquery-1.7.1.min.js"></script>
 	    <script type="text/javascript" src="{$path}/js/jqueryui/jquery-ui-1.8.18.custom.min.js"></script>
 	    <script type="text/javascript" src="{$path}/js/jquery.plugins.js"></script>
-      <script type="text/javascript" src="{$path}/js/scripts.js"></script>
+        <script type="text/javascript" src="{$path}/js/scripts.js?t=01312013"></script>
 	    
 	    {if $enableBookCart}
 	    <script type="text/javascript" src="{$path}/js/bookcart/json2.js"></script>
@@ -51,7 +51,7 @@
 	    
 	    {* Code for description pop-up and other tooltips.*}
 	    <script type="text/javascript" src="{$path}/js/title-scroller.js"></script>
-      	<script type="text/javascript" src="{$path}/services/Search/ajax.js"></script>
+      	<script type="text/javascript" src="{$path}/services/Search/ajax.js?t=01232013"></script>
 		<script type="text/javascript" src="{$path}/services/Record/ajax.js"></script>
 		<script type="text/javascript" src="{$path}/js/overdrive.js"></script>
 		<!--  <script type="text/javascript" src="{$path}/js/jquery.media.js"></script> -->

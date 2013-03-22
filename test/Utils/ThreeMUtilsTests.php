@@ -8,7 +8,7 @@ class ThreeMUtilsTests extends PHPUnit_Framework_TestCase
 	
 	public function setUp()
 	{
-		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("find"));
+		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("find", "getSourceUrl"));
 		parent::setUp();
 	}
 
@@ -20,7 +20,12 @@ class ThreeMUtilsTests extends PHPUnit_Framework_TestCase
 	public function test_get3MId_called_returnCorrectId()
 	{
 		$expected = "mnvz9";
-		$this->eContentRecordMock->sourceUrl = "http://ebook.3m.com/library/DouglasCountyLibraries-document_id-".$expected;
+		$sourceUrl = "http://ebook.3m.com/library/DouglasCountyLibraries-document_id-".$expected;
+		
+		$this->eContentRecordMock->expects($this->once())
+									->method("getSourceUrl")
+									->will($this->returnValue($sourceUrl));
+		
 		$actual = ThreeMUtils::get3MId($this->eContentRecordMock);
 		$this->assertEquals($expected, $actual);
 	}
@@ -50,7 +55,7 @@ class ThreeMUtilsTests extends PHPUnit_Framework_TestCase
 	*/
 	public function test_getEcontentRecordFrom3MId_called_returnCorreclty()
 	{
-		$threemId = "aDummy3MId";
+		$threemId = "aDummy3MId";	
 		$this->eContentRecordMock->expects($this->once())
 								 ->method("find")
 								 ->with($this->equalTo(true))
@@ -60,8 +65,5 @@ class ThreeMUtilsTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals("http://ebook.3m.com/library/DouglasCountyLibraries-document_id-".$threemId, $this->eContentRecordMock->sourceUrl);
 		$this->assertEquals($this->eContentRecordMock, $actual);
 	}
-	
-		
-	
 }
 ?>

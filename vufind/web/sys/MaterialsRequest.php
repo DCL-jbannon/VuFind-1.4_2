@@ -4,6 +4,7 @@
  */
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
+require_once dirname(__FILE__).'/../../classes/Utils/DateTimeUtils.php';
 
 class MaterialsRequest extends DB_DataObject
 {

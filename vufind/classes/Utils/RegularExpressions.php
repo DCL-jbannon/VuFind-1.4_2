@@ -15,7 +15,7 @@ class RegularExpressions implements IRegularExpressions{
 	public function getFieldValueFromURL($url, $paramName)
 	{
 		$matches = array();
-		preg_match("/".$paramName."=(.*)/",$url, $matches);
+		preg_match("/".$paramName."=(.*)/i",$url, $matches);
 		if(!empty($matches))
 		{
 			$paramValue = explode("&",$matches[1]);

@@ -4,7 +4,7 @@
  */
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
-require_once 'sys/SolrDataObject.php';
+require_once dirname(__FILE__).'/../SolrDataObject.php';
 
 class EContentCheckout extends DB_DataObject {
 	public $__table = 'econtent_checkout';    // table name
@@ -26,5 +26,10 @@ class EContentCheckout extends DB_DataObject {
 
 	function keys() {
 		return array('id', 'userId');
+	}
+	
+	public function setRecordId($recordId)
+	{
+		$this->recordId = $recordId;
 	}
 }

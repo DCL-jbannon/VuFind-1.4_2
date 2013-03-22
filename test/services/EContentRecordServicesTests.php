@@ -2,161 +2,185 @@
 require_once dirname(__FILE__).'/../../vufind/classes/services/EContentRecordServices.php';
 require_once dirname(__FILE__).'/../mother/marcRecordMother.php';
 
-
-
-
 class EContentRecordServicesTests extends PHPUnit_Framework_TestCase
 {
 	
+	const eContentRecordFromId = "aDummyEcontentRecordFromId";
+	const eContentRecordToId = "aDummyEcontentRecordToId";
+	
 	private $service;
-	private $eContentRecordMock;
-	private $fileMarcMock;
-	private $marcRecordMother;
+	private $econtentRecordDbUtilsMock;
+	private $econtentHistoryDbUtilsMock;
+	private $econtentHoldDbUtilsMock;
+	private $econtentCheckOutDbUtilsMock;
+	private $resourceDBUtilsMock;
+	private $commentsDBUtilsMock;
+	private $userRatingsDBUtilsMock;
+	
+	private $resourceMock;
 	
 	public function setUp()
 	{
-		$this->marcRecordMother = new MarcRecordMother();
-		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("getNormalizedMarcRecord"));
+		$this->econtentRecordDbUtilsMock   = $this->getMock("IDB_DataObjectUtils", array("getObjectById"));
+		$this->econtentHistoryDbUtilsMock   = $this->getMock("IDB_DataObjectUtils", array("changeRecordId"));
+		$this->econtentHoldDbUtilsMock     = $this->getMock("IDB_DataObjectUtils", array("changeRecordId"));
+		$this->econtentCheckOutDbUtilsMock = $this->getMock("IDB_DataObjectUtils", array("changeRecordId"));
+		$this->resourceDBUtilsMock = $this->getMock("IDB_DataObjectUtils", array("getByRecordId", "changeRecordIdByResourceId"));
+		$this->commentsDBUtilsMock = $this->getMock("IDB_DataObjectUtils", array("changeResourceId"));
+		$this->userRatingsDBUtilsMock = $this->getMock("IDB_DataObjectUtils", array("changeResourceId"));
+		
+		$this->resourceMock = $this->getMock("IResource");
+		
 		$this->service = new EContentRecordServices();
 		parent::setUp();		
 	}
-	
-	
+
 	/**
-	* method isFree
-	* when recordIsNotFree
-	* should returnFalse
-	* @dataProvider DP_isFree_recordIsNotFree
+	* method moveEcontentRelatedInformation 
+	* when eContentRecordFromIdDoesNotExists
+	* should throw
+	* @expectedException DomainException
 	*/
-	public function test_isFree_recordIsNotFree_returnFalse($accessType)
+	public function test_moveEcontentRelatedInformation_eContentRecordFromIdDoesNotExists_throw()
 	{
-		$this->eContentRecordMock->accessType = $accessType;
-		$actual = $this->service->isFree($this->eContentRecordMock);
-		$this->assertFalse($actual);
-	}
-	
-	public function DP_isFree_recordIsNotFree()
-	{
-		return array(
-				  		array("acs")
-					);
+		$this->prepareCheckFromIdExists(false);
+		$this->executeMove();
 	}
 	
 	/**
-	* method isFree
-	* when recordIsFree
-	* should returnTrue
-	* @dataProvider DP_isFree_recordIsFree
-	*/
-	public function test_isFree_recordIsFree_returnTrue($accessType)
+	 * method moveEcontentRelatedInformation
+	 * when eContentRecordToIdDoesNotExists
+	 * should throw
+	 * @expectedException DomainException
+	 */
+	public function test_moveEcontentRelatedInformation_eContentRecordToIdDoesNotExists_throw()
 	{
-		$this->eContentRecordMock->accessType = $accessType;
-		$actual = $this->service->isFree($this->eContentRecordMock);
-		$this->assertTrue($actual);
+		$this->prepareCheckFromIdExists("aDummyReturnValue");
+		$this->prepareCheckToIdExists(false);
+		$this->executeMove();
 	}
-	
-	public function DP_isFree_recordIsFree()
-	{
-		return array(
-				array("free"),
-				array("singleUse")
-		);
-	}
-	
 	
 	/**
-	* method getMarcTitle
-	* when titleExist
-	* should returnMarcTitle
-	*/
-	public function test_getMarcTitle_titleExist_returnMarcTitle()
+	 * method moveEcontentRelatedInformation
+	 * when oldRecordIdHasNoResourceEntry
+	 * should executesCorrectly
+	 */
+	public function test_moveEcontentRelatedInformation_oldRecordIdHasNoResourceEntry_executesCorrectly()
+	{
+		$this->prepareCheckFromIdExists("aDummyReturnValue");
+		$this->prepareCheckToIdExists("aDummyReturnValue");
+		$this->prepareMockToChangeRecorId($this->econtentHistoryDbUtilsMock);
+		$this->prepareMockToChangeRecorId($this->econtentHoldDbUtilsMock);
+		$this->prepareMockToChangeRecorId($this->econtentCheckOutDbUtilsMock);
+		$this->prepareGetResourceByRecordId(false, self::eContentRecordFromId, 0);
+		$this->executeMove();
+	}
+	
+	/**
+	 * method moveEcontentRelatedInformation
+	 * when OldRecordHasReourceButNewRecordIdHasNoResourceEntry
+	 * should executesCorrectly
+	 */
+	public function test_moveEcontentRelatedInformation_OldRecordHasReourceButNewRecordIdHasNoResourceEntry_executesCorrectly()
 	{	
-		$expected = "The Anteater of Death";
-		$eContentMarcRecord = $this->marcRecordMother->getEContentMarcRecord();
-		$this->prepareGetTitleAuthor($eContentMarcRecord);
-		$actual = $this->service->getMarcTitle($this->eContentRecordMock);
-		$this->assertEquals($expected, $actual);
+		$resourceId = "aDummyResourceId";
+		$this->resourceMock->id = $resourceId;
+		
+		$this->prepareCheckFromIdExists("aDummyReturnValue");
+		$this->prepareCheckToIdExists("aDummyReturnValue");
+		$this->prepareMockToChangeRecorId($this->econtentHistoryDbUtilsMock);
+		$this->prepareMockToChangeRecorId($this->econtentHoldDbUtilsMock);
+		$this->prepareMockToChangeRecorId($this->econtentCheckOutDbUtilsMock);
+		$this->prepareGetResourceByRecordId($this->resourceMock, self::eContentRecordFromId, 0);
+		$this->prepareGetResourceByRecordId(false, self::eContentRecordToId, 1);
+		
+		$this->resourceDBUtilsMock->expects($this->once())
+									->method("changeRecordIdByResourceId")
+									->with($this->equalTo($resourceId), self::eContentRecordToId);
+		$this->executeMove();
 	}
 	
 	/**
-	 * method getMarcTitle
-	 * when titleMarcNotExistsExist
-	 * should returnBBDDTitle
+	 * method moveEcontentRelatedInformation
+	 * when oldRecordHasReourceEntryNewRecordIdHasResourceEntry
+	 * should executesCorrectly
 	 */
-	public function test_getMarcTitle_titleMarcNotExistsExist_returnBBDDTitle()
+	public function test_moveEcontentRelatedInformation_oldRecordHasReourceEntryNewRecordIdHasResourceEntry_executesCorrectly()
 	{
-		$expected = "a Dummy Title from Database";
-		$eContentMarcRecord = $this->marcRecordMother->getEContentMarcRecordNoAuthorNoTitle();
-		$this->prepareGetTitleAuthor($eContentMarcRecord);
-		$actual = $this->service->getMarcTitle($this->eContentRecordMock);
-		$this->assertEquals($expected, $actual);
+		$resourceId = "aDummyResourceId";
+		$resourceIdTo = "aDummyResourceIdTo";
+		$this->resourceMock->id = $resourceId;
+		
+		$resourceMockTo = clone $this->resourceMock;
+		$resourceMockTo->id = $resourceIdTo;
+	
+		$this->prepareCheckFromIdExists("aDummyReturnValue");
+		$this->prepareCheckToIdExists("aDummyReturnValue");
+		$this->prepareMockToChangeRecorId($this->econtentHistoryDbUtilsMock);
+		$this->prepareMockToChangeRecorId($this->econtentHoldDbUtilsMock);
+		$this->prepareMockToChangeRecorId($this->econtentCheckOutDbUtilsMock);
+		$this->prepareGetResourceByRecordId($this->resourceMock, self::eContentRecordFromId, 0);
+		$this->prepareGetResourceByRecordId($resourceMockTo, self::eContentRecordToId, 1);
+	
+		$this->commentsDBUtilsMock->expects($this->once())
+									->method("changeResourceId")
+									->with($this->equalTo($resourceId), $this->equalTo($resourceIdTo));
+		
+		$this->userRatingsDBUtilsMock->expects($this->once())
+										->method("changeResourceId")
+										->with($this->equalTo($resourceId), $this->equalTo($resourceIdTo));
+		
+		$this->executeMove();
 	}
 	
-	/**
-	 * method getMarcTitle
-	 * when recordHasNoMarcRecord
-	 * should returnBBDDTitle
-	 */
-	public function test_getMarcTitle_recordHasNoMarcRecord_returnBBDDTitle()
+
+	
+	//Executes
+	
+	private function prepareGetResourceByRecordId($returnValue, $parameterValue, $index = 0)
 	{
-		$expected = "a Dummy Title from Database";
-		$eContentMarcRecord = NULL;
-		$this->prepareGetTitleAuthor($eContentMarcRecord);
-		$actual = $this->service->getMarcTitle($this->eContentRecordMock);
-		$this->assertEquals($expected, $actual);
+		$this->resourceDBUtilsMock->expects($this->at($index))
+									->method("getByRecordId")
+									->with($this->equalTo($parameterValue))
+									->will($this->returnValue($returnValue));
 	}
 	
-	/**
-	 * method getMarcAuthor
-	 * when authorExist
-	 * should returnMarcAuthor
-	 */
-	public function test_getMarcAuthor_authorExist_returnMarcAuthor()
-	{	
-		$expected = "Webb, Betty,";
-		$eContentMarcRecord = $this->marcRecordMother->getEContentMarcRecord();
-		$this->prepareGetTitleAuthor($eContentMarcRecord);
-		$actual = $this->service->getMarcAuthor($this->eContentRecordMock);
-		$this->assertEquals($expected, $actual);
-	}
-	
-	/**
-	 * method getMarcAuthor
-	 * when authorMarcNotExist
-	 * should returnBBDDAuthor
-	 */
-	public function test_getMarcAuthor_authorMarcNotExist_returnBBDDAuthor()
+	private function prepareMockToChangeRecorId($mokObject)
 	{
-		$eContentMarcRecord = $this->marcRecordMother->getEContentMarcRecordNoAuthorNoTitle();
-		$expected = "a Dummy Author From Database";
-		$this->prepareGetTitleAuthor($eContentMarcRecord);
-		$actual = $this->service->getMarcAuthor($this->eContentRecordMock);
-		$this->assertEquals($expected, $actual);
+		$mokObject->expects($this->once())
+					->method("changeRecordId")
+					->with($this->equalTo(self::eContentRecordFromId), $this->equalTo(self::eContentRecordToId));
 	}
 	
-	/**
-	 * method getMarcAuthor
-	 * when recordHasNoMarcRecord
-	 * should returnBBDDAuthor
-	 */
-	public function test_getMarcAuthor_recordHasNoMarcRecord_returnBBDDAuthor()
+	
+	private function prepareCheckFromIdExists($returnValue)
 	{
-		$eContentMarcRecord = NULL;
-		$expected = "a Dummy Author From Database";
-		$this->prepareGetTitleAuthor($eContentMarcRecord);
-		$actual = $this->service->getMarcAuthor($this->eContentRecordMock);
-		$this->assertEquals($expected, $actual);
+		$this->econtentRecordDbUtilsMock->expects($this->at(0))
+										->method("getObjectById")
+										->with($this->equalTo(self::eContentRecordFromId))
+										->will($this->returnValue($returnValue));
 	}
 	
-	
-	private function prepareGetTitleAuthor($eContentMarcRecord)
+	private function prepareCheckToIdExists($returnValue)
 	{
-		$this->eContentRecordMock->title = "a Dummy Title from Database";
-		$this->eContentRecordMock->author = "a Dummy Author From Database";
-		$this->eContentRecordMock->expects($this->once())
-									->method("getNormalizedMarcRecord")
-									->will($this->returnValue($eContentMarcRecord));
+		$this->econtentRecordDbUtilsMock->expects($this->at(1))
+										->method("getObjectById")
+										->with($this->equalTo(self::eContentRecordToId))
+										->will($this->returnValue($returnValue));
 	}
 	
+	
+	private function executeMove()
+	{
+		return $this->service->moveEcontentRelatedInformation(	self::eContentRecordFromId,
+																self::eContentRecordToId,
+																$this->econtentRecordDbUtilsMock,
+																$this->econtentHistoryDbUtilsMock,
+																$this->econtentHoldDbUtilsMock,
+																$this->econtentCheckOutDbUtilsMock,
+																$this->resourceDBUtilsMock,
+																$this->commentsDBUtilsMock,
+																$this->userRatingsDBUtilsMock);
+	}
 }
 ?>

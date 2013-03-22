@@ -1,8 +1,8 @@
 <?php
 
-interface IMarcSubfieldMock{}
+interface IMarcSubfield{}
 
-class MarcSubField implements IMarcSubfieldMock
+class MarcSubField implements IMarcSubfield
 {
 	const indicatorsIndex = 'indicators';
 	const codesIndex = 'codes';

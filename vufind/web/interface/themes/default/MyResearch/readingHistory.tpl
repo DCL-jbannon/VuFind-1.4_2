@@ -4,8 +4,9 @@
 </script>
 {/if}
 <script type="text/javascript" src="{$path}/js/readingHistory.js" ></script>
-<script type="text/javascript" src="{$path}/services/MyResearch/ajax.js" ></script>
+<script type="text/javascript" src="{$path}/services/MyResearch/ajax.js?t=03182013" ></script>
 <script type="text/javascript" src="{$path}/js/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="{$url}/services/EcontentRecord/ajax.js"></script>
 <div id="page-content" class="content">
 	<div id="sidebar">
 		{include file="MyResearch/menu.tpl"}
@@ -86,6 +87,7 @@
                 <th><input id='selectAll' type='checkbox' onclick="toggleCheckboxes('.titleSelect', $(this).attr('checked'));" title="Select All/Deselect All"/></th>
                 <th>{translate text='Title'}</th>
                 <th>{translate text='Format'}</th>
+                <th>{translate text='Rating'}</th>
                 <th>{translate text='Out'}</th>
               </tr>
             </thead>
@@ -97,7 +99,7 @@
 					{else}
 							<tr id="record{$record.recordId|escape}" class="result record{$smarty.foreach.recordLoop.iteration}">
 					{/if}
-					<td class="titleSelectCheckedOut myAccountCell">
+					<td class="titleSelectCheckedOut myAccountCell myAccountFormat">
 						<input type="checkbox" name="selected[{$record.recordId|escape:"url"}]" class="titleSelect" id="selected{$record.shortId|escape:"url"}" />
 						</td>
 						<td class="myAccountCell">
@@ -105,7 +107,12 @@
 				    	<div class="imageColumn"> 
 						    
 						    <a href="{$url}/{if strcasecmp($record.source, 'vufind') == 0}Record{else}EcontentRecord{/if}/{$record.recordId|escape:"url"}?searchId={$searchId}&amp;recordIndex={$recordIndex}&amp;page={$page}" id="descriptionTrigger{$record.recordId|escape:"url"}">
-						    <img src="{$path}/bookcover.php?id={$record.recordId}&amp;isn={$record.isbn|@formatISBN}&amp;size=small&amp;upc={$record.upc}&amp;category={$record.format_category|escape:"url"}" class="listResultImage" alt="{translate text='Cover Image'}"/>
+						    
+						    {if $record.bookCoverUrl eq ''}
+						    	<img src="{$path}/bookcover.php?id={$record.recordId}&amp;isn={$record.isbn|@formatISBN}&amp;size=small&amp;upc={$record.upc}&amp;category={$record.format_category|escape:"url"}" class="listResultImage" alt="{translate text='Cover Image'}"/>
+						    {else}				    
+						    	<img src="{$record.bookCoverUrl}" class="listResultImage" alt="{translate text='Cover Image'}"/>
+						    {/if}
 						    </a>
 						    
 						    <div id='descriptionPlaceholder{$record.recordId|escape}' style='display:none'></div>
@@ -144,7 +151,7 @@
                </div>
             </td>
 						
-			      <td class="myAccountCell">
+			      <td class="myAccountCell myAccountFormat">
               {if is_array($record.format)}
                 {foreach from=$record.format item=format}
                   {translate text=$format}
@@ -153,13 +160,34 @@
                 {translate text=$record.format}
               {/if}
             </td>
-            
-            <td class="myAccountCell">      
+            <td class='myAccountCell myAccountRating'>
+            	<div id ="searchStars{$record.recordId|escape}" class="resultActions">
+	            	{if $record.format_category eq 'emedia'}
+	            		<div class="rateEContent{$record.recordId|escape} stat">
+	            	{else}
+	            		<div class="rate{$record.recordId|escape} stat">
+	            	{/if}
+					    	<div class="statVal">
+		            			<span class="ui-rater">
+		      						<span class="ui-rater-starsOff" style="width:90px;"><span class="ui-rater-starsOn" style="width:0px"></span>
+		      					</span>
+		      			    	(<span class="ui-rater-rateCount-{$record.recordId|escape} ui-rater-rateCount">0</span>)
+		      			    </div>
+		      			    {if $record.format_category eq 'emedia'}
+	            				{assign var=id value=$record.recordId}
+	                			{include file="EcontentRecord/title-review.tpl"}
+	               			{else}
+	                			{assign var=shortId value=$record.recordId scope="global"}
+	                			{assign var=id value=$record.recordId}
+	                  			{include file="Record/title-review.tpl"}
+	                		{/if}
+	      				</div>
+      			</div>
+      			
+            </td>
+            <td class="myAccountCell myAccountOut">      
 				       {$record.checkout|escape}{if $record.lastCheckout} to {$record.lastCheckout|escape}{/if}
 		        </td>             
-            
-
-						
 						{if $record.recordId != -1}
 						<script type="text/javascript">
 						  $(document).ready(function(){literal} { {/literal}
@@ -168,19 +196,36 @@
 						</script>
 						{/if}
 					</tr>
+					<script type="text/javascript">
+		      		     $(
+		      		         function() {literal} { {/literal}
+		      		        	{if $record.format_category eq 'emedia'}
+		      		             	$('.rateEContent{$record.recordId|escape}').rater({literal}{ {/literal}module: 'EcontentRecord', recordId: '{$record.recordId}',  rating:0.0, postHref: '{$url}/EcontentRecord/{$record.recordId}/AJAX?method=RateTitle'{literal} } {/literal});
+		      		             {else}
+		      		           		$('.rate{$record.recordId|escape}').rater({literal}{ {/literal}module: 'Record', recordId: '{$record.recordId}',  rating:0.0, postHref: '{$url}/Record/{$record.recordId}/AJAX?method=RateTitle'{literal} } {/literal});
+		      		             {/if}	
+		      		         {literal} } {/literal}
+		      		      );
+      		 		</script>
+      		 		
+      		 		{if $record.recordId != -1}
+						<script type="text/javascript">
+							{if $record.format_category eq 'emedia'}
+						  		addRatingId('{$record.recordId|escape:"javascript"}', 'eContent');
+						  	{else}
+						  		addRatingId('{$record.recordId|escape:"javascript"}');
+						  	{/if}
+						</script>
+					{/if}
 				{/foreach}
 	        </tbody>
       </table>           
 	      
 				<script type="text/javascript">
-        $(document).ready(function() {literal} { {/literal}
-          doGetRatings();
-          /*$("#readingHistoryTable")
-          	.tablesorter({literal}{cssAsc: 'sortAscHeader', cssDesc: 'sortDescHeader', cssHeader: 'unsortedHeader', headers: { 0: { sorter: false}, 3: { sorter: 'date' }, 4: { sorter: false }, 7: { sorter: false} } }{/literal})
-            .tablesorterPager({literal}{container: $("#pager")}{/literal})
-            	;*/
-        {literal} }); {/literal}
-      </script>
+			        $(document).ready(function() {literal} { {/literal}
+			          doGetRatings();
+			        {literal} }); {/literal}
+      			</script>
           {else if $historyActive == true}
             {* No Items in the history, but the history is active *}
             You do not have any items in your reading list.  It may take up to 3 hours for your reading history to be updated after you start recording your history.

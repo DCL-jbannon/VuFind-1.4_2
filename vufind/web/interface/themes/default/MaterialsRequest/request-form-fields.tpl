@@ -41,9 +41,10 @@
 		<div>
 			<label for="format">Format <span class="requiredIndicator">*</span>:</label>
 			<select name="format" class="required" id="format" onchange="setFieldVisibility();">
-			{foreach from=$availableFormats item=label key=formatKey}
-				<option value="{$formatKey}"{if $materialsRequest->format==$formatKey}selected='selected'{/if}>{$label}</option>
-			{/foreach}
+				<option value="" selected='selected'></option>
+				{foreach from=$availableFormats item=label key=formatKey}
+					<option value="{$formatKey}"{if $materialsRequest->format==$formatKey}{/if}>{$label}</option>
+				{/foreach}
 			</select>
 		</div>
 		<div class="formatSpecificField articleField">
@@ -110,7 +111,7 @@
 		<div id="suggestedIdentifiers" style="display:none"></div>
 		<div class="formatSpecificField bookField largePrintField dvdField blurayField cdAudioField cdMusicField ebookField eaudioField playawayField cassetteField vhsField otherField">
 			<label for="isbn">ISBN:</label>
-			<input name="isbn" id="isbn" size="15" maxlength="15" value="{$materialsRequest->isbn}"/>
+			<input name="isbn" id="isbn" size="15" maxlength="15" value="{$materialsRequest->isbn}"/> <strong>Enter ISBN with no dashes</strong>
 		</div>
 		<div class="formatSpecificField dvdField blurayField cdMusicField vhsField otherField" >
 			<label for="upc">UPC:</label>
@@ -175,8 +176,8 @@
 				<input type="radio" name="placeHoldWhenAvailable" value="0" id="placeHoldNo" onclick="updateHoldOptions();"/><label for="placeHoldNo">No</label>
 			</div>
 			<div id="pickupLocationField">
-				<label for="pickupLocation">Pickup Location: </label>
-				<select name="holdPickupLocation" id="pickupLocation" onchange="updateHoldOptions();">
+				<label for="pickupLocation"><span class="requiredIndicator">*</span>Pickup Location: </label>
+				<select name="holdPickupLocation" id="pickupLocation" onchange="updateHoldOptions();" class="required">
 					{foreach from=$pickupLocations item=location}
 						<option value="{$location->locationId}" {if $location->selected == "selected"}selected="selected"{/if}>{$location->displayName}</option>
 					{/foreach}

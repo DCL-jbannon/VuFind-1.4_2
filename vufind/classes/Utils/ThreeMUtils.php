@@ -8,7 +8,7 @@ class ThreeMUtils implements IThreeMUtils
 
 	public static function get3MId(IEContentRecord $econtentRecord)
 	{
-		$sourceUrlParts = explode("-", $econtentRecord->sourceUrl);
+		$sourceUrlParts = explode("-", $econtentRecord->getSourceUrl());
 		return $sourceUrlParts[count($sourceUrlParts)-1];
 	}
 	

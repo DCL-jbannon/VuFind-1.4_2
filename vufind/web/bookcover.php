@@ -5,7 +5,7 @@
  * @author Juan Giménez <jgimenez@dclibraries.org>
  *
  */
-require_once dirname(__FILE__).'/../classes/services/EContentRecordServices.php';
+
 require_once dirname(__FILE__).'/../classes/covers/AttachedEcontentCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/OriginalFolderCovers.php';
 require_once dirname(__FILE__).'/../classes/covers/LibraryThingCovers.php';
@@ -267,9 +267,8 @@ function dieWithFailImage($id = NULL)
 			if ($eContentRecord->find(true))
 			{
 				$eContentRecord->fetch();
-				$eContentRecordServices = new EContentRecordServices();
-				$title=$eContentRecordServices->getMarcTitle($eContentRecord);
-				$author=$eContentRecordServices->getMarcAuthor($eContentRecord);
+				$title=$eContentRecord->getTitle();
+				$author=$eContentRecord->getAuthor();
 				$type   = "emedia";
 			}
 		}
@@ -280,8 +279,8 @@ function dieWithFailImage($id = NULL)
 			if ($resource->find(true))
 			{
 				$resource->fetch();
-				$title=$resource->title;
-				$author=$resource->author;
+				$title=$resource->getTitle();
+				$author=$resource->getAuthor();
 				$type = CoversType::getCoverTypeFromFormat($resource->format_category);
 			}
 		}
@@ -407,7 +406,7 @@ function processImageURL($imageUrl, $size, $cache = true)
 		// Display the image:
 		header('Content-type: image/jpeg');
 		//header('Content-type: text/plain'); //Use this to debug notices and warnings
-		readfile($finalFile);
+		echo file_get_contents($finalFile);
 
 		// If we don't want to cache the image, delete it now that we're done.
 		if (!$cache) {

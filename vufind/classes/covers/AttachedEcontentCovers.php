@@ -1,6 +1,8 @@
 <?php
+require_once dirname(__FILE__).'/../interfaces/IEcontentCovers.php';
 
-class AttachedEcontentCovers {
+class AttachedEcontentCovers implements IEcontentCovers
+{
 	
 	private $baseDirectoryCovers;
 	

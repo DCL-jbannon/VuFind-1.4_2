@@ -26,6 +26,10 @@ require_once 'services/Record/UserComments.php';
 require_once 'services/Record/Holdings.php';
 require_once 'CatalogConnection.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
+require_once dirname(__FILE__).'/../../../classes/Utils/RegularExpressions.php';
+require_once dirname(__FILE__).'/../../sys/eContent/EContentRecord.php';
+require_once 'Drivers/OverDriveDriver.php';
+require_once 'Drivers/EContentDriver.php';
 
 /**
  * API methods related to getting information about specific items. 
@@ -49,7 +53,8 @@ require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
  * @author Mark Noble <mnoble@turningleaftech.com>
  * @copyright Copyright (C) Douglas County Libraries 2011.
  */
-class ItemAPI extends Action {
+class ItemAPI extends Action
+{
 	protected $catalog;
 
 	public $id;
@@ -92,7 +97,121 @@ class ItemAPI extends Action {
 		echo $output;
 	}
 	
-	function addFileToAcsServer(){
+	
+	public function eContentCheckOutPlaceHold()
+	{
+		
+		if (!isset($_GET['username']))
+		{
+			return array('error' => 'The username must be provided');
+		}
+		if (!isset($_GET['password']))
+		{
+			return array('error' => 'The password must be provided');
+		}
+		
+		$_POST['username'] = $_GET['username'];
+		$_POST['password'] = $_GET['password'];
+		
+		$user = UserAccount::login();
+		
+		if(get_class($user) == "PEAR_Error")
+		{
+			return array('error' => 'Authentication Error');
+		}
+		
+		if (!isset($_GET['id']))
+		{
+			return array('error' => 'The ID must be provided');
+		}
+		
+		$id = $_GET['id'];
+		//DB_DataObject::debugLevel(5);
+		
+		$econtentRecord = new EContentRecord();
+		$econtentRecord->id = $id;
+		if(!$econtentRecord->find(true))
+		{
+			return array('error' => 'There is no eContent with the ID '.$id);
+		}
+		
+		$driver = new EContentDriver();
+		if($econtentRecord->isACS() || $econtentRecord->is3M())
+		{  //115
+			$result = $driver->checkoutRecord($id, $user);
+			if($result['result'])
+			{
+				return array('type'=>'checkout', 'message'=>$result['message']);
+			}
+			else
+			{
+				$result = $driver->placeHold($id, $user);
+				if($result['result'])
+				{
+					return array('type'=>'placeHold', 'message'=>$result['message']);
+				}
+				else
+				{
+					return array('error' => $result['message']);
+				}
+			};
+		}
+		
+		if($econtentRecord->isOverDrive())
+		{ 
+			if(!isset($_GET['formatId']))
+			{
+				return array('error' => 'The formatId parameter for OverDrive Items is mandatory');
+			}
+			
+			if(!isset($_GET['lendingPeriod']))
+			{
+				return array('error' => 'The lendingPeriod parameter for OverDrive Items is mandatory');
+			}
+			
+			$validLendingsPeriod = array(7,14,21);
+			if(!in_array($_GET['lendingPeriod'], $validLendingsPeriod))
+			{
+				return array('error' => 'The lendingPeriod values must be 7, 14 or 21');
+			}
+			
+			$validsFormats = array(25, 35, 30, 50, 302, 410, 420, 810, 450, 425);
+						
+			if(!in_array($_GET['formatId'], $validsFormats))
+			{
+				return array('error' => 'The formatId values must be 25, 35, 30, 50, 302, 410, 420, 810, 450, 425');
+			}
+			
+			$regularExpressions = new RegularExpressions();
+			$overDriveId = $regularExpressions->getFieldValueFromURL($econtentRecord->getsourceurl(), "ID");
+			$overDriveDriver = new OverDriveDriver();
+			$result = $overDriveDriver->checkoutOverDriveItem($overDriveId, $_GET['formatId'], $_GET['lendingPeriod'], $user);
+			
+			if($result['result'])
+			{
+				return array('type'=>'checkout', 'message'=>$result['message']);
+			}
+			else
+			{
+				$result = $overDriveDriver->placeOverDriveHold($overDriveId, $_GET['formatId'], $user);
+				if($result['result'])
+				{
+					return array('type'=>'placeHold', 'message'=>$result['message']);
+				}
+				else
+				{
+					return array('error' => $result['message']);
+				}
+				
+			}
+		}
+		
+		return array('error' => 'This item is not one of this: 3M, OverDrive, ACS');
+	}
+	
+	
+	function addFileToAcsServer()
+	{
 		global $configArray;
 		require_once('sys/AdobeContentServer.php');
 		if (!isset($_REQUEST['filename'])){
@@ -104,9 +223,17 @@ class ItemAPI extends Action {
 		
 		$filename = $_REQUEST['filename'];
 		$availableCopies = $_REQUEST['availableCopies'];
-		$fullFilename = $configArray['EContent']['library'] . '/' . $filename;
+		if(RequestUtils::getGet("absPath") != "1")
+		{
+			$fullFilename = $configArray['EContent']['library'] . '/' . $filename;
+		}
+		else
+		{
+			$fullFilename = RequestUtils::getGet("filename");
+		}
+		
 		if (!file_exists($fullFilename)){
-			return array('error' => 'Filename does not exist in the library.  Unable to add to the ACS server.');
+			return array('error' => 'Filename does not exist in the library.  Unable to add to the ACS server.'.$fullFilename);
 		}
 		$ret = AdobeContentServer::packageFile($fullFilename, '', 1,'',$availableCopies);
 		return $ret;
@@ -115,7 +242,8 @@ class ItemAPI extends Action {
 	/**
 	 * Get information about a particular item and return it as JSON
 	 */
-	function getItem(){
+	function getItem()
+	{
 		global $timer;
 		global $configArray;
 		$itemData = array();
@@ -425,7 +553,8 @@ class ItemAPI extends Action {
 		return $itemData;
 	}
 	
-	function getItemAvailability(){
+	function getItemAvailability()
+	{
 		global $timer;
 		global $configArray;
 		$itemData = array();
@@ -442,12 +571,23 @@ class ItemAPI extends Action {
 			$this->db->debug = true;
 		}
 
-		// Retrieve Full Marc Record
-		if (!($record = $this->db->getRecord($this->id))) {
+		
+		/*if (!($record = $this->db->getRecord('econtentRecord'.$this->id)))
+		{
 			PEAR::raiseError(new PEAR_Error('Record Does Not Exist'));
+		}*/
+		
+		if (!($record = $this->db->getRecord($this->id)))
+		{
+				
 		}
+		
+		// Retrieve Full Marc Record
+		
+		
 		$this->record = $record;
-		if ($record['recordtype'] == 'econtentRecord'){
+		if ($record['recordtype'] == 'econtentRecord')
+		{
 			require_once('sys/eContent/EContentRecord.php');
 			$eContentRecord = new EContentRecord();
 			$eContentRecord->id = substr($record['id'], strlen('econtentRecord'));

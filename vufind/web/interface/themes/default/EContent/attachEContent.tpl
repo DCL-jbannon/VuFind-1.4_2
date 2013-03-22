@@ -9,13 +9,20 @@
 		<div id="importMarcContainer">
 			<form action="{$path}" method="post" enctype="multipart/form-data">
 				<p>Enter the folder to import files from.  The folder must be readale by the server.</p> 
-				<div>
-				<label for="sourcePath">Source Path: </label><input type="text" size="60" name="sourcePath" id="sourcePath"/>
-				</div>
-				<div>
-				
-				<input type="submit" name="submit" value="Attach eContent"/>
-				</div>
+					<div>
+					<label for="sourcePath">Source Path: </label><input type="text" size="60" name="sourcePath" id="sourcePath"/>
+					</div>
+					<div>
+						<label for="source">Source:</label> 
+						<select name="sourceacs" id="sourceacs">
+							{foreach from=$sourceFilterACS item="sourceItem"}
+								<option value="{$sourceItem}" {if $sourceItem == $source}selected="selected"{/if}>{$sourceItem}</option>
+							{/foreach}
+						</select>					
+					</div>
+					<div>
+						<input type="submit" name="submit" value="Attach eContent"/>
+					</div>
 				<p>eContent will be attached to records in a batch process.  You can check the status of your import by viewing the <a href="AttachEContentLog">import log</a>.</p>
 			</form>
 		</div>

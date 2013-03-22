@@ -1643,6 +1643,9 @@ class Solr implements IndexEngine {
             "\xE2\x80\xBA" => "'", // â€º (U+203A) in UTF-8
 		);
 		$input = strtr($input, $quotes);
+		
+		$input = str_replace('ø','o', $input);
+		
 
 		// If the user has entered a lone BOOLEAN operator, convert it to lowercase
 		// so it is treated as a word (otherwise it will trigger a fatal error):

@@ -1247,6 +1247,22 @@ class DBMaintenance extends Admin {
 				'ALTER TABLE analytics_search CHANGE COLUMN searchType searchType VARCHAR(50)'
 			),
 		),
+		
+		'notif_reviews' => array(
+				'title' => 'Profile - Notification Review',
+				'description' => 'Patrons can opt-in or opt-out to receive emails notification when returns a eContent.',
+				'dependencies' => array(),
+				'sql' => array(
+						'ALTER TABLE `user` ADD `notificationReview` TINYINT( 4 ) NOT NULL DEFAULT \'1\''
+				),
+		),
+		'rebuListPrivileges' =>array(
+				'title' => 'Rebus:List Privileges',
+				'description' => 'Add Rebus:List Administration Privileges',
+				'dependencies' => array(),
+				'sql' => array("INSERT INTO `roles` (`roleId`, `name`, `description`) VALUES (NULL, 'rebusList-admin', 'Admin Privilege on Rebus:List'), (NULL, 'rebusList-librarian', 'Librarian Privilege on Rebus:List'), (NULL, 'rebusList-staff', 'Staff Privilege on Rebus:List');")
+				)
+				
 	);
 }
 	

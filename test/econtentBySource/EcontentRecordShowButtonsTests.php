@@ -17,10 +17,10 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 	 * should returnFalse
 	 * @dataProvider DP_showCheckOut_cannotBeCheckedOut
 	 */
-	public function test_showCheckOut_cannotBeCheckedOut_returnFalse($patronID)
+	public function test_showCheckOut_cannotBeCheckedOut_returnFalse($user)
 	{
 		$this->prepareisCheckOutAvailable(false);
-		$actual = $this->service->showCheckOut($patronID);
+		$actual = $this->service->showCheckOut($user);
 		$this->assertFalse($actual);
 	}
 	
@@ -28,16 +28,16 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 	{
 		return array(
 				array(NULL), //No Patron
-				array("aDummyPatronId")
+				array($this->userMock)
 		);
 	}
 	
 	/**
 	* method showCheckOut 
-	* when PatronIdIsNullCanBeCheckOut
+	* when UserIsNullCanBeCheckOut
 	* should returnTrue
 	*/
-	public function test_showCheckOut_PatronIdIsNullCanBeCheckOut_returnTrue()
+	public function test_showCheckOut_UserIsNullCanBeCheckOut_returnTrue()
 	{
 		$this->prepareisCheckOutAvailable(true);
 		$actual = $this->service->showCheckOut();
@@ -46,10 +46,10 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 	
 	/**
 	 * method showCheckOut
-	 * when PatronIdIsNullCanNotBeCheckOut
+	 * when UserIsNullCanNotBeCheckOut
 	 * should returnTrue
 	 */
-	public function test_showCheckOut_PatronIdIsNullCanNotBeCheckOut_returnTrue()
+	public function test_showCheckOut_UserIdIsNullCanNotBeCheckOut_returnTrue()
 	{
 		$this->prepareisCheckOutAvailable(false);	
 		$actual = $this->service->showCheckOut();
@@ -58,31 +58,30 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 	
 	/**
 	* method showCheckOut 
-	* when PatronIdIsNotNullAndAvailableToCheckOutAndUserHasNotCheckedItOut
+	* when UserIsNotNullAndAvailableToCheckOutAndUserHasNotCheckedItOut
 	* should returnTrue
 	*/
-	public function test_showCheckOut_PatronIdIsNotNullAndAvailableToCheckOutAndUserHasNotCheckedItOut_returnTrue()
+	public function test_showCheckOut_UserIsNotNullAndAvailableToCheckOutAndUserHasNotCheckedItOut_returnTrue()
 	{
-		$patronID = "aDummyPatronId";
 		$this->prepareisCheckOutAvailable(true);
 		$this->prepareCheckedOutByPatron(false);
 		
-		$actual = $this->service->showCheckOut($patronID);
+		$actual = $this->service->showCheckOut($this->userMock);
 		$this->assertTrue($actual);
 	}
 	
 	/**
 	 * method showCheckOut
-	 * when PatronIdIsNotNullAndAvailableToCheckOutAndUserHasCheckedItOut
+	 * when UserIsNotNullAndAvailableToCheckOutAndUserHasCheckedItOut
 	 * should returnFalse
 	 */
-	public function test_showCheckOut_PatronIdIsNotNullAndAvailableToCheckOutAndUserHasNotCheckedItOut_returnFalse()
+	public function test_showCheckOut_UserIsNotNullAndAvailableToCheckOutAndUserHasNotCheckedItOut_returnFalse()
 	{
 		$patronID = "aDummyPatronId";
 		$this->prepareisCheckOutAvailable(true);
 		$this->prepareCheckedOutByPatron(true);
 	
-		$actual = $this->service->showCheckOut($patronID);
+		$actual = $this->service->showCheckOut($this->userMock);
 		$this->assertFalse($actual);
 	}
 	
@@ -112,31 +111,31 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 	
 	/**
 	 * method showPlaceHold
-	 * when patronIdIsNotNullCanPlaceHoldItemHasNotCheckedOutByPatron
+	 * when UserIsNotNullCanPlaceHoldItemHasNotCheckedOutByPatron
 	 * should returnTrue
 	 */
-	public function test_showPlaceHold_patronIdIsNotNullCanPlaceHoldItemHasNotCheckedOutByPatron_returnTrue()
+	public function test_showPlaceHold_UserIdIsNotNullCanPlaceHoldItemHasNotCheckedOutByPatron_returnTrue()
 	{
 		$patronId = "aDummyPatronId";
 		$this->prepareIsPlaceHoldAvailable(true);
 		$this->prepareCheckedOutByPatron(false);
 		
-		$actual = $this->service->showPlaceHold($patronId);
+		$actual = $this->service->showPlaceHold($this->userMock);
 		$this->assertTrue($actual);
 	}
 	
 	/**
 	 * method showPlaceHold
-	 * when patronIdIsNotNullCanPlaceHoldItemHasBeenCheckedOutByPatron
+	 * when UserIsNotNullCanPlaceHoldItemHasBeenCheckedOutByPatron
 	 * should returnTrue
 	 */
-	public function test_showPlaceHold_patronIdIsNotNullCanPlaceHoldItemHasBeenCheckedOutByPatron_returnTrue()
+	public function test_showPlaceHold_UserIsNotNullCanPlaceHoldItemHasBeenCheckedOutByPatron_returnTrue()
 	{
 		$patronId = "aDummyPatronId";
 		$this->prepareIsPlaceHoldAvailable(true);
 		$this->prepareCheckedOutByPatron(true);
 	
-		$actual = $this->service->showPlaceHold($patronId);
+		$actual = $this->service->showPlaceHold($this->userMock);
 		$this->assertFalse($actual);
 	}
 	
@@ -179,7 +178,7 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 		$this->prepareisAddToWishListAvailable(true);
 		$this->prepareCheckedOutByPatron(true);
 		
-		$actual = $this->service->showAddToWishList($patronId);
+		$actual = $this->service->showAddToWishList($this->userMock);
 		$this->assertFalse($actual);
 	}
 	
@@ -195,7 +194,7 @@ class EcontentRecordShowButtonsTests extends BaseHelperClassesTests
 		$this->prepareCheckedOutByPatron(false);
 		$this->prepareIsCancelHoldAvailable(true);	
 										
-		$actual = $this->service->showAddToWishList($patronId);
+		$actual = $this->service->showAddToWishList($this->userMock);
 		$this->assertFalse($actual);
 	}
 	

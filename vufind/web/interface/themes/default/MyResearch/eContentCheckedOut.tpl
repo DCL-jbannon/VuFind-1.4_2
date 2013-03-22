@@ -1,4 +1,4 @@
-<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js"></script>
+<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js?t=03182013"></script>
 <script type="text/javascript" src="{$url}/services/EcontentRecord/ajax.js"></script>
 {if (isset($title)) }
 <script type="text/javascript">
@@ -97,7 +97,7 @@
       				    <script type="text/javascript">
       				      $(
       				         function() {literal} { {/literal}
-      				             $('.rateEContent{$record.id|escape}').rater({literal}{ {/literal}module: 'EcontentRecord', recordId: '{$record.id}',  rating:0.0, postHref: '{$url}/Record/{$record.id|escape}/AJAX?method=RateTitle'{literal} } {/literal});
+      				             $('.rateEContent{$record.id|escape}').rater({literal}{ {/literal}module: 'EcontentRecord', recordId: '{$record.id}',  rating:0.0, postHref: '{$url}/EcontentRecord/{$record.id|escape}/AJAX?method=RateTitle'{literal} } {/literal});
       				         {literal} } {/literal}
       				      );
       				    </script>
@@ -108,14 +108,14 @@
                     
         				{if $record.id != -1}
         				<script type="text/javascript">
-        				  addRatingId('{$record.id|escape:"javascript"}');
+        				  addRatingId('{$record.id|escape:"javascript"}', 'eContent');
         				</script>
         				{/if}
 	        	</td>
 	        	<td>
 	        		{* Options for the user to view online or download *}
 							{foreach from=$record.links item=link}
-								<a href="{if $link.url}{$link.url}{else}#{/if}" {if $link.onclick}onclick="{$link.onclick}"{/if} class="button" target='_blank'>{$link.text}</a>
+								<a href="{if $link.url}{$link.url}{else}#{/if}" {if $link.onclick}onclick="{$link.onclick}"{/if} class="button" style='width: 110px;' target='_blank'>{$link.text}</a>
 							{/foreach}
 	        	</td>
 	        </tr>

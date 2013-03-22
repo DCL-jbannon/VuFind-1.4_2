@@ -19,7 +19,7 @@ public class EContentReindexThread extends Thread{
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			URL url = new URL(econtentProcessor.getVufindUrl() + "/EcontentRecord/" + eContentRecordId + "/Reindex");
+			URL url = new URL(econtentProcessor.getVufindUrl() + "/EcontentRecord/" + eContentRecordId + "/Reindex?quick=1");
 			Object reindexResultRaw = url.getContent();
 			if (reindexResultRaw instanceof InputStream) {
 				String updateIndexResponse = Util.convertStreamToString((InputStream) reindexResultRaw);

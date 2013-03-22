@@ -19,6 +19,7 @@
  */
 require_once 'services/MyResearch/lib/Resource.php';
 require_once 'sys/Pager.php';
+require_once dirname(__FILE__).'/../../../../classes/Utils/BookCoverURL.php';
 
 /**
  * FavoriteHandler Class
@@ -86,7 +87,16 @@ class FavoriteHandler
 		
 		$resourceList = array();
 		if (is_array($this->favorites)) {
-			foreach($this->favorites as $currentResource) {
+			foreach($this->favorites as $currentResource)
+			{
+				$bookCoverUrl = new BookcoverURL();
+				$currentResource->imageUrl = "";
+				$eContent = ($currentResource->format_category == 'EMedia' ? true : false);
+				if($eContent)
+				{
+					$currentResource->imageUrl = $bookCoverUrl->getBookCoverUrl('medium', $currentResource->isbn, $currentResource->record_id, $eContent);
+				}
+				
 				$interface->assign('resource', $currentResource);
 				$resourceEntry = $interface->fetch('RecordDrivers/Resource/listentry.tpl');
 				$resourceList[] = $resourceEntry; 

@@ -31,7 +31,7 @@ abstract class BaseEcontentDetails
 	 * By Default the Canchel Hold is a VuFind Url
 	 * @param integer $patronId
 	 */
-	public function getCancelHoldUrls($patronId  = NULL)
+	public function getCancelHoldUrls()
 	{
 		return "/EcontentRecord/".$this->getRecordId()."/CancelHold";
 	}
@@ -40,7 +40,7 @@ abstract class BaseEcontentDetails
 	 * By Default the Check Out is a VuFind Url
 	 * @param integer $patronId
 	 */
-	public function getCheckOutUrls($patronId  = NULL)
+	public function getCheckOutUrls()
 	{
 		return "/EcontentRecord/".$this->getRecordId()."/Checkout";
 	}
@@ -51,5 +51,4 @@ abstract class BaseEcontentDetails
 	}
 	
 }
-
 ?>

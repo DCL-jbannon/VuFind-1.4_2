@@ -12,7 +12,7 @@
  * exist; it should be relatively easy to plug any of them in by modifying the
  * mobile_device_detect function below.
  */
-require_once 'sys/mobileesp/mdetect.php';
+require_once dirname(__FILE__).'/mobileesp/mdetect.php';
 
 function mobile_device_detect()
 {

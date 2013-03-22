@@ -1,4 +1,4 @@
-<script type="text/javascript" src="{$path}/services/EcontentRecord/ajax.js"></script>
+<script type="text/javascript" src="{$path}/services/EcontentRecord/ajax.js?t=01312013"></script>
 {if !empty($addThis)}
 <script type="text/javascript" src="https://s7.addthis.com/js/250/addthis_widget.js?pub={$addThis|escape:"url"}"></script>
 {/if}
@@ -243,6 +243,9 @@ function redrawSaveStatus() {literal}{{/literal}
         {if $eContentRecord->status != 'deleted'}
         	<span id="deleteEContentLink"><a href='{$path}/EcontentRecord/{$id}/Delete' onclick="return confirm('Are you sure you want to delete this record?  The record should not have any holds or checkouts when it is deleted.')">(delete)</a></span>
         {/if}
+        {if $moveFunction}
+        	<span id="moveEContentLink"><a href='{$path}/EcontentRecord/{$id}/Move' onclick="return confirm('Are you sure you want to move this record?">(move)</a></span>
+        {/if}
         {/if}
         </div>
         {* Display more information about the title*}
@@ -337,7 +340,7 @@ function redrawSaveStatus() {literal}{{/literal}
         <script type="text/javascript">
         $(
          function() {literal} { {/literal}
-             $('#myrating').rater({literal}{ {/literal} module:'EcontentRecord', rating:'{if $user}{$ratingData.user}{else}{$ratingData.average}{/if}', recordId: '{$id}', postHref: '{$path}/EcontentRecord/{$id}/AJAX?method=RateTitle'{literal} } {/literal});
+             $('#myrating').rater({literal}{ {/literal} module:'EcontentRecord', rating:'{if $user}{$ratingData.user}{else}{$ratingData.average}{/if}', recordId: '{$id}', postHref: '{$path}/EcontentRecord/{$id}/AJAX?method=RateTitle&notuid={$notuid}'{literal} } {/literal});
          {literal} } {/literal}
 	    );
         </script>
@@ -642,6 +645,8 @@ function redrawSaveStatus() {literal}{{/literal}
   </div>
     
 </div>
+
+<span style='display:none;' id='nologinRR'>{if $allowRRWithOutLogin}{$notuid}{/if}</span>
 
 {if $showStrands}   
 {* Strands Tracking *}{literal}

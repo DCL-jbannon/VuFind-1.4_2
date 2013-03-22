@@ -13,11 +13,11 @@ class EcontentRecordStatusTextTests extends BaseHelperClassesTests
 	
 	/**
 	* method getString
-	* when patronIdIsNullAndRecordCanBeCheckOut
+	* when userIsNullAndRecordCanBeCheckOut
 	* should returnCorrectString
 	* @dataProvider commonDataProvider
 	*/
-	public function test_getStatus_patronIdIsNullAndCanBeCheckOut_returnCorrectString($customMessage)
+	public function test_getStatus_userIsNullAndCanBeCheckOut_returnCorrectString($customMessage)
 	{
 		$expected = $this->getExpectedMessage($customMessage, EcontentRecordStatusText::availableOnline);
 		$this->prepareIsCheckOutAvailable(true);
@@ -31,11 +31,11 @@ class EcontentRecordStatusTextTests extends BaseHelperClassesTests
 	
 	/**
 	* method getString 
-	* when patronIdIsNullAndRecordCannotBeCheckOut
+	* when userIsNullAndRecordCannotBeCheckOut
 	* should returnCorrectString
 	* @dataProvider commonDataProvider
 	*/
-	public function test_getString_patronIdIsNullAndRecordCannotBeCheckOut_returnCorrectString($customMessage)
+	public function test_getString_userIsNullAndRecordCannotBeCheckOut_returnCorrectString($customMessage)
 	{
 		$expected = $this->getExpectedMessage($customMessage, EcontentRecordStatusText::checkedOut);
 		$this->prepareIsCheckOutAvailable(false);
@@ -49,11 +49,11 @@ class EcontentRecordStatusTextTests extends BaseHelperClassesTests
 
 	/**
 	* method getString 
-	* when patronIdIsNotNullRecordCanBeCheckOutAndUserHasNotCheckedItOut
+	* when userIsNotNullRecordCanBeCheckOutAndUserHasNotCheckedItOut
 	* should returnCorrectString
 	* @dataProvider commonDataProvider
 	*/
-	public function test_getString_patronIdIsNotNullRecordCanBeCheckOutAndUserHasNotCheckedItOut_returnCorrectString($customMessage)
+	public function test_getString_userIsNotNullRecordCanBeCheckOutAndUserHasNotCheckedItOut_returnCorrectString($customMessage)
 	{
 		$patronId = "aDummyPatronId";
 		$expected = $this->getExpectedMessage($customMessage, EcontentRecordStatusText::availableOnline);
@@ -63,17 +63,17 @@ class EcontentRecordStatusTextTests extends BaseHelperClassesTests
 										->method("getMsgAvailable")
 										->will($this->returnValue($expected));
 		
-		$actual = $this->service->getString($patronId);
+		$actual = $this->service->getString($this->userMock);
 		$this->assertEquals($expected, $actual);
 	}
 	
 	/**
 	 * method getString
-	 * when patronIdIsNotNullRecordCanNotBeCheckOutAndUserHasNotCheckedItOut
+	 * when userIsNotNullRecordCanNotBeCheckOutAndUserHasNotCheckedItOut
 	 * should returnCorrectString
 	 * @dataProvider commonDataProvider
 	 */
-	public function test_getString_patronIdIsNotNullRecordCanNotBeCheckOutAndUserHasNotCheckedItOut_returnCorrectString($customMessage)
+	public function test_getString_userIsNotNullRecordCanNotBeCheckOutAndUserHasNotCheckedItOut_returnCorrectString($customMessage)
 	{
 		$patronId = "aDummyPatronId";
 		$expected = $this->getExpectedMessage($customMessage, EcontentRecordStatusText::checkedOut);
@@ -83,17 +83,17 @@ class EcontentRecordStatusTextTests extends BaseHelperClassesTests
 										->method("getMsgCheckedOut")
 										->will($this->returnValue($expected));
 	
-		$actual = $this->service->getString($patronId);
+		$actual = $this->service->getString($this->userMock);
 		$this->assertEquals($expected, $actual);
 	}
 	
 	/**
 	* method getString 
-	* when patronIdIsNotNullUserHasCheckedItOut
+	* when userIsNotNullUserHasCheckedItOut
 	* should returnCorrectString
 	* @dataProvider commonDataProvider
 	*/
-	public function test_getString_patronIdIsNotNullUserHasCheckedItOut_returnCorrectString($customMessage)
+	public function test_getString_userIsNotNullUserHasCheckedItOut_returnCorrectString($customMessage)
 	{
 		$patronId = "aDummyPatronId";
 		$expected = $this->getExpectedMessage($customMessage, EcontentRecordStatusText::checkedOutToYou);
@@ -103,7 +103,7 @@ class EcontentRecordStatusTextTests extends BaseHelperClassesTests
 										->method("getMsgCheckedOutToYou")
 										->will($this->returnValue($expected));
 		
-		$actual = $this->service->getString($patronId);
+		$actual = $this->service->getString($this->userMock);
 		$this->assertEquals($expected, $actual);
 	}
 

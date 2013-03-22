@@ -11,6 +11,8 @@ class SolrDriver implements ISolrDriver
 	private $ch;
 	private $urlUtils;
 	
+	private $timeOut = NULL;
+	
 	public function __construct($solrUrl = NULL, $index = 'testIdclReader', IUrlUtils $urlUtils = NULL)
 	{
 		if(!$solrUrl) $solrUrl = @SOLRURL;
@@ -121,6 +123,11 @@ class SolrDriver implements ISolrDriver
 	
 	private function exec()
 	{
+		
+		if($this->timeOut !== NULL)
+		{
+			$this->setOpt(CURLOPT_TIMEOUT, $this->timeOut);
+		}
 		return curl_exec($this->ch);
 	}
 	
@@ -132,6 +139,12 @@ class SolrDriver implements ISolrDriver
 	private function getPingUrl()
 	{
 		return $this->solrUrl.'/admin/ping?'.self::jsonFormat;
+	}
+
+	//Seconds
+	public function setTimeOut($timeOut)
+	{
+		$this->timeOut = $timeOut;
 	}
 	
 }

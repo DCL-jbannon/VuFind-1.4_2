@@ -63,7 +63,7 @@ class OverDriveFormatTranslation {
 				return 425;
 				break;
 			case "ebook-overdrive":
-				return -1;
+				return -1; //610
 				break;
 			default:
 				throw new OverDriveAPIException("OverDriveFormatTranslation::getFormatIdFromString No format found: ".$formatString);
@@ -71,7 +71,5 @@ class OverDriveFormatTranslation {
 										
 		}
 	}
-	
 }
-
 ?>

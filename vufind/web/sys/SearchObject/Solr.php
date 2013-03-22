@@ -22,13 +22,15 @@ require_once 'sys/SearchObject/Base.php';
 require_once 'RecordDrivers/Factory.php';
 require_once 'Drivers/marmot_inc/Location.php';
 
+interface ISearchObject_Solr{}
+
 /**
  * Search Object class
  *
  * This is the default implementation of the SearchObjectBase class, providing the
  * Solr-driven functionality used by VuFind's standard Search module.
  */
-class SearchObject_Solr extends SearchObject_Base
+class SearchObject_Solr extends SearchObject_Base implements ISearchObject_Solr
 {
 	// SOLR QUERY
 	// Parsed query

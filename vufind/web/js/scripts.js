@@ -1,3 +1,13 @@
+function getNotificationId()
+{
+	if($("#nologinRR"))
+	{
+		return $("#nologinRR").html();
+	}
+	return '';
+}
+
+
 function getLightbox(module, action, id, lookfor, message, followupModule,
 		followupAction, followupId, left, width, top, height) {
 	// Optional parameters

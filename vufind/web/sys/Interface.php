@@ -18,11 +18,14 @@
  *
  */
 
+require_once dirname(__FILE__).'/../../classes/interfaces/IUInterface.php';
+
 require_once 'Smarty/Smarty.class.php';
-require_once 'sys/mobile_device_detect.php';
+require_once dirname(__FILE__).'/mobile_device_detect.php';
+
 
 // Smarty Extension class
-class UInterface extends Smarty
+class UInterface extends Smarty implements IUInterface
 {
 	public $lang;
 	private $vufindTheme;   // which theme(s) are active?

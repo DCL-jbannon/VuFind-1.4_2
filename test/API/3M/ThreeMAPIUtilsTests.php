@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/../../../vufind/classes/API/3M/ThreeMAPIUtils.php';
+require_once dirname(__FILE__).'/../../../vufind/classes/API/3M/ThreeMApiUtils.php';
 
 
 class ThreeMAPIUtilsTests extends PHPUnit_Framework_TestCase

@@ -41,6 +41,7 @@ public class ImportFreegalTest {
 	private Section processSettings;
 	private CronLogEntry cronEntry;
 	private ImportFreegal importFreegal;
+	private long thisRunTimeStamp;
 	private String serverName = "dcl.localhost";
 
 	@Before
@@ -100,6 +101,10 @@ public class ImportFreegalTest {
 		String freegalPIN = processSettings.get("freegalPIN");
 		String freegalAPIkey = processSettings.get("freegalAPIkey");
 		String freegalLibrary = processSettings.get("freegalLibrary");
+
+		// make sure we don't commit/optimize solr changes
+		processSettings.put("commitSolr", "false");
+		processSettings.put("optimizeSolr", "false");
 
 		// create new instance of process handler
 		importFreegal = new ImportFreegal();
@@ -175,6 +180,14 @@ public class ImportFreegalTest {
 		// set freegalUrl to point to the URLs of our downloaded data
 		processSettings.put("freegalUrl", ini.get("Site", "url")
 				+ "/files/freegal");
+
+		// Temporarily set all freegal albums to "deleted" status
+		// We keep a special timestamp so we can revert back later in tearDown
+		thisRunTimeStamp = (int) (new Date().getTime() / 100) + 36000;
+		PreparedStatement setAllFreegalStatusToDeleted = econtentConn
+				.prepareStatement("UPDATE econtent_record SET status = 'deleted', date_updated = ? WHERE source = 'freegal' AND status = 'active'");
+		setAllFreegalStatusToDeleted.setLong(1, thisRunTimeStamp);
+		setAllFreegalStatusToDeleted.executeUpdate();
 	}
 
 	@After
@@ -185,25 +198,29 @@ public class ImportFreegalTest {
 		if ((id = getEContentRecordId("Mexicanisimo (JUNIT TESTING)",
 				"Ignacio López Tarso")) != -1) {
 			importFreegal.deleteAlbumAndSongs(econtentConn, id);
-			Util.doSolrUpdate(ini.get("Index", "url") + "/econtent", "<delete><id>econtentRecord" + id + "</id></delete>");
 		}
 		if ((id = getEContentRecordId("Between the Worlds (JUNIT TESTING)",
 				"Alkonost")) != -1) {
 			importFreegal.deleteAlbumAndSongs(econtentConn, id);
-			Util.doSolrUpdate(ini.get("Index", "url") + "/econtent", "<delete><id>econtentRecord" + id + "</id></delete>");
 		}
 		if ((id = getEContentRecordId("Cuentopos 2 (JUNIT TESTING)",
 				"Maria Elena Walsh")) != -1) {
 			importFreegal.deleteAlbumAndSongs(econtentConn, id);
-			Util.doSolrUpdate(ini.get("Index", "url") + "/econtent", "<delete><id>econtentRecord" + id + "</id></delete>");
 		}
 		// this record may be created on the fly by one of the tests
 		// we need to delete it if it still exists (due to test failures)
 		if ((id = getEContentRecordId(ON_THE_FLY_ALBUM_TITLE,
 				ON_THE_FLY_ALBUM_AUTHOR)) != -1) {
 			importFreegal.deleteAlbumAndSongs(econtentConn, id);
-			Util.doSolrUpdate(ini.get("Index", "url") + "/econtent", "<delete><id>econtentRecord" + id + "</id></delete>");
 		}
+
+		// set status to "active" for the ones we set to "deleted" in setUp
+		PreparedStatement setAllFreegalStatusToActive = econtentConn
+				.prepareStatement("UPDATE econtent_record SET status = 'active', date_updated = ? WHERE source = 'freegal' AND status = 'deleted' AND date_updated = ?");
+		setAllFreegalStatusToActive.setLong(1,
+				(int) (new Date().getTime() / 100));
+		setAllFreegalStatusToActive.setLong(2, thisRunTimeStamp);
+		setAllFreegalStatusToActive.executeUpdate();
 
 		// rollback database changes --- in case rollback is supported
 		vufindConn.rollback();
@@ -213,16 +230,22 @@ public class ImportFreegalTest {
 		FileUtils.deleteDirectory(new File(ini.get("Site", "local")
 				+ "/files/freegal"));
 
+		// rollback solr updates
+		Util.doSolrUpdate(ini.get("Index", "url") + "/econtent", "<rollback/>");
+
 		// add some info to the log so we can see
 		logger.info("End of tearDown() - eContent records count = "
 				+ countEContentRecords());
 		logger.info("End of tearDown() - eContent items count = "
-				+ countEContentItems());		
+				+ countEContentItems());
+
 	}
 
 	@Test
 	public void testImportFreegal() {
+		long activeFreegalAlbumCount = 0;
 		long eContentCount = 0;
+		long eContentItemCount = 0;
 
 		// pre-import checks
 		try {
@@ -245,6 +268,13 @@ public class ImportFreegalTest {
 
 			// get total count of eContent records before the import process
 			eContentCount = countEContentRecords();
+
+			// get total count of eContent items before the import process
+			eContentItemCount = countEContentItems();
+
+			// get total count of active Freegal albums before the import
+			// process
+			activeFreegalAlbumCount = countActiveFreegalAlbums();
 		} catch (Exception e) {
 			fail(e.toString());
 		}
@@ -255,7 +285,7 @@ public class ImportFreegalTest {
 
 		// post-import checks
 		try {
-			// before the ImportFreegal process, the albums SHOULD exists
+			// after the ImportFreegal process, the albums SHOULD exists
 			assertFalse(
 					"Album: \"Mexicanisimo (JUNIT TESTING) - Ignacio López Tarso\" SHOULD exist.",
 					getEContentRecordId("Mexicanisimo (JUNIT TESTING)",
@@ -273,11 +303,15 @@ public class ImportFreegalTest {
 			assertEquals(
 					"There should be 3 more econtent records after the import",
 					eContentCount + 3, countEContentRecords());
+			// after the import process, there should be 14 more econtent items
+			assertEquals(
+					"There should be 14 more econtent items after the import",
+					eContentItemCount + 14, countEContentItems());
 
-			// after the import process, there should be 3 ACTIVE albums
+			// after the import process, there should be 3 more ACTIVE albums
 			assertEquals(
 					"There should be 3 more active albums after the import",
-					 3, countActiveFreegalAlbums());
+					activeFreegalAlbumCount + 3, countActiveFreegalAlbums());
 
 		} catch (Exception e) {
 			fail(e.toString());
@@ -288,7 +322,7 @@ public class ImportFreegalTest {
 	public void testDeleteAlbumsNotInFreegalAPI() {
 		long activeFreegalAlbumCount = 0;
 		long eContentCount = 0;
-
+		long eContentItemCount = 0;
 		// pre-import checks
 		try {
 			// the test record should not exists
@@ -313,6 +347,13 @@ public class ImportFreegalTest {
 
 			// get total count of eContent records before the import process
 			eContentCount = countEContentRecords();
+
+			// get total count of eContent items before the import process
+			eContentItemCount = countEContentItems();
+
+			// get total count of active Freegal albums before the import
+			// process
+			activeFreegalAlbumCount = countActiveFreegalAlbums();
 		} catch (Exception e) {
 			fail(e.toString());
 		}
@@ -340,20 +381,19 @@ public class ImportFreegalTest {
 					getEContentRecordId(ON_THE_FLY_ALBUM_TITLE,
 							ON_THE_FLY_ALBUM_AUTHOR));
 
-			// after the import process, there should be 2 more ACTIVE econtent
-			// records because 1 record (that we created on the fly) should have
-			// been
-			// deleted by the import process, and 3 new econtent records
-			// should have been imported by the import process, so the NET
-			// count should be 2 more econtent records
+			// after the import process, there should be 14 more econtent items
 			assertEquals(
-					"There should be 2 more econtent records after the import",
-					eContentCount + 2, countEContentRecords());
+					"There should be 14 more econtent items after the import",
+					eContentItemCount + 14, countEContentItems());
 
-			// after the import process, there should be 3 ACTIVE albums
+			// after the import process, there should be 2 more ACTIVE albums
+			// because 1 active (one we created on the fly) should have been
+			// deleted by the import process, and 3 new albums
+			// should have been imported by the import process, so the NET
+			// count should be 2 more active albums
 			assertEquals(
-					"There should be 3 more active albums after the import",
-					activeFreegalAlbumCount + 3, countActiveFreegalAlbums());
+					"There should be 2 more active albums after the import",
+					activeFreegalAlbumCount + 2, countActiveFreegalAlbums());
 		} catch (Exception e) {
 			fail(e.toString());
 		}
@@ -426,7 +466,7 @@ public class ImportFreegalTest {
 	private long getActiveAlbumId(String title, String author)
 			throws SQLException {
 		PreparedStatement stmt = econtentConn
-				.prepareStatement("SELECT id FROM econtent_record WHERE source='Freegal' AND status='active' AND title = ? AND author = ?");
+				.prepareStatement("SELECT id FROM econtent_record WHERE source='freegal' AND status='active' AND title = ? AND author = ?");
 		stmt.setString(1, title);
 		stmt.setString(2, author);
 		ResultSet results = stmt.executeQuery();
@@ -454,7 +494,7 @@ public class ImportFreegalTest {
 
 	private long countActiveFreegalAlbums() throws SQLException {
 		PreparedStatement stmt = econtentConn
-				.prepareStatement("SELECT COUNT(id) FROM econtent_record WHERE source='Freegal' AND status='active'");
+				.prepareStatement("SELECT COUNT(id) FROM econtent_record WHERE source='freegal' AND status='active'");
 		ResultSet results = stmt.executeQuery();
 		long count = 0;
 		if (results.next()) {

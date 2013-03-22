@@ -11,9 +11,21 @@ require_once dirname(__FILE__).'/../../../classes/Utils/RegularExpressions.php';
 require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
 require_once dirname(__FILE__).'/../../../classes/FileMarc/FileMarc.php';
 require_once dirname(__FILE__).'/../../../classes/FileMarc/MarcSubField.php';
+require_once dirname(__FILE__).'/../../../classes/FileMarc/MarcRecordFields.php';
+require_once dirname(__FILE__).'/../../../classes/interfaces/IGenericRecord.php';
+require_once dirname(__FILE__).'/../../../classes/interfaces/IMarcRecordFieldsReader.php';
 
 
-class EContentRecord extends SolrDataObject implements IEContentRecord{
+class EContentRecord extends SolrDataObject implements IEContentRecord,IMarcRecordFieldsReader,IGenericRecord
+{
+	const prefixUnique = "econtentRecord";
+	const notReviewed = 'Not Reviewed';
+	const reviewApproved = 'Approved';
+	const reviewRejected = 'Rejected';
+	const briefRecord = 'Brief Record';
+	
+	const accesType_acs = 'acs';
+	
 	public $__table = 'econtent_record';    // table name
 	public $id;                      //int(25)
 	public $cover;                    //varchar(255)
@@ -48,7 +60,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 	public $purchaseUrl;
 	public $addedBy; //Id of the user who added the record or -1 for imported
 	public $reviewedBy; //Id of a cataloging use who reviewed the item for consistency
-	public $reviewStatus; //0 = unreviewed, 1=approved, 2=rejected
+	public $reviewStatus; //0 = unreviewed, 1=approved, 2=rejected, 3=brief
 	public $reviewNotes;
 	public $accessType;
 	public $availableCopies;
@@ -59,14 +71,47 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 	public $literary_form_full;
 	public $marcRecord;
 	public $status; //'active', 'archived', or 'deleted'
+	
+	//No table fields
+	public $insertToSolr = true;
 
 	/* Static get */
 	function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('EContentRecord',$k,$v); }
 
+	
+	public function getMarcString()
+	{
+		return $this->marcRecord;
+	}
+	
+	public function getMarcRecordFieldReader(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		if(!$marcRecordFields)
+		{
+			$object = new MarcRecordFields($this);
+			return $object;
+		}
+		return $marcRecordFields;
+	}
+	
+	public function getType()
+	{
+		return 'EcontentRecord';
+	}
+	
+	public function getPermanentPath()
+	{
+		return '/EcontentRecord/'.$this->id;
+	}
+	
+	public function getUniqueSystemID()
+	{
+		return self::prefixUnique.$this->id;
+	}
+	
 	function keys() {
 		return array('id', 'filename');
 	}
-
 	function cores(){
 		return array('econtent');
 	}
@@ -655,7 +700,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		'reviewStatus' => array(
 		  'property' => 'reviewStatus',
 		  'type' => 'enum',
-		  'values' => array('Not Reviewed' => 'Not Reviewed', 'Approved' => 'Approved', 'Rejected' => 'Rejected'),
+		  'values' => array('Not Reviewed' => self::notReviewed, 'Approved' => self::reviewApproved , 'Rejected' => self::reviewRejected, 'Brief Record' => self::briefRecord),
 		  'label' => 'Review Status',
 		  'description' => 'The Review Status of the item.',
 		  'required'=> true,
@@ -750,7 +795,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		return $structure;
 	}
 	static function getValidAccessTypes(){
-		return array('free' => 'No Usage Restrictions', 'acs' => 'Adobe Content Server', 'singleUse' => 'Single use per copy');
+		return array('free' => 'No Usage Restrictions', self::accesType_acs => 'Adobe Content Server', 'singleUse' => 'Single use per copy');
 	}
 	function institution(){
 		$institutions = array();
@@ -997,28 +1042,6 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		{
 			return array($detailsEcontent->getFormats());
 		}
-		elseif ($this->isOverDrive())
-		{
-			foreach ($items as $item)
-			{
-				if(isset($item->links))
-				{
-					foreach($item->links as $link)
-					{
-						if (!empty($formats[0]))
-						{
-							$formats[0] .= ", ";
-						}
-						else
-						{
-							$formats[0] = "";
-						}
-						$formats[0] .= $link['format'];
-					}
-				}
-				
-			}
-		}
 		else
 		{
 			foreach ($items as $item)
@@ -1147,15 +1170,13 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		require_once dirname(__FILE__).'/OverdriveItem.php';
 		
 		$overDriveServices  = new OverDriveServices();
-		$overDriveServicesAPI = new OverDriveServicesAPI($configArray['OverDriveAPI']['clientKey'],
-														 $configArray['OverDriveAPI']['clientSecret'],
-														 $configArray['OverDriveAPI']['libraryId']);
+		$overDriveServicesAPI = new OverDriveServicesAPI();
 		
 		$marRecord = $this->getNormalizedMarcRecord();
 		
 		$regularExpressions = new RegularExpressions();
 		
-		$overDriveId = $regularExpressions->getFieldValueFromURL($this->getsourceurl(), "ID");
+		$overDriveId = $regularExpressions->getFieldValueFromURL($this->getSourceUrl(), "ID");
 		$availability = $overDriveServicesAPI->getItemAvailability($overDriveId);
 		
 		$item = new OverdriveItem();
@@ -1227,7 +1248,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 	{
 		if ($this->items == null){
 			$this->items = array();
-			if ($this->isOverDrive() == 0)
+			if ($this->isOverDrive())
 			{
 				return -1;
 			}
@@ -1283,8 +1304,9 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		return $validationResults;
 	}
 
-	function insert(){
-		$ret =  parent::insert();
+	function insert()
+	{
+		$ret =  $this->insertDetailed($this->insertToSolr);
 		if ($ret){
 			$this->clearCachedCover();
 		}
@@ -1335,6 +1357,7 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 			return explode("\r\n", $propertyValue);
 		}
 	}
+	
 	public function getIsbn(){
 		require_once 'sys/ISBN.php';
 		$isbns = $this->getPropertyArray('isbn');
@@ -1464,117 +1487,186 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 				break;
 		}
 	}
+	
+	public function isBriefRecord()
+	{
+		if($this->reviewStatus == self::briefRecord)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	
+	public function isFree()
+	{
+		if ($this->accessType != self::accesType_acs)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public function isACS()
+	{
+		if ($this->accessType == self::accesType_acs)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public function getTitle(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		$title = $this->title;
+		if(empty($title))
+		{
+			$title = $this->getMarcRecordFieldReader($marcRecordFields)->getTitle();
+		}
+		return $title;
+	}
+	
+	public function getAuthor(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		$author = $this->author;
+		if(empty($author))
+		{
+			$author = $this->getMarcRecordFieldReader($marcRecordFields)->getAuthor();
+		}
+		return $author;
+	}
+	
+	public function getSourceUrl(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		$sourceUrl = $this->sourceUrl;
+		if(empty($sourceUrl))
+		{
+			$sourceUrl = $this->getMarcRecordFieldReader($marcRecordFields)->getSourceUrl();
+		}
+		return $sourceUrl;
+	}
+	
+	public function getYear(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getYear();
+	}
+	
+	public function getPublicationPlace(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getPublicationPlace();
+	}
+	
+	public function getEAN(){return '';}
+	public function getSecondaryAuthor(){return $this->getAuthor2();}
+	
+	public function getShelfMark(){return '';}
 
 	//setters and getters
-	public function getid(){
+	public function getId(){
 		return $this->id;
 	}
 
-	public function setid($id){
+	public function setId($id){
 		$this->id = $id;
 	}
 
-	public function getcover(){
+	public function getCover(){
 		return $this->cover;
 	}
 
-	public function setcover($cover){
+	public function setCover($cover){
 		$this->cover = $cover;
 	}
 
-	public function gettitle(){
-		return $this->title;
-	}
+	
 
-	public function settitle($title){
+	public function setTitle($title){
 		$this->title = $title;
 	}
 
-	public function getsubtitle(){
+	public function getSubtitle(){
 		return $this->subtitle;
 	}
 
-	public function setsubtitle($subtitle){
+	public function setSubtitle($subtitle){
 		$this->subtitle = $subtitle;
 	}
 
-	public function getauthor(){
-		return $this->author;
-	}
+	
 
-	public function setauthor($author){
+	public function setAuthor($author){
 		$this->author = $author;
 	}
 
-	public function getauthor2(){
+	public function getAuthor2(){
 		return $this->author2;
 	}
 
-	public function setauthor2($author2){
+	public function setAuthor2($author2){
 		$this->author2 = $author2;
 	}
 
-	public function getdescription(){
+	public function getDescription(){
 		return $this->description;
 	}
 
-	public function setdescription($description){
+	public function setDescription($description){
 		$this->description = $description;
 	}
 
-	public function getcontents(){
+	public function getContents(){
 		return $this->contents;
 	}
 
-	public function setcontents($contents){
+	public function setContents($contents){
 		$this->contents = $contents;
 	}
 
-	public function getsubject(){
+	public function getSubject(){
 		return $this->subject;
 	}
 
-	public function setsubject($subject){
+	public function setSubject($subject){
 		$this->subject = $subject;
 	}
 
-	public function getlanguage(){
+	public function getLanguage(){
 		return $this->language;
 	}
 
-	public function setlanguage($language){
+	public function setLanguage($language){
 		$this->language = $language;
 	}
 
-	public function getpublisher(){
+	public function getPublisher(){
 		return $this->publisher;
 	}
 
-	public function setpublisher($publisher){
+	public function setPublisher($publisher){
 		$this->publisher = $publisher;
 	}
 
-	public function getpublishdate(){
+	public function getPublishdate(){
 		return $this->publishdate;
 	}
 
-	public function setpublishdate($publishdate){
+	public function setPublishdate($publishdate){
 		$this->publishdate = $publishdate;
 	}
 
-	public function getedition(){
+	public function getEdition(){
 		return $this->edition;
 	}
 
-	public function setedition($edition){
+	public function setEdition($edition){
 		$this->edition = $edition;
 	}
 
-	public function getissn(){
+	public function getISSN(){
 		return $this->issn;
 	}
 
-	public function setissn($issn){
+	public function setISSN($issn){
 		$this->issn = $issn;
 	}
 
@@ -1586,43 +1678,43 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 		$this->lccn = $lccn;
 	}
 
-	public function getseries(){
+	public function getSeries(){
 		return $this->series;
 	}
 
-	public function setseries($series){
+	public function setSeries($series){
 		$this->series = $series;
 	}
 
-	public function gettopic(){
+	public function getTopic(){
 		return $this->topic;
 	}
 
-	public function settopic($topic){
+	public function setTopic($topic){
 		$this->topic = $topic;
 	}
 
-	public function getgenre(){
+	public function getGenre(){
 		return $this->genre;
 	}
 
-	public function setgenre($genre){
+	public function setGenre($genre){
 		$this->genre = $genre;
 	}
 
-	public function getregion(){
+	public function getRegion(){
 		return $this->region;
 	}
 
-	public function setregion($region){
+	public function setRegion($region){
 		$this->region = $region;
 	}
 
-	public function getera(){
+	public function getEra(){
 		return $this->era;
 	}
 
-	public function setera($era){
+	public function setEra($era){
 		$this->era = $era;
 	}
 
@@ -1672,20 +1764,6 @@ class EContentRecord extends SolrDataObject implements IEContentRecord{
 
 	public function setsource($source){
 		$this->source = $source;
-	}
-
-	public function getsourceurl()
-	{		
-		if(!empty($this->sourceUrl))
-		{
-			return $this->sourceUrl;
-		}
-		
-		$fileMarc = new FileMarc($this->getNormalizedMarcRecord(), File_Marc::SOURCE_STRING);
-		$fileMarcRecord = $fileMarc->next();
-		$marcSubField = new MarcSubField($fileMarcRecord);
-		return $marcSubField->getCode("856", "u", 1, 1);
-		
 	}
 
 	public function setsourceurl($sourceurl){

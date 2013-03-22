@@ -3,6 +3,24 @@
 class MarcRecordMother
 {
 	
+	public function getMartcRecordEdition()
+	{
+		$marcRecord = "01320nam  22003978a 4450001001300000003000600013005001700019008004100036010001700077020003000094020002700124035002100151040001300172042000900185049000900194050002400203092001900227100002700246245009200273250001200365260006500377263000900442300003700451520012300488590001000611650003100621650003000652650004000682655002900722700002700751700002900778948001900807950001200826994001200838949007200850ocn474866842OCoLC20110726064400.0091106s2011    nyua   b      000 1 eng    a  2009042301  a9781416987024 (hardcover)  a1416987029 (hardcover)  a(OCoLC)474866842  aDLCcDLC  alcac  aDADA00aPZ8.3.D933bDp 2011  aEbDURANGO, J.1 aDurango, Julia,d1967-10aDream away /cJulia Durango and Katie Belle Trupiano ; illustrated by Robert Goldstrom.  a1st ed.  aNew York :bSimon & Schuster Books for Young Readers,c2011.  a1104  a1 v. (unpaged) :bill. ;c26 cm.  aAt bedtime, a young boy looks forward to falling asleep and dreaming about sailing the ocean of stars with his father.  acat55 0aBedtimevJuvenile fiction. 0aDreamsvJuvenile fiction. 0aFather and childvJuvenile fiction. 7aStories in rhyme.2lcgft1 aTrupiano, Katie Belle.1 aGoldstrom, Robert,eill.  aLTI 07/26/2011  a1003180  aC0bDAD  cedDURANGO, J.i33025022533739mcrn2171033sIngram Backordertmui";
+		return $marcRecord;
+	}
+	
+	public function getMarcRecordISBN()
+	{
+		$marcRecord = "01826cam  2200469Ia 4450001001300000003000600013005001700019008004100036020004500077020004200122024001700164035002100181040001800202049000900220092001400229100001900243245010300262246005200365246001900417246004100436260006100477300003500538490002400573500006800597500003200665500002000697520020200717590001000919650003400929655002800963655002700991655002401018655002401042700002301066730003901089830002501128948001901153950001201172994001201184949008001196949008001276ocn341368064OCoLC20110614063900.0090522s2009    ilua   a      000 1 eng d  a9781412717205 (board bk. : padded cover)  a1412717205 (board bk. : padded cover)1 a042799717202  a(OCoLC)341368064  aBIBcBIBdIHI  aDADA  aEbSESAME1 aQuinn, Deidre.10aAbby Cadabby fairy tale funh[board book] /c[written by Deidre Quinn ; illustrated by Bob Berry].18aFirst look and find Abby Cadabby fairy tale fun30aFairy tale fun1 iAt head of title:a123 Sesame Street  aLincolnwood, Ill. :bPublications International,cc2009.  a[16] p. :bcol. ill. ;c31 cm.1 aFirst look and find  aTitle from cover ; statement of responsibility from Cover p. 4.  a\"123 Sesame Street\"--Cover.  aOn board pages.  aHelp fairy Abby Cadabby look at the pictures and search for specific shapes, colors and other objects when she visits her fairy tale friends. Includes parents' guide for interactive learning ideas.  acat54 0aFairiesvJuvenile literature. 7aPicture puzzles.2lcgft 7aMatching games.2lcgft 7aFairy tales.2lcgft 7aBoard books.2lcgft1 aBerry, Bob,d1953-0 aSesame Street (Television program) 0aFirst look and find.  aLTI 06/14/2011  a1003178  aC0bDAD  cedSESAMEe/Board booki33025023080599mhin2171083sIngram Backordertmuo  cedSESAMEe/Board booki33025023080532mhin2171084sIngram Backordertmuo";
+		return $marcRecord;
+	}
+	
+	public function getMarcRecordISSN()
+	{
+		$marcRecord = "01123cas  22003857a 4450001001300000003000600013005001700019008004100036010001700077012000900094022002800103032001400131035002100145040004500166042001400211049000900225050001600234082001200250092001500262130002800277222002900305245001000334260003000344310001400374362003300388588007500421588005700496590001000553650004000563650002400603948001900627950001200646994001200658949006700670ocn212915362OCoLC20110705070600.0080306c20079999ohuqr p       |   a0eng c  a  2008212057  l1m11 a1941-6350l1941-635021  a221bUSPS  a(OCoLC)212915362  aNSDcNSDdNSDdBNOdOCLCQdZQPdDLCdDAD  ansdpapcc  aDADA10aISSN RECORD10a051214  aPERbJ KIK0 aKiki (Cincinnati, Ohio) 0aKikib(Cincinnati, Ohio)10aKiki.  aCincinnati, OH :bB-Books  aQuarterly1 aBegan with: Aug./Sept. 2007.  aDescription based on: Vol. 1, issue 2 (winter 2007); title from cover.  aLatest issue consulted: Vol. 4, issue 1 (fall 2010).  acat54 0aChildren's literaturevPeriodicals. 0aGirlsvPeriodicals.  aLTI 07/05/2011  a1006519  aC0bDAD  cjperdJ KIKe/2012 Aug-Sepi33025025378462mcrn2436479tcpui";
+		return $marcRecord;
+	}
+	
 	public function getMarcRecord()
 	{
 		return $this->getOverDriveMarcRecord(); //That is the only example for the moment that we have there.

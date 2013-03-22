@@ -85,7 +85,7 @@
 				</ul>
 			</div>
 			
-			<div id="materialsRequestPrefilterLimit" class="materialsRequestLine">Please limit your requests to 5 per week and submit only 1 title per request form.</div>
+			<div id="materialsRequestPrefilterLimit" class="materialsRequestLine"><p class='error'>Please limit your requests to 5 per week and submit only 1 title per request form.</p></div>
 		</div>
 		{/if}
 		

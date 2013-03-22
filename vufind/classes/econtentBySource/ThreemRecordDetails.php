@@ -11,9 +11,12 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 	
 	private $threeMAPI;
 	private $threeMUtils;
+	private $memcacheServices;
 	
-	public function __construct(IEContentRecord $econtentRecord, IThreeMAPI $threeMAPI = NULL,
-																 IThreeMUtils $threeMUtils = NULL)
+	public function __construct(IEContentRecord $econtentRecord, 
+			                    IThreeMAPI $threeMAPI = NULL,
+								IThreeMUtils $threeMUtils = NULL,
+								IMemcacheServices $memcacheServices = NULL)
 	{
 		$this->econtentRecord = $econtentRecord;
 		
@@ -22,6 +25,9 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 		
 		if(!$threeMUtils) $threeMUtils = new ThreeMUtils();
 		$this->threeMUtils = $threeMUtils;
+		
+		if(!$memcacheServices) $memcacheServices = new MemcacheServices();
+		$this->memcacheServices = $memcacheServices;
 	}
 	
 	public function getTotalCopies()
@@ -48,10 +54,11 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 		return $this->itIsTrueValue($result->CanHold);
 	}
 		
-	public function isCancelHoldAvailable($patronId)
+	public function isCancelHoldAvailable(IUser $user)
 	{
+		$patronId = $this->getUserId($user);
 		$threeMId = $this->getId();
-		$actual = $this->threeMAPI->getPatronCirculation($patronId);
+		$actual = $this->getPatronCirculation($patronId);
 		foreach ($actual->Holds as $itemOnHolds)
 		{
 			if($itemOnHolds->Item->ItemId == $threeMId)
@@ -72,10 +79,11 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 		return (string)$results->OnHoldCount;
 	}
 	
-	public function isCheckedOutByPatron($patronId)
+	public function isCheckedOutByPatron(IUser $user)
 	{
+		$patronId = $this->getUserId($user);
 		$threeMId = $this->getId();
-		$actual = $this->threeMAPI->getPatronCirculation($patronId);
+		$actual = $this->getPatronCirculation($patronId);
 		if(isset($actual->Checkouts))
 		{
 			
@@ -93,7 +101,7 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 		return false;
 	}
 
-	public function getFormatType()
+	public function getFormatType($itemIndex = 1)
 	{
 		return EContentFormatType::eBook;	
 	}
@@ -119,8 +127,9 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 	public function getMsgCheckedOut(){return false;}
 	public function getMsgCheckedOutToYou(){return false;}
 	
-	public function checkout($patronId)
+	public function checkout(IUser $user)
 	{
+		$patronId = $this->getUserId($user);
 		$id = $this->getId();
 		return $this->threeMAPI->checkout($id, $patronId);
 	}
@@ -129,14 +138,16 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 	 * Check In a eContentRecord from 3M
 	 * @see IEcontentRecordDetails::checkin()
 	 */
-	public function checkin($patronId)
+	public function checkin(IUser $user)
 	{
+		$patronId = $this->getUserId($user);
 		$id = $this->getId();
 		return $this->threeMAPI->checkin($id, $patronId);
 	}
 	
-	public function placeHold($patronId)
+	public function placeHold(IUser $user)
 	{
+		$patronId = $this->getUserId($user);
 		$id = $this->getId();
 		return $this->threeMAPI->placeHold($id, $patronId);
 	}
@@ -145,21 +156,21 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 	 * Return true or false
 	 * @see IEcontentRecordDetails::cancelHold()
 	 */
-	public function cancelHold($patronId)
+	public function cancelHold(IUser $user)
 	{
+		$patronId = $this->getUserId($user);
 		$id = $this->getId();
 		return $this->threeMAPI->cancelHold($id, $patronId);
 	}
 	
-	public function getAccessUrls($patronId = NULL)
+	public function getAccessUrls(IUser $user)
 	{
-		return $this->econtentRecord->sourceUrl;
+		return $this->econtentRecord->getSourceUrl();
 	}
 	
-	public function getSize()
+	public function getSize($itemIndex = 1)
 	{
-		$threeMId = $this->getId();
-		$result = $this->threeMAPI->getItemDetails($threeMId);
+		$result = $this->callGetItemDetailsMethod();
 		return (string)$result->Size;
 	}
 	
@@ -183,7 +194,19 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 		return false;
 	}
 	
+	public function canBeCheckIn(){return true;}
+	
+	public function getNumItems(){return 1;}
+	
+	public function removeWishList(IUser $user){return false;}
+	public function addWishList(IUser $user){return false;}
+	
 	//Private Methods
+	public function getPatronCirculation($patronId)
+	{
+		return $this->memcacheServices->call($this->threeMAPI, "getPatronCirculation", array($patronId), "3MGetPatronCirculation_".$patronId, 30);
+	}
+	
 	private function itIsTrueValue($value)
 	{
 		if ($value == "TRUE")
@@ -196,11 +219,16 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 	private function callGetItemDetailsMethod()
 	{
 		$threeMId = $this->getId();
-		return $this->threeMAPI->getItemDetails($threeMId);
+		return $this->memcacheServices->call($this->threeMAPI, "getItemDetails", array($threeMId), "3MGetItemDetails_".$threeMId, 300);
 	}
 	
 	private function getId()
 	{
 		return $this->threeMUtils->get3MId($this->econtentRecord);
+	}
+	
+	private function getUserId($user)
+	{
+		return $user->getId();
 	}
 }

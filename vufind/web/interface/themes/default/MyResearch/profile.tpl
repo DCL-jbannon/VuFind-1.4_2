@@ -37,6 +37,7 @@
         <tr><th>{translate text='Home Library'}:</th><td>{$profile.homeLocationName|escape}</td></tr>
         <tr><th>{translate text='Show Recommendations'}:</th><td><input type="radio" name='disableRecommendations' {if $user->disableRecommendations == 1}checked="checked"{/if} value="1"/>No <input type="radio" name='disableRecommendations' {if $user->disableRecommendations == 0}checked="checked"{/if} value="0"/> Yes</td></tr>
         <tr><th>{translate text='Show Cover Art'}:</th><td><input type="radio" name='disableCoverArt' {if $user->disableCoverArt == 1}checked="checked"{/if} value="1"/>No <input type="radio" name='disableCoverArt' {if $user->disableCoverArt == 0}checked="checked"{/if} value="0"/> Yes</td></tr>
+        <tr><th>{translate text='Reviews Notifications'}:</th><td><input type="radio" name='notificationReview' {if $user->notificationReview == 0}checked="checked"{/if} value="0"/>No <input type="radio" name='notificationReview' {if $user->notificationReview == 1}checked="checked"{/if} value="1"/> Yes</td></tr>
         {if $onInternalIP || $profile.bypassAutoLogout==1}
         <tr><th>{translate text='Bypass Automatic Logout'}:</th><td><input type='radio' name="bypassAutoLogout" value='yes' {if $profile.bypassAutoLogout==1}checked='checked'{/if}/>Yes&nbsp;&nbsp;<input type='radio' name="bypassAutoLogout" value='no' {if $profile.bypassAutoLogout==0}checked='checked'{/if}/>No<br/><em>Warning: If this is set to yes, you must manually logout of your account.  You should not use this setting if you regularly access the catalog from public computers.</em></td></tr>
         {/if}
@@ -54,6 +55,52 @@
         <tr><th>{translate text='Old PIN'}:</th><td><input type='password' name='oldPin' value='' size='4' maxlength='4' /></td></tr>
         <tr><th>{translate text='New PIN'}:</th><td><input type='password' name='newPin' value='' size='4' maxlength='4' /></td></tr>
         <tr><th>{translate text='Re-enter New PIN'}:</th><td><input type='password' name='verifyPin' value='' size='4' maxlength='4' /></td></tr>
+      	<tr><th colspan='2'><input type='submit' value='Update' name='update'/></th></tr>
+      	
+      	
+      	<thead>
+      	<tr><th colspan='2'>OverDrive Lending Options</th></tr>
+        </thead>
+      	<tr>
+      		<th>{translate text='eBook'}:</th>
+      		<td>
+      						<select name='odlo_ebook'>
+      							<option value='7'  {if $lo->ebook eq 7}selected="selected"{/if}>7 days</option>
+      							<option value='14' {if $lo->ebook eq 14}selected="selected"{/if}>14 days</option>
+      							<option value='21' {if $lo->ebook eq 21}selected="selected"{/if}>21 days</option>
+      						</select>
+      		</td>
+      	</tr>
+      	<tr>
+      		<th>{translate text='Audiobook'}:</th>
+      		<td>
+      						<select name='odlo_audiobook'>
+      							<option value='7'  {if $lo->audio eq 7}selected="selected"{/if}>7 days</option>
+      							<option value='14' {if $lo->audio eq 14}selected="selected"{/if}>14 days</option>
+      							<option value='21' {if $lo->audio eq 21}selected="selected"{/if}>21 days</option>
+      						</select>
+      		</td>
+      	</tr>
+      	<tr>
+      		<th>{translate text='Video'}:</th>
+      		<td>
+      						<select name='odlo_video'>
+      							<option value='3' {if $lo->video eq 3}selected="selected"{/if}>3 days</option>
+      							<option value='5' {if $lo->video eq 5}selected="selected"{/if}>5 days</option>
+      							<option value='7' {if $lo->video eq 7}selected="selected"{/if}>7 days</option>
+      						</select>
+      		</td>
+      	</tr>
+      	<tr>
+      		<th>{translate text='Disney Online eBook'}:</th>
+      		<td>
+      						<select name='odlo_disney'>
+      							<option value='7'  {if $lo->disney eq 7}selected="selected"{/if}>7 days</option>
+      							<option value='14' {if $lo->disney eq 14}selected="selected"{/if}>14 days</option>
+      							<option value='21' {if $lo->disney eq 21}selected="selected"{/if}>21 days</option>
+      						</select>
+      		</td>
+      	</tr>
       	<tr><th colspan='2'><input type='submit' value='Update' name='update'/></th></tr>
       	
       </table>

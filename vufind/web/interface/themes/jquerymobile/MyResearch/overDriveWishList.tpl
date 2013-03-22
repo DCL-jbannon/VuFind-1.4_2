@@ -1,4 +1,4 @@
-<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js"></script>
+<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js?t=03182013"></script>
 <script type="text/javascript" src="{$url}/js/overdrive.js"></script>
 {if (isset($title)) }
 <script type="text/javascript">

@@ -2,19 +2,29 @@
 
 class OverDriveResultsMother
 {
+	
+	const accessToken = "AAEAACWEA9cbeEMQWKvYvNA5xO-fEXp83AE2i-lBZd9ubERzYOcSG3w5bd6Q3WEbijyNAIbav4fn7MLWosyXZktPImr";
+	const productsUrl = "https://api.overdrive.com/v1/collections/L1BGAEAAA2f/products";
+	
+	const totalCopies = "aDummyTotalCopiesValue";
+	const onHold = "aDummyOnHoldValue";
+	const availableCopies = "aDummyAvailableCopiesValue";
 
-	public function getValidLoginResult()
+	public function getValidLoginResult($accessToken = NULL)
 	{
+		if(!$accessToken) $accessToken = self::accessToken;
+		
 		$object = new stdClass();
-		$object->access_token = "AAEAACWEA9cbeEMQWKvYvNA5xO-fEXp83AE2i-lBZd9ubERzYOcSG3w5bd6Q3WEbijyNAIbav4fn7MLWosyXZktPImr";
+		$object->access_token = $accessToken;
 		$object->token_type = "bearer";
 		$object->expires_in = "3600";
 		$object->scope = "LIB META AVAIL SRCH";
 		return $object;
 	}
 	
-	public function getInfoLibraryResult()
+	public function getInfoLibraryResult($productUrl = NULL)
 	{
+		if(!$productUrl) $productUrl = self::productsUrl;
 		
 		$object = new stdClass();
 		$object->id = "1344";
@@ -24,7 +34,7 @@ class OverDriveResultsMother
 		$object->links->self->href = "https://api.overdrive.com/v1/libraries/1344";
 		$object->links->self->type = "application/vnd.overdrive.api+json";
 		
-		$object->links->products->href = "https://api.overdrive.com/v1/collections/L1BGAEAAA2f/products";
+		$object->links->products->href = $productUrl;
 		$object->links->products->type = "application/vnd.overdrive.api+json";
 		
 		$object->links->advantageAccounts->href = "https://api.overdrive.com/v1/libraries/1344/advantageAccounts";
@@ -154,6 +164,9 @@ class OverDriveResultsMother
 		//There are more rights, but we do not use them....so....
 		$object->formats[0]->samples[0]->source = "Introduction/Chapter 1";
 		$object->formats[0]->samples[0]->url = "http://excerpts.contentreserve.com/FormatType-25/0887-1/129776-KabulBeautySchool.wma";
+		$object->formats[1]->id = "ebook-pdf-adobe";
+		$object->formats[1]->name = "Ebook";
+		$object->formats[1]->fileSize = 0;
 		
 		return $object;
 	}
@@ -166,6 +179,80 @@ class OverDriveResultsMother
 		$object->token = "b31e17ef-608f-442f-92f1-d0c883673f5a";
 	}
 	
-}
+	public function getItemCheckedOutStatus($canBe)
+	{
+		return $this->getItemDetails($canBe);
+	}
+	
+	public function getItemPlaceHoldStatus($canBe)
+	{
+		return $this->getItemDetails(NULL, $canBe);
+	}
+	
+	public function getItemWishListStatus($canBe)
+	{
+		return $this->getItemDetails(NULL, NULL, $canBe);
+	}
+	
+	public function getItemDetails($canCheckOut = NULL, $canHold = NULL, $canAddWishList = NULL)
+	{
+		$details = new stdClass();
+		$details->AvailableCopies = self::availableCopies;
+		$details->TotalCopies = self::totalCopies;
+		$details->OnHoldCount = self::onHold;
+		$details->CanCheckout = $canCheckOut;
+		$details->CanHold = $canHold;
+		$details->CanAddWishList = $canAddWishList;
+		return $details;
+	}
+	
+	public function getItemDetailsHoldOption()
+	{
+		$details = $this->getItemDetails();
+		$details->formatIdHold = 25;
+		return $details;
+	}
+	
+	public function getPatronCirculation()
+	{
+		$patronCiculation->Checkouts[] = array("ItemId" =>  "0E325B48-E1A7-465A-8914-3EA6E46227B6",
+											   "Title"=>    "Australia's North West",
+											   "Expires" => "Mar 15 2013  1:15PM",
+											   "Link" => "aDummyLink-0E325B48",
+											   "ChooseFormat"=>false);
+		
+		$patronCiculation->Checkouts[] = array("ItemId" =>  "EA87339B-9B92-423E-B413-D9A17BF33AF9",
+											   "Title"=>    "The Cat Who Said Cheese",
+											   "Expires" => "Mar 29 2013  1:12PM",
+											   "Link" => "aDummyLink-EA87339B",
+											   "ChooseFormat"=>false);
+		
+		$patronCiculation->Checkouts[] = array("ItemId" =>  "833283EE-3A23-45FB-B5DF-217DEC6C2D02",
+											   "Title"=>    "The Cat Who Said Cheese",
+											   "Expires" => "Mar 25 2019  2:12AM",
+											   "Link" => "",
+											   "ChooseFormat"=>true);
+		
+		$patronCiculation->Holds[] = array("ItemId" => "8489B13C-FAFD-4751-81EE-1F0F090EFFEE",
+				                           "FormatId" => 425,
+										   "Title" =>  "The Poisonwood Bible",
+				 						   "UserPosition" =>  5,
+				 						   "QueueLength" => 98);
+		
+		$patronCiculation->Holds[] = array("ItemId" => "82CDD641-857A-45CA-8775-34EEDE35B238",
+										   "FormatId" => 50,
+										   "Title" =>  "Fifty Shades of Grey",
+				   						   "UserPosition" =>  19,
+				   						   "QueueLength" =>  91);
+		
+		$patronCiculation->WishList[] = array("ItemId" => "7C0C0960-D041-468D-ABCC-3DD4F43ACB2B",
+											  "Title"  => "If You Were Mine");
+		
+		$patronCiculation->WishList[] = array("ItemId" => "F1430E53-C02F-4FB6-85FE-6319BDDF7084",
+				                              "Title"  => "I Only Have Eyes For You ");
+		
+		return $patronCiculation;
+	}
 
+}
 ?>

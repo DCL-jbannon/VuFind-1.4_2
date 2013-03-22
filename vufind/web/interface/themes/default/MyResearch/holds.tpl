@@ -4,7 +4,7 @@
 </script>
 {/if}
 <script type="text/javascript" src="{$path}/js/holds.js"></script>
-<script type="text/javascript" src="{$path}/services/MyResearch/ajax.js"></script>
+<script type="text/javascript" src="{$path}/services/MyResearch/ajax.js?t=03182013"></script>
 <script type="text/javascript" src="{$path}/js/tablesorter/jquery.tablesorter.min.js"></script>
 <div id="page-content" class="content">
 	<div id="sidebar">

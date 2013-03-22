@@ -22,6 +22,9 @@ require_once 'Action.php';
 
 require_once 'services/MyResearch/lib/Resource.php';
 require_once 'services/MyResearch/lib/User.php';
+require_once dirname(__FILE__).'/../../../classes/notifications/ReturnEcontentNotification.php';
+require_once dirname(__FILE__).'/../../../classes/Utils/DB_DataObject/UserDBUtils.php';
+require_once dirname(__FILE__).'/../../../classes/notifications/NotificationsConstants.php';
 
 class Home extends Action
 {
@@ -40,7 +43,7 @@ class Home extends Action
 		if (isset($_POST['body'])){
 			$post_body = $_POST['body'];
 		}
-		$logger->log("POST_BODY $post_body", PEAR_LOG_INFO);
+		$logger->log("POST_BODY :".print_r($post_body,true), PEAR_LOG_INFO);
 
 		$notificationData = new SimpleXMLElement($post_body);
 		//Check to see of the EPUB is being fulfilled or returned
@@ -51,13 +54,19 @@ class Home extends Action
 		//Get the user acsId
 		$userAcsId = (string)$notificationData->body->user;
 			
-		if ($isFulfilled){
-			if ($isReturned){
-				$logger->log("Transaction $transactionId was returned, returning it in the catalog.", PEAR_LOG_INFO);
-			}else{
+		if ($isFulfilled)
+		{
+			if ($isReturned)
+			{
+				$logger->log("Transaction $transactionId was returned, returning it in the catalog.", PEAR_LOG_INFO);	
+			}
+			else
+			{
 				$logger->log("Transaction $transactionId was fulfilled, checking it out in the catalog.", PEAR_LOG_INFO);
 			}
-		}else{
+		}
+		else
+		{
 			$logger->log("Transaction $transactionId was not fulfilled or returned, ignoring it.", PEAR_LOG_INFO);
 			exit();
 		}
@@ -74,22 +83,38 @@ class Home extends Action
 		$logger->log("Inserted log entry result: $ret", PEAR_LOG_INFO);
 		
 		//Update the database as appropriate
-		//Get the chckd out item for the transaction Id
+		//Get the checked out item for the transaction Id
 		require_once('sys/eContent/EContentCheckout.php');
 		$checkout = new EContentCheckout();
 		$checkout->acsTransactionId = $transactionId;
 		if ($checkout->find(true)){
 			//Update the checkout to show
-			if ($isReturned){
-				if ($checkout->status == 'out'){
+			if ($isReturned)
+			{
+				if ($checkout->status == 'out')
+				{
 					//return the item
 					require_once 'Drivers/EContentDriver.php';
 					$driver = new EContentDriver();
 					$driver->returnRecord($checkout->recordId);
 				}
-			}else{
+					
+				$userDBUtils = new UserDBUtils();
+				$user = $userDBUtils->getObjectById($checkout->userId);
+				
+				if($user->isOptInReviewNotification())
+				{
+					//System Notification
+					$returnEcontentNotification = new ReturnEcontentNotification();
+					$returnEcontentNotification->sendNotification($checkout->userId, $checkout->recordId, UniqueIdentifier::get(NotificationsPrefixes::returnEcontent));
+				}
+				
+			}
+			else
+			{
 				//Update the checked out item with information from acs
-				if ($checkout->downloadedToReader == 0){
+				if ($checkout->downloadedToReader == 0)
+				{
 					$checkout->downloadedToReader = 1;
 					$checkout->dateFulfilled = time();
 					$checkout->userAcsId = $userAcsId;

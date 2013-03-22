@@ -212,13 +212,16 @@ public class MarcRecordDetails {
 				// so we check indicator 1 and indicator 2 and fudge the note
 				text = "Access eBook";
 			}
-
+			else if (url.startsWith("https://douglascountylibraries.idm.oclc.org"))
+			{
+				text = "Access eBook";
+			}
+			
 			if (text != null && url != null) {
 				boolean isSourceUrl = false;
-				if (text.matches("(?i).*?(?:download|access online|electronic book|access digital media|access title|Access eBook).*?")) {
+				if (text.matches("(?i).*?(?:download|access online|electronic book|access digital media|access title|Access eBook|access|Available|ABDO).*?")) {
 					if (!url.matches("(?i).*?vufind.*?")) {
 						isSourceUrl = true;
-						
 					}
 				} else if (text.matches("(?i).*?(?:cover|review).*?")) {
 					// File is an enrichment url
@@ -231,7 +234,7 @@ public class MarcRecordDetails {
 					logger.info("Unknown URL " + url + " " + text);
 				}
 				if (isSourceUrl){
-					// System.out.println("Found source url");
+					System.out.println("Found source url");
 					boolean addedUrl = false;
 					long libraryId = marcProcessor.getLibraryIdForLink(url);
 					if (libraryId == -1){
@@ -290,7 +293,7 @@ public class MarcRecordDetails {
 			// Check the record in the ILS
 			getUrlsForItemsFromMillennium();
 		}
-
+		
 		urlsLoaded = true;
 	}
 
@@ -2898,12 +2901,15 @@ public class MarcRecordDetails {
 			for (DetectionSettings curSettings : marcProcessor.getDetectionSettings()) {
 				Set<String> fieldData = getFieldList(curSettings.getFieldSpec());
 				boolean isMatch = false;
-				// logger.debug("Found " + fieldData.size() + " fields matching " +
-				// curSettings.getFieldSpec());
+				logger.debug("Found " + fieldData.size() + " fields matching " + curSettings.getFieldSpec());
 				for (String curField : fieldData) {
-					// logger.debug("Testing if value " + curField.toLowerCase() +
-					// " matches " + curSettings.getValueToMatch());
-					isMatch = ((String) curField.toLowerCase()).matches(".*" + curSettings.getValueToMatch().toLowerCase() + ".*");
+					 //logger.debug("Testing if value -" + curField.toLowerCase() +
+					 //"- matches -" + curSettings.getValueToMatch().toLowerCase() + "-");
+					
+					 String textToMatch = ".*" + curSettings.getValueToMatch().toLowerCase() + ".*";
+					 textToMatch = textToMatch.replaceAll(Pattern.quote("+"), "\\\\+");
+					 
+					isMatch = ((String) curField.toLowerCase()).matches(textToMatch);
 					if (isMatch) break;
 				}
 				if (isMatch) {
@@ -2914,6 +2920,7 @@ public class MarcRecordDetails {
 					}
 				}
 			}
+			logger.debug("Finished checking detection settings");
 			logger.debug("Finished checking detection settings");
 
 			if (!isEContent) {

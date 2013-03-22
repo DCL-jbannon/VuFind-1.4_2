@@ -1,5 +1,4 @@
 <?php
-
 require_once dirname(__FILE__).'/Utils/ArrayTests.php';
 require_once dirname(__FILE__).'/Utils/CheckArgsTests.php';
 require_once dirname(__FILE__).'/Utils/ObjectUtilsTests.php';
@@ -23,6 +22,18 @@ require_once dirname(__FILE__).'/classes/covers/AttachedEcontentCoversTests.php'
 require_once dirname(__FILE__).'/classes/covers/ThreeMCoversTests.php';
 require_once dirname(__FILE__).'/Utils/ThreeMUtilsTests.php';
 require_once dirname(__FILE__).'/classes/covers/OriginalFolderCoversTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/EcontentRecordDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/UserDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/EcontentHoldDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/EcontentHistoryDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/ResourceDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/CommentsDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/DB_DataObject/UserRatingsDBUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/UniqueIdentifierTests.php';
+require_once dirname(__FILE__).'/Utils/NotificationUtilsTests.php';
+require_once dirname(__FILE__).'/FileMarc/MarcRecordFieldsTests.php';
+require_once dirname(__FILE__).'/Utils/PaginationUtilsTests.php';
+require_once dirname(__FILE__).'/Utils/OverDriveUtilsTests.php';
 
 class SuiteUtilsTests
 {
@@ -52,8 +63,19 @@ class SuiteUtilsTests
 		$suite->addTestSuite('ThreeMCoversTests');
 		$suite->addTestSuite('ThreeMUtilsTests');
         $suite->addTestSuite('OriginalFolderCoversTests');
+        $suite->addTestSuite('EcontentRecordDBUtilsTests');
+        $suite->addTestSuite('UserDBUtilsTests');
+        $suite->addTestSuite('EcontentHistoryDBUtilsTests');
+        $suite->addTestSuite('ResourceDBUtilsTests');
+        $suite->addTestSuite('EcontentHoldDBUtilsTests');
+        $suite->addTestSuite('CommentsDBUtilsTests');
+        $suite->addTestSuite('UserRatingsDBUtilsTests');
+        $suite->addTestSuite('UniqueIdentifierTests');
+        $suite->addTestSuite('NotificationUtilsTests');
+        $suite->addTestSuite("MarcRecordFieldsTests");
+        $suite->addTestSuite("PaginationUtilsTests");
+        $suite->addTestSuite("OverDriveUtilsTests");
 		return $suite;
 	}
 }
-
 ?>

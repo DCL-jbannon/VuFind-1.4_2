@@ -19,6 +19,7 @@
  */
 
 require_once 'services/MyResearch/MyResearch.php';
+require_once dirname(__FILE__).'/../../../classes/API/OverDrive/OverDriveServicesAPI.php';
 
 class Profile extends MyResearch
 {
@@ -28,7 +29,12 @@ class Profile extends MyResearch
 		global $interface;
 		global $user;
 
-		if (isset($_POST['update'])) {
+		$odapiservices = new OverDriveServicesAPI();
+		
+		if (isset($_POST['update']))
+		{
+			$odapiservices->changeLendingOptions($user->getBarcode(), $_POST['odlo_ebook'], $_POST['odlo_audiobook'], $_POST['odlo_video'], $_POST['odlo_disney']);
+			
 			$result = $this->catalog->updatePatronInfo($user->cat_password);
 			$_SESSION['profileUpdateErrors'] = $result;
 
@@ -76,6 +82,10 @@ class Profile extends MyResearch
 		}else{
 			$interface->assign('userIsStaff', false);
 		}
+		
+		//OverDrive Lending Options
+		$lo = $odapiservices->getLendingOptions($user->getBarcode());
+		$interface->assign("lo", $lo);
 
 		$interface->setTemplate('profile.tpl');
 		$interface->setPageTitle(translate('My Profile'));

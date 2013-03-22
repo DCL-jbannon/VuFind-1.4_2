@@ -4,7 +4,7 @@
  */
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
-require_once 'sys/SolrDataObject.php';
+require_once dirname(__FILE__).'/../SolrDataObject.php';
 
 class EContentHold extends DB_DataObject {
 	public $__table = 'econtent_hold';    // table name
@@ -19,7 +19,14 @@ class EContentHold extends DB_DataObject {
 	/* Static get */
 	function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('econtent_hold',$k,$v); }
 
-	function keys() {
+	function keys() 
+	{
 		return array('id', 'userId');
 	}
+	
+	public function setRecordId($recordId)
+	{
+		$this->recordId = $recordId;
+	}
+	
 }

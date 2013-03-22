@@ -85,7 +85,7 @@ public class ProcessorResults {
 	public synchronized void addNote(String note) {
 		Date date = new Date();
 		this.notes.add(dateFormat.format(date) + " - " + note);
-		this.logger.info(note);
+		this.logger.debug(note);
 	}
 	public int getEContentRecordsProcessed() {
 		return eContentRecordsProcessed;
@@ -187,7 +187,7 @@ public class ProcessorResults {
 				updateResultsStmt.setLong(10, resultsId);
 				updateResultsStmt.executeUpdate();
 			}
-			logger.info("Saved results for process " + getProcessorName());
+			logger.debug("Saved results for process " + getProcessorName());
 		} catch (Exception e) {
 			logger.error("Unable to save results of process to database", e);
 		}

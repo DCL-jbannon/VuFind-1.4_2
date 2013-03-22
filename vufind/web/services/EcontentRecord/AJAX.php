@@ -3,6 +3,9 @@ require_once 'Action.php';
 require_once 'sys/Proxy_Request.php';
 require_once 'sys/eContent/EContentRecord.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
+require_once dirname(__FILE__).'/../../../classes/Utils/NotificationUtils.php';
+require_once 'sys/Notification/NotificationSent.php';
+require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
 
 global $configArray;
 
@@ -15,7 +18,7 @@ class AJAX extends Action {
 		global $analytics;
 		$analytics->disableTracking();
 		$method = $_GET['method'];
-		if (in_array($method, array('RateTitle', 'GetSeriesTitles', 'GetComments', 'DeleteItem', 'SaveComment', 'CheckoutOverDriveItem', 'PlaceOverDriveHold', 'AddOverDriveRecordToWishList', 'RemoveOverDriveRecordFromWishList', 'CancelOverDriveHold'))){
+		if (in_array($method, array('RateTitle', 'GetSeriesTitles', 'GetComments', 'DeleteItem', 'SaveComment', 'CheckoutOverDriveItem', 'PlaceOverDriveHold', 'AddEcontentRecordToWishList', 'RemoveOverDriveRecordFromWishList', 'CancelOverDriveHold'))){
 			header('Content-type: text/plain');
 			header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
@@ -95,7 +98,6 @@ class AJAX extends Action {
 		{
 			$interface->assign('showAddItemButton', $detailsEcontent->showAddItemButton());
 		}
-		
 		
 		$interface->assign('isOverDrive', $eContentRecord->isOverDrive());
 		$interface->assign('source', $eContentRecord->source);
@@ -210,9 +212,22 @@ function GetProspectorInfo(){
 	{
 		require_once 'services/MyResearch/lib/Resource.php';
 
-		$user = UserAccount::isLoggedIn();
-		if ($user === false) {
-			return json_encode(array('result' => 'Unauthorized'));
+		if(!NotificationUtils::isValidNotificationUID(RequestUtils::getRequest("notuid")))
+		{
+			$user = UserAccount::isLoggedIn();
+			if ($user === false) {
+				return json_encode(array('result' => 'Unauthorized'));
+			}
+		}
+		else
+		{
+			$ns = new NotificationSent();
+			$ns->setUniqueIdentifier(RequestUtils::getRequest("notuid"));
+			$ns->find(true);
+			
+			$user = new User();
+			$user->id = $ns->getUserId();
+			$user->find(true);
 		}
 
 		$resource = new Resource();
@@ -223,7 +238,7 @@ function GetProspectorInfo(){
 		}
 		$resource->addComment($_REQUEST['comment'], $user, 'eContent');
 
-		return json_encode(array('result' => 'true'));
+		return json_encode(array('result' => 'true', "notuid"=>$ns->getUserId()));
 	}
 
 	function DeleteComment()
@@ -276,10 +291,25 @@ function GetProspectorInfo(){
 	function RateTitle(){
 		require_once('sys/eContent/EContentRating.php');
 		global $user;
-		if (!isset($user) || $user == false){
-			header('HTTP/1.0 500 Internal server error');
-			return 'Please login to rate this title.';
+		
+		if(!NotificationUtils::isValidNotificationUID(RequestUtils::getRequest("notuid")))
+		{
+			if (!isset($user) || $user == false)
+			{
+				return 'Please login to rate this title.';
+			}
 		}
+		else
+		{
+			$ns = new NotificationSent();
+			$ns->setUniqueIdentifier(RequestUtils::getRequest("notuid"));
+			$ns->find(true);
+				
+			$user = new User();
+			$user->id = $ns->getUserId();
+			$user->find(true);
+		}
+		
 		$ratingValue = $_REQUEST['rating'];
 		//Save the rating
 		$rating = new EContentRating();
@@ -439,8 +469,21 @@ function GetProspectorInfo(){
 		return $interface->fetch('EcontentRecord/ajax-loan-period.tpl');
 	}
 	
-	function AddOverDriveRecordToWishList(){
+	function AddEcontentRecordToWishList()
+	{
 		global $user;
+		
+		if ($user && !PEAR::isError($user) && isset($_REQUEST['recordId']))
+		{
+			$details = EcontentDetailsFactory::getById($_REQUEST['recordId']);
+			//The title was added to your wishlist.
+			$details->addWishList($user);
+			return json_encode(array('result'=>true, 'message'=>'The title was added to your wishlist.'));
+		}else{
+			return json_encode(array('result'=>false, 'message'=>'You must be logged in to add an item to your wish list.'));
+		}
+		
+		
 		if (isset($_REQUEST['recordId'])){
 			//TODO: get the overdrive id from the EContent REcord
 			require_once 'sys/eContent/EContentRecord.php';
@@ -452,14 +495,7 @@ function GetProspectorInfo(){
 		}else{
 			$overDriveId = $_REQUEST['overDriveId'];
 		}
-		if ($user && !PEAR::isError($user)){
-			require_once('Drivers/OverDriveDriver.php');
-			$driver = new OverDriveDriver();
-			$result = $driver->addItemToOverDriveWishList($overDriveId, $user);
-			return json_encode($result);
-		}else{
-			return json_encode(array('result'=>false, 'message'=>'You must be logged in to add an item to your wish list.'));
-		}
+		
 	}
 	
 	function RemoveOverDriveRecordFromWishList(){

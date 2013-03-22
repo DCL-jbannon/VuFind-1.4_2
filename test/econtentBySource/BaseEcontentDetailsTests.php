@@ -5,10 +5,13 @@ abstract class BaseEcontentDetailsTests extends PHPUnit_Framework_TestCase
 
 	protected $service;
 	protected $econtentRecordMock;
+	protected $userMock;
 	
 	public function setUp()
 	{
-		$this->econtentRecordMock = $this->getMock("IEContentRecord");
+		$this->userMock = $this->getMock("IUser", array("getId", "getUsername", "getEmail"));
+		$this->econtentRecordMock = $this->getMock("IEContentRecord", array("getSourceUrl"));
+		parent::setUp();
 	}
 	
 	/**
@@ -101,8 +104,6 @@ abstract class BaseEcontentDetailsTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->getSourceName();
 		$this->assertEquals($expected, $actual);
 	}
-	
-		
 
 }
 

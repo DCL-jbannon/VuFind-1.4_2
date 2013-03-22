@@ -3,8 +3,14 @@
  * Table Definition for resource
  */
 require_once 'DB/DataObject.php';
+require_once dirname(__FILE__).'/../../../../classes/FileMarc/MarcRecordFields.php';
+require_once dirname(__FILE__).'/../../../../classes/interfaces/IMarcRecordFieldsReader.php';
+require_once dirname(__FILE__).'/../../../../classes/interfaces/IGenericRecord.php';
 
-class Resource extends DB_DataObject {
+interface IResource{}
+
+class Resource extends DB_DataObject implements IResource,IMarcRecordFieldsReader,IGenericRecord
+{
 	###START_AUTOCODE
 	/* the code below is auto generated do not remove the above tag */
 
@@ -28,7 +34,94 @@ class Resource extends DB_DataObject {
 
 	/* the code above is auto generated do not remove the tag below */
 	###END_AUTOCODE
-
+	
+	public function getPermanentPath()
+	{
+		return '/Record/'.$this->id;
+	}
+	
+	public function getUniqueSystemID()
+	{
+		return $this->record_id;
+	}
+	
+	public function getMarcString()
+	{
+		return $this->marc;
+	}
+	
+	public function getMarcRecordFieldReader(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		if(!$marcRecordFields)
+		{
+			$object = new MarcRecordFields($this);
+			return $object;
+		}
+		return $marcRecordFields;
+	}
+	
+	public function getType()
+	{
+		return 'Record';
+	}
+	
+	public function getISSN(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getISSN();
+	}
+	
+	public function getAuthor()
+	{
+		return $this->author;
+	}
+	
+	public function getTitle(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		$title = $this->title;
+		if(empty($title))
+		{
+			$title = $this->getMarcRecordFieldReader($marcRecordFields)->getTitle();
+		}
+		return $title;
+	}
+	
+	public function getSeries(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getSeries();
+	}
+	
+	public function getISBN(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getISBN();
+	}
+	
+	public function getPublicationPlace(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getPublicationPlace();
+	}
+	
+	public function getPublisher(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getPublisher();
+	}
+	
+	public function getYear(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getYear();
+	}
+	
+	public function getEdition(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getEdition();
+	}
+	
+	public function getShelfMark(IMarcRecordFields $marcRecordFields = NULL)
+	{
+		return $this->getMarcRecordFieldReader($marcRecordFields)->getShelfMark();
+	}
+	
+	public function getSecondaryAuthor(){return'';}
+	public function getEAN(){return'';}
 	/**
 	 * Get tags associated with the current resource.
 	 *
@@ -451,4 +544,30 @@ class Resource extends DB_DataObject {
 		imagedestroy($im);
 		return "images/fiveStar/{$this->record_id}.png";
 	}
+	
+	public function setRecordId($recordId)
+	{
+		$this->record_id = $recordId;
+	}
+	
+	public function setSource($source)
+	{
+		$this->source = $source;
+	}
+	
+	public function setResourceId($resourceId)
+	{
+		$this->id = $resourceId;
+	}
+	
+	public function setTitle($title)
+	{
+		$this->title = $title;
+	}
+	
+	public function setId($id)
+	{
+		$this->id = $id;
+	}
 }
+?>

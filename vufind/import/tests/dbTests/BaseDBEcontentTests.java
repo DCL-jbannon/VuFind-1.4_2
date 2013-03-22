@@ -6,8 +6,6 @@ import org.dbunit.DBTestCase;
 
 public abstract class BaseDBEcontentTests extends BaseDBTests
 {
-
-
 	public String getDatabaseName() 
 	{
 		return "testdclecontent";
@@ -21,8 +19,5 @@ public abstract class BaseDBEcontentTests extends BaseDBTests
 	public String getSQLFileName()
 	{
 		return "C:/projects/VuFind-Plus/test/sql/testEcontent.sql";
-	}
-	
-	
-	
+	}	
 }

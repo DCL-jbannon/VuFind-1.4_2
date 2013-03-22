@@ -4,6 +4,7 @@ abstract class BaseHelperClassesTests extends PHPUnit_Framework_TestCase
 {
 	protected $service;
 	protected $econtentRecordDetailsMock;
+	protected $userMock;
 	
 	public function setUp()
 	{
@@ -18,7 +19,9 @@ abstract class BaseHelperClassesTests extends PHPUnit_Framework_TestCase
 															  "getMethodLoadStatusSummaries", "getFormats",
 															  "checkout","checkin", "placeHold", "cancelHold","canSuspendHolds",
 															  "getAccessUrls","getRecordId", "showAddItemButton", "showCancelHoldLinkAvailableHolds",
-															  "getCancelHoldUrls", "getSize", "getUsageNotesMessage", "getCheckOutUrls"));
+															  "getCancelHoldUrls", "getSize", "getUsageNotesMessage", "getCheckOutUrls", 
+															  "canBeCheckIn", "getNumItems", "removeWishList", "AddWishList"));
+		$this->userMock = $this->getMock("IUser");	
 		parent::setUp();
 	}
 	

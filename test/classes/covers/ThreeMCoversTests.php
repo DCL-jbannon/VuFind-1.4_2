@@ -9,7 +9,7 @@ class ThreeMCoversTests extends PHPUnit_Framework_TestCase
 	
 	public function setUp()
 	{
-		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("find","fetch", "is3M"));
+		$this->eContentRecordMock = $this->getMock("IEContentRecord", array("find","fetch", "is3M", "getSourceUrl"));
 		$this->service = new ThreeMCovers($this->eContentRecordMock);
 		parent::setUp();		
 	}
@@ -62,7 +62,10 @@ class ThreeMCoversTests extends PHPUnit_Framework_TestCase
 		$id="a3MRecordId";
 		$expected = "http://ebook.3m.com/delivery/img?type=DOCUMENTIMAGE&documentID=".$id."&size=LARGE";
 		
-		$this->eContentRecordMock->sourceUrl = "http://ebook.3m.com/library/DouglasCountyLibraries-document_id-".$id;
+		$this->eContentRecordMock->expects($this->once())
+								 ->method("getSourceUrl")
+								 ->will($this->returnValue("http://ebook.3m.com/library/DouglasCountyLibraries-document_id-".$id));
+								 		
 		$this->eContentRecordMock->expects($this->once())
 									->method("find")
 									->will($this->returnValue(true));

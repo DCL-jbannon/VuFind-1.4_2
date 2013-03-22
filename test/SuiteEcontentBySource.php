@@ -9,10 +9,11 @@ class SuiteEcontentBySourceTests
 	public static function suite()
 	{
 		$suite = new PHPUnit_Framework_TestSuite('Econtent By Source');
-		$suite->addTestSuite('EcontentDetailsFactoryTests');
-		$suite->addTestSuite('ThreemRecordDetailsTests');
 		$suite->addTestSuite('EcontentRecordStatusTextTests');
 		$suite->addTestSuite('EcontentRecordShowButtonsTests');
+		$suite->addTestSuite('EcontentDetailsFactoryTests');
+		$suite->addTestSuite('ThreemRecordDetailsTests');
+		
 		return $suite;
 	}
 }

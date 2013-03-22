@@ -1,4 +1,4 @@
-<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js"></script>
+<script type="text/javascript" src="{$url}/services/MyResearch/ajax.js?t=03182013"></script>
 
 <div id="page-content" class="content">
   <div id="sidebar">

@@ -37,8 +37,7 @@
 								<img src="/interface/themes/{$theme}/images/{$eContentItem->item_type}.png" class="ui-li-icon">
 								Source: {$eContentItem->source}<br>
 								{if $showEContentNotes}Notes: {$eContentItem->notes}<br>{/if}
-								Usage: {if $eContentItem->getAccessType() == 'free'}No Usage Restrictions{elseif $eContentItem->getAccessType() == 'acs' || $eContentItem->getAccessType() == 'singleUse'}Must be checked out to read{/if}<br>
-								Size:{$eContentItem->getSize()|file_size}
+								Usage: Must be checked out to read<br>
 							{/if}
 						
 					{/if}

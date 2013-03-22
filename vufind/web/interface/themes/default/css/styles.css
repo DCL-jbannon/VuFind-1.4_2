@@ -1635,6 +1635,7 @@ a.holdUpdatelink {
 
 .frozenHold {
 	color: red;
+	font-weight: bold;
 }
 
 /*Format category information */

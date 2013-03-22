@@ -1,6 +1,8 @@
 <?php
 
-class BookcoverURL {
+interface IBookcoverURL{}
+
+class BookcoverURL implements IBookcoverURL{
 	
 	const urlEcontent = 'bookcover.php?id={eContentId}&econtent=true&isn={ISSN}&size={size}&category=EMedia';
 	private $baseUrl;
@@ -15,25 +17,28 @@ class BookcoverURL {
 		return $this->baseUrl;
 	}
 	
-	public function getBookCoverUrl($size = 'small', $issn, $eContentId, $eContent = false)
+	public function getBookCoverUrl($size = 'small', $issn, $eContentRecordId, $eContent = false)
 	{
+		global $configArray;
+		
 		$patterns = array();
 		$patterns[0] = '/{eContentId}/';
 		$patterns[1] = '/{ISSN}/';
 		$patterns[2] = '/{size}/';
 		$replacements = array();
-		$replacements[0] = $eContentId;
+		$replacements[0] = $eContentRecordId;
 		$replacements[1] = $issn;
 		$replacements[2] = $size;
 		
 		if($eContent)
 		{
 			$url = preg_replace($patterns, $replacements, self::urlEcontent);
-			if(!empty($this->baseUrl))
+			
+			if(empty($this->baseUrl))
 			{
-				$url = $this->baseUrl.'/'.$url;
-			}
-			return $url;
+				$this->setBaseUrl($configArray['Site']['url']);
+			}			
+			return $this->baseUrl.'/'.$url;
 		}
 	}
 	

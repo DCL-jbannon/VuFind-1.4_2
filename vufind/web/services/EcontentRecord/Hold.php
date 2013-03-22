@@ -127,7 +127,7 @@ class Hold extends Action
 				}
 				else
 				{
-					header("Location: " . $configArray['Site']['url'] . '/MyResearch/MyEContent');
+					header("Location: " . $configArray['Site']['url'] . '/MyResearch/EContentHolds');
 				}
 			}
 		}

@@ -102,7 +102,6 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 	private function exec($method)
 	{
 		$result = curl_exec($this->ch);
-		
 		$reponseCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
 		
 		$validResponseCode = $this->odhr->checkResponseCode($reponseCode);

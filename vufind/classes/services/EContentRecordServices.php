@@ -1,52 +1,65 @@
 <?php
 
-require_once dirname(__FILE__).'/../FileMarc/FileMarc.php';
-require_once dirname(__FILE__).'/../FileMarc/MarcSubField.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/EcontentRecordDBUtils.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/EcontentHistoryDBUtils.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/EcontentHoldDBUtils.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/EcontentCheckOutDBUtils.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/ResourceDBUtils.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/CommentsDBUtils.php';
+require_once dirname(__FILE__).'/../Utils/DB_DataObject/UserRatingsDBUtils.php';
 
-class EContentRecordServices {
+
+class EContentRecordServices
+{
 	
-	public function isFree(IEContentRecord $eContentRecord)
+	public function moveEcontentRelatedInformation( $eContentRecordFromId, $eContentRecordToId,
+													IDB_DataObjectUtils $econtentRecordDbUtils = NULL,
+													IDB_DataObjectUtils $econtentHistoryDbUtils = NULL,
+													IDB_DataObjectUtils $econtentHoldDbUtils = NULL,
+													IDB_DataObjectUtils $econtentCheckOutDbUtils = NULL,
+													IDB_DataObjectUtils $resourceDbUtils = NULL,
+													IDB_DataObjectUtils $commentsDbUtils = NULL,
+													IDB_DataObjectUtils $userRatingsDbUtils = NULL)
 	{
-		if ($eContentRecord->accessType != 'acs')
+		
+		if(!$econtentRecordDbUtils) $econtentRecordDbUtils = new EcontentRecordDBUtils();
+		if(!$econtentHistoryDbUtils) $econtentHistoryDbUtils = new EcontentHistoryDBUtils();
+		if(!$econtentHoldDbUtils) $econtentHoldDbUtils = new EcontentHoldDBUtils();
+		if(!$econtentCheckOutDbUtils) $econtentCheckOutDbUtils = new EcontentCheckOutDBUtils();
+		if(!$resourceDbUtils) $resourceDbUtils = new ResourceDBUtils();
+		if(!$commentsDbUtils) $commentsDbUtils = new CommentsDBUtils();
+		if(!$userRatingsDbUtils) $userRatingsDbUtils = new UserRatingsDBUtils();
+		
+		if($econtentRecordDbUtils->getObjectById($eContentRecordFromId) === false)
 		{
-			return true;
+			throw new DomainException("There is no eContent Record with the ID: ".$eContentRecordFromId);
 		}
-		return false;
-	}
-	
-	public function getMarcTitle(IEContentRecord $eContentRecord)
-	{
-		$title = $this->getFieldValue($eContentRecord, "245", "a");
-		if(empty($title))
+		
+		if($econtentRecordDbUtils->getObjectById($eContentRecordToId) === false)
 		{
-			$title = $eContentRecord->title;
+			throw new DomainException("There is no eContent Record with the ID: ".$eContentRecordToId);
 		}
-		return $title;
-	}
-	
-	public function getMarcAuthor(IEContentRecord $eContentRecord)
-	{
-		$author = $this->getFieldValue($eContentRecord, "100", "a");
-		if(empty($author))
+		
+		$econtentHoldDbUtils->changeRecordId($eContentRecordFromId, $eContentRecordToId);
+		$econtentHistoryDbUtils->changeRecordId($eContentRecordFromId, $eContentRecordToId);
+		$econtentCheckOutDbUtils->changeRecordId($eContentRecordFromId, $eContentRecordToId);
+		
+		$resourceFrom = $resourceDbUtils->getByRecordId($eContentRecordFromId);
+		if($resourceFrom !== false)
 		{
-			$author = $eContentRecord->author;
+			$resourceTo = $resourceDbUtils->getByRecordId($eContentRecordToId);
+			if($resourceTo === false)
+			{
+				$resourceDbUtils->changeRecordIdByResourceId($resourceFrom->id, $eContentRecordToId);
+			}
+			else
+			{
+				$commentsDbUtils->changeResourceId($resourceFrom->id, $resourceTo->id);
+				$userRatingsDbUtils->changeResourceId($resourceFrom->id, $resourceTo->id);
+			}
 		}
-		return $author;
-	}
-	
-	private function getFieldValue(IEContentRecord $eContentRecord, $subFieldNumber, $code)
-	{
-		$marcRecord = $eContentRecord->getNormalizedMarcRecord();
-		if($marcRecord)
-		{
-			$fileMarc = new FileMarc($marcRecord, File_Marc::SOURCE_STRING);
-			$fileMarcRecord = $fileMarc->next();
-			$marcSubField = new MarcSubField($fileMarcRecord);
-			return $marcSubField->getCode($subFieldNumber, $code);
-		}
-		return "";
+		
 	}
 	
 }
-
 ?>

@@ -5,7 +5,7 @@
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
 
-class EContentHistoryEntry extends DB_DataObject 
+class EContentHistoryEntry extends DB_DataObject
 {
 	public $__table = 'econtent_history';   // table name
 	public $id;
@@ -23,5 +23,10 @@ class EContentHistoryEntry extends DB_DataObject
     
 	function keys() {
 	    return array('userHistoryId', 'userId', 'resourceId');
+ 	}
+ 	
+ 	public function setRecordId($recordId)
+ 	{
+ 		$this->recordId = $recordId;
  	}
 }

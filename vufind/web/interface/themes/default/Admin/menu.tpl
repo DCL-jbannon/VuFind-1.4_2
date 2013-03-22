@@ -109,6 +109,7 @@
 		<div class="adminMenuLink{if $action == "ReportPurchase"}{assign var="defaultSection" value=$curSection} active{/if}"><a href="{$path}/Report/ReportPurchase">Purchase Tracking</a></div>
 		<div class="adminMenuLink{if $action == "ReportExternalLinks"}{assign var="defaultSection" value=$curSection} active{/if}"><a href="{$path}/Report/ReportExternalLinks">External Link Tracking</a></div>
 		<div class="adminMenuLink{if $action == "ReportPageViewsLocation"}{assign var="defaultSection" value=$curSection} active{/if}"><a href="{$path}/Report/ReportPageViewsLocation">Usage By Location</a></div>
+		<div class="adminMenuLink{if $action == "ReportMailNotifications"}{assign var="defaultSection" value=$curSection} active{/if}"><a href="{$path}/Report/ReportMailNotifications">Mails Notification</a></div>
 	</div>
 	{/if}
 	

@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../../vufind/classes/Utils/EContentFormatType.php';
-require_once dirname(__FILE__).'/../../vufind/classes/services/FreeEcontentRecordServices.php';
+require_once dirname(__FILE__).'/../../vufind/classes/services/FreeEContentRecordServices.php';
 
 class FreeEcontentRecordServicesTests extends PHPUnit_Framework_TestCase
 {

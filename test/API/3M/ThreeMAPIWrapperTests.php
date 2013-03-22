@@ -11,9 +11,9 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	//private $base3MUrl = "http://localhost:9090";
 	private $base3MUrl = "https://cloudlibraryapi.3m.com";
 	private $service;
-	private $itemId = "f6xg9";
-	private $itemPlaceHoldId = "ayryg9";
-	private $itemIdCanNOTCHECK = "uwfz9";
+	private $itemId = "ff7z9";
+	private $itemPlaceHoldId = "d1umz9";
+	private $itemIdCanNOTCHECK = "keng9";
 	
 	public function setUp()
 	{
@@ -237,7 +237,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	{
 		$expected = $patronId = "aNonValidPatronId";
 		$actual = $this->service->getPatronCirculation($patronId);
-		$this->assertEquals($expected ,(string)$actual->PatronId);//Return Empty Lists, but Do not give a error message! :(
+		$this->assertEquals($expected ,(string)$actual->PatronId);//Returns Empty Lists, but Do not give a error message! :(
 	}	
 }
 ?>

@@ -4,13 +4,15 @@
  */
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
+require_once dirname(__FILE__).'/../../../../classes/interfaces/IUser.php';
+require_once dirname(__FILE__).'/../../../../classes/DAO/MaterialsRequestDAO.php';
 
-class User extends DB_DataObject
+class User extends DB_DataObject implements IUser
 {
 	###START_AUTOCODE
 	/* the code below is auto generated do not remove the above tag */
 
-	public $__table = 'user';                            // table name
+	public $__table = 'user';                // table name
 	public $id;                              // int(11)  not_null primary_key auto_increment
 	public $username;                        // string(30)  not_null unique_key
 	public $displayName;                     // string(30)
@@ -29,12 +31,19 @@ class User extends DB_DataObject
 	public $myLocation1Id;					 // int(11)
 	public $myLocation2Id;					 // int(11)
 	public $trackReadingHistory; 			 // tinyint
-	public $bypassAutoLogout;        //tinyint
-	public $disableRecommendations;     //tinyint
-	public $disableCoverArt;     //tinyint
+	public $bypassAutoLogout;                //tinyint
+	public $disableRecommendations;          //tinyint
+	public $disableCoverArt;                 //tinyint
+	public $notificationReview;                 //tinyint
 	private $roles;
 	private $data = array();
 
+	
+	const roleRebusListAdmin = "rebusList-admin";
+	const roleRebusListLibrarian = "rebusList-librarian";
+	const roleRebusListStaff = "rebusList-staff";
+	const maxRequestPerWeek = 5;
+	
 	/* Static get */
 	function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('User',$k,$v); }
 
@@ -43,11 +52,26 @@ class User extends DB_DataObject
 
 	function __sleep()
 	{
-		return array('id', 'username', 'password', 'cat_username', 'cat_password', 'firstname', 'lastname', 'email', 'phone', 'college', 'major', 'homeLocationId', 'myLocation1Id', 'myLocation2Id', 'trackReadingHistory', 'roles', 'bypassAutoLogout', 'displayName', 'disableRecommendations', 'disableCoverArt', 'patronType');
+		return array('id', 'username', 'password', 'cat_username', 'cat_password', 'firstname', 'lastname', 'email', 'phone', 'college', 'major', 'homeLocationId', 'myLocation1Id', 'myLocation2Id', 'trackReadingHistory', 'roles', 'bypassAutoLogout', 'displayName', 'disableRecommendations', 'disableCoverArt', 'patronType','notificationReview');
 	}
 
 	function __wakeup()
 	{
+	}
+	
+	public function getId()
+	{
+		return $this->id;
+	}
+	
+	public function getUsername()
+	{
+		return $this->username;
+	}
+	
+	public function getEmail()
+	{
+		return $this->email;
 	}
 
 	function hasResource($resource) {
@@ -362,4 +386,92 @@ class User extends DB_DataObject
 	{
 		return $this->cat_username;
 	}
+	
+	public function isOptInReviewNotification()
+	{
+		if($this->notificationReview == 0)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	public function hasRebusListPrivileges()
+	{	
+		$result = false;
+		$roles = $this->__get('roles');
+		if(!empty($roles))
+		{
+			foreach ($roles as $role)
+			{
+				if($role == self::roleRebusListAdmin)
+				{
+					$result = true;
+				}
+				if($role == self::roleRebusListStaff)
+				{
+					$result = true;
+				}
+				if($role == self::roleRebusListLibrarian)
+				{
+					$result = true;
+				}
+			}
+		}
+		return $result;
+	}
+	
+	
+	/**
+	 * 1st priority: admin
+	 * 2nd priority: librarian 
+	 * 3rd priority: staff
+	 * If a User has more than one Rebu:List, return highest one
+	 */
+	public function getRebusListUserType()
+	{
+		$resultRole = "";
+		if($this->hasRebusListPrivileges())
+		{
+			$roles = $this->__get("roles");
+			foreach($roles as $role)
+			{
+				switch ($role)
+				{
+					case self::roleRebusListAdmin:
+						$resultRole = self::roleRebusListAdmin;
+						break;
+					case self::roleRebusListLibrarian:
+						if(empty($resultRole) || $resultRole==self::roleRebusListStaff)
+						{
+							$resultRole = self::roleRebusListLibrarian;
+						}
+						break;
+					case self::roleRebusListStaff:
+						if(empty($resultRole))
+						{
+							$resultRole = self::roleRebusListStaff;
+						}
+						break;
+					default:
+						//do nothing
+						break;
+				}
+			}
+		}
+		return $resultRole;
+	}
+	
+	public function hasReachMaxRequestPerWeek(IMaterialsRequestDAO $mrDAO = NULL)
+	{
+		if(!$mrDAO) $mrDAO = new MaterialsRequestDAO();
+		
+		$numberRequestThisWeek = $mrDAO->countNumberOfRequestsMadeThisWeekByUser($this->id);
+		if($numberRequestThisWeek >= self::maxRequestPerWeek)
+		{
+			return true;
+		}
+		return false;
+	}
 }
+?>

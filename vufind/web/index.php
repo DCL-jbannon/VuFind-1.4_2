@@ -18,10 +18,15 @@
  *
  */
 
+
 //Requires
 require_once dirname(__FILE__).'/../classes/Utils/ObjectUtils.php';
 require_once dirname(__FILE__).'/../classes/Utils/RegularExpressions.php';
 require_once dirname(__FILE__).'/../classes/services/IDCLReaderServices.php';
+require_once dirname(__FILE__).'/../classes/Utils/UniqueIdentifier.php';
+require_once dirname(__FILE__).'/../classes/Utils/RequestUtils.php';
+require_once dirname(__FILE__).'/../classes/services/NotificationServices.php';
+require_once dirname(__FILE__).'/../classes/notifications/NotificationsConstants.php';
 
 /** CORE APPLICATION CONTROLLER **/
 $startTime = microtime(true);
@@ -106,7 +111,6 @@ if (isset($_GET['module']) && $_GET['module'] == 'MyAccount'){
 setlocale(LC_MONETARY, array($configArray['Site']['locale'] . ".UTF-8",
 $configArray['Site']['locale']));
 date_default_timezone_set($configArray['Site']['timezone']);
-
 // Require System Libraries
 require_once 'sys/Interface.php';
 $timer->logTime("Include Interface");
@@ -144,11 +148,23 @@ PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, 'handlePEARError');
 //set_error_handler('handlePHPError');
 
 // Setup Local Database Connection
+
 define('DB_DATAOBJECT_NO_OVERLOAD', 0);
 $options =& PEAR::getStaticProperty('DB_DataObject', 'options');
+
 $options = $configArray['Database'];
 $timer->logTime('Setup database connection');
 
+//Coming from Mail click???
+$module = RequestUtils::getRequest('module');
+$action = RequestUtils::getRequest('action');
+$method = RequestUtils::getRequest('method');
+$notuid = RequestUtils::getRequest('notuid');
+
+$nservice = new NotificationServices();
+$nservice->insertMailStats($notuid, $module, $action, $method);
+
+	
 // Initiate Session State
 $session_type = $configArray['Session']['type'];
 $session_lifetime = $configArray['Session']['lifetime'];
@@ -635,7 +651,7 @@ if (!is_null($ipLocation) && $ipLocation != false && $user){
 }
 $timer->logTime('Check whether or not to include auto logout code');
 
-if (!in_array($action, array("AJAX", "JSON")) && !in_array($module, array("API", "Admin", "Report")) ){
+if (!in_array($action, array("AJAX", "JSON")) && !in_array($module, array("Notification","API", "Admin", "Report")) ){
 	// Log the usageTracking data
 	$usageTracking = new UsageTracking();
 	$usageTracking->logTrackingData('numPageViews', 1, $ipLocation, $ipId);
@@ -763,7 +779,7 @@ function enableErrorHandler(){
 
 // Process any errors that are thrown
 function handlePEARError($error, $method = null){
-	global $errorHandlingEnabled;
+	global $errorHandlingEnabled, $logger;
 	if (isset($errorHandlingEnabled) && $errorHandlingEnabled == false){
 		return;
 	}
@@ -831,7 +847,7 @@ function handlePEARError($error, $method = null){
 	5 => $baseError . $detailedServer . $detailedBacktrace
 	);
 	
-	$logger = new Logger();
+	
 	$logger->log($errorDetails, PEAR_LOG_ERR);
 
 	exit();

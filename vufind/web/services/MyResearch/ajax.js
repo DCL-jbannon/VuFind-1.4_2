@@ -1,3 +1,21 @@
+function getEcontentSummary()
+{
+	var url = path + "/MyResearch/AJAX";
+	var params = "method=GetEcontentSummary";
+	var fullUrl = url + "?" + params;
+	$.ajax({
+			  url: fullUrl,
+			  success: function(data)
+			  {
+				$('#econtentCheckedOutCount').html(data.numEContentCheckedOut);
+				$('#econtentAvailableHoldsCount').html(data.numEContentAvailableHolds);
+				$('#econtentUnavailableHoldsCount').html(data.numEContentUnavailableHolds);
+				$('#econtentWishCount').html(data.numEContentWishList);
+		      }
+		   });
+}
+
+
 var suggestionScroller;
 function getSuggestions(){
 	suggestionScroller = new TitleScroller('titleScrollerSuggestion', 'Suggestion', 'suggestionList');

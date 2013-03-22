@@ -18,7 +18,7 @@ class OverDriveServicesTests extends PHPUnit_Framework_TestCase
 		$this->eContentRecordMock = $this->getMock("IEContentRecord");
 		$this->fileMarcMock = $this->getMock("IFileMarc",array("next"));
 		$this->fileMarcRecordMock = $this->getMock("IFileMARCRecord");
-		$this->marcSubfieldMock = $this->getMock("IMarcSubfieldMock", array("getCode"));
+		$this->marcSubfieldMock = $this->getMock("IMarcSubfield", array("getCode"));
 		$this->regularExpressionsMock = $this->getMock("IRegularExpressions", array("getFieldValueFromURL"));
 		
 		$this->service = new OverDriveServices($this->regularExpressionsMock);

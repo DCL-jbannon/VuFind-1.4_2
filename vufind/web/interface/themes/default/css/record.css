@@ -197,7 +197,8 @@
   cursor: pointer;
 }
 
-#editEContentLink, #deleteEContentLink, #archiveEContentLink{
+#editEContentLink, #deleteEContentLink, #archiveEContentLink, #moveEContentLink
+{
 	font-size: 8px;
 }
 #eContentStatus{

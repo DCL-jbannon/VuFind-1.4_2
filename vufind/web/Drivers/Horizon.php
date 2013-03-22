@@ -19,7 +19,7 @@
  */
 
 require_once 'Interface.php';
-require_once 'sys/SIP2.php';
+require_once dirname(__FILE__).'/../sys/SIP2.php';
 
 class Horizon implements DriverInterface{
 	protected $db;
@@ -1301,26 +1301,30 @@ public function getMyHoldsViaDB($patron)
 		}elseif ($sortOption == "format"){
 			$readingHistorySql .= " order by format DESC, title ASC";
 		}
-
+//echo $readingHistorySql;die();
 		//Get count of reading history
 		$readingHistoryCount = new ReadingHistoryEntry();
 		$readingHistoryCount->query($readingHistorySql);
 		$numTitles = $readingHistoryCount->N;
 
 		//Get individual titles to display
-		if ($recordsPerPage > 0){
+		if ($recordsPerPage > 0)
+		{
 			$startRecord = ($page - 1) * $recordsPerPage;
 			$readingHistorySql .= " LIMIT $startRecord, $recordsPerPage";
 		}
+		
 		$readingHistory->query($readingHistorySql);
-		if ($readingHistory->N > 0){
+		if ($readingHistory->N > 0)
+		{
 			//Load additional details for each title
 			global $configArray;
 			// Setup Search Engine Connection
 
 			$i = 0;
 			$titles = array();
-			while ($readingHistory->fetch()){
+			while ($readingHistory->fetch())
+			{
 				$firstCheckoutDate = $readingHistory->firstCheckoutDate;
 				$firstCheckoutTime = strtotime($firstCheckoutDate);
 				$lastCheckoutDate = $readingHistory->lastCheckoutDate;
@@ -1343,11 +1347,13 @@ public function getMyHoldsViaDB($patron)
 			}
 		}
 
-		return array(
-		  'historyActive' => $historyActive,
-		  'titles' => array_values($titles),
-		  'numTitles' => $numTitles,
-		);
+		$results = array(
+						  'historyActive' => $historyActive,
+		  				  'titles' => array_values($titles),
+						  'numTitles' => $numTitles,
+				   );
+		return $results;
+		
 	}
 
 	/**
@@ -1486,12 +1492,6 @@ private $patronProfiles = array();
             'numCheckedOut' => $result['fixed']['ChargedCount'] ,
 					  'bypassAutoLogout' => ($user ? $user->bypassAutoLogout : false),
 					);
-					
-					//Get eContent info as well
-					require_once('Drivers/EContentDriver.php');
-					$eContentDriver = new EContentDriver(); 
-					$eContentAccountSummary = $eContentDriver->getAccountSummary();
-					$profile = array_merge($profile, $eContentAccountSummary);
 					
 					//Get a count of the materials requests for the user
 					$materialsRequest = new MaterialsRequest();
@@ -2264,10 +2264,12 @@ public function renewItem($patronId, $itemId){
 		if ((isset($_REQUEST['displayName']) && $_REQUEST['displayName'] != $user->displayName) ||
 		(isset($_REQUEST['disableRecommendations']) && $_REQUEST['disableRecommendations'] != $user->disableRecommendations) ||
 		(isset($_REQUEST['disableCoverArt']) && $_REQUEST['disableCoverArt'] != $user->disableCoverArt) || 
-		(isset($_REQUEST['bypassAutoLogout']) && $_REQUEST['bypassAutoLogout'] != $user->bypassAutoLogout)){
+		(isset($_REQUEST['bypassAutoLogout']) && $_REQUEST['bypassAutoLogout'] != $user->bypassAutoLogout) ||
+		(isset($_REQUEST['notificationReview']) && $_REQUEST['notificationReview'] != $user->notificationReview)){
 			$user->displayName = $_REQUEST['displayName'];
 			$user->disableRecommendations = $_REQUEST['disableRecommendations'];
 			$user->disableCoverArt = $_REQUEST['disableCoverArt'];
+			$user->notificationReview = $_REQUEST['notificationReview'];
 			if (isset($_REQUEST['bypassAutoLogout'])){
 				$user->bypassAutoLogout = $_REQUEST['bypassAutoLogout'] == 'yes' ? 1 : 0;
 			}
@@ -2727,22 +2729,22 @@ public function renewItem($patronId, $itemId){
 			if (isset($_REQUEST['suspendDate'])){
 				$suspendDate = $_REQUEST['suspendDate'];
 			}else{
-				$suspendDate = date('mm-dd-yyyy');
+				$suspendDate = date('m/d/Y', mktime() + 86400);
 			}
 			$dateParts = date_parse($suspendDate);
 			$currentTime = strtotime($suspendDate) . '000'; //Convert seconds to milliseconds
 			//The freeze/hold functionality is just a toggle in HIP
 			$post_data = array(
-        'changestatus' => 'Change Status',
-        'menu' => 'account',
-        'profile' => $this->hipProfile,
-        'select1' => $dateParts['month'],
-        'select2' => $dateParts['day'],
-        'select3' => $dateParts['year'] ,
-        'session' => $sessionId,
-        'submenu' => 'holds',
-        'suspend_date' => $currentTime,
-			);
+						        'changestatus' => 'Change Status',
+						        'menu' => 'account',
+						        'profile' => $this->hipProfile,
+						        'select1' => $dateParts['month'],
+						        'select2' => $dateParts['day'],
+						        'select3' => $dateParts['year'] ,
+						        'session' => $sessionId,
+						        'submenu' => 'holds',
+						        'suspend_date' => $currentTime,
+						  );
 			//add ready holds that are selected
 			//add waiting holds that are selected
 			$post_items = array();

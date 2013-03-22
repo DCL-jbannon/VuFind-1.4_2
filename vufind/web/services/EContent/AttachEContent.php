@@ -37,23 +37,28 @@ class AttachEContent extends Admin
 		if (isset($_REQUEST['submit']) && $_REQUEST['submit'] == 'Attach eContent'){
 			$errors = array();
 			//Get the source folder to process
-			$source = $_REQUEST['sourcePath'];
-			if (!file_exists($source) && !is_dir($source)){
+			$sourcePath = $_REQUEST['sourcePath'];
+			$source = $_REQUEST['sourceacs'];
+			
+			if (!file_exists($sourcePath) && !is_dir($sourcePath))
+			{
 				$errors[] = "Sorry, we could not find a directory with that name to import files from.";
-			}else{
+			}
+			else
+			{
 				//Get import information
 				global $servername;
 				$cronPath = $configArray['Site']['cronPath']; 
 				if ($configArray['System']['operatingSystem'] == 'windows'){
-					$commandToRun = "cd $cronPath && start /b java -jar cron.jar $servername org.epub.AttachEContent";
+					$commandToRun = "cd $cronPath && start /b java -jar cron.jar $servername org.epub.EcontentAttachments";
 				}else{
-					$commandToRun = "cd {$cronPath}; java -jar cron.jar $servername org.epub.AttachEContent";
+					$commandToRun = "cd {$cronPath}; java -jar cron.jar $servername org.epub.EcontentAttachments";
 				}
-				$commandToRun .= " source=\"" . $source . "\"";
+				$commandToRun .= "  sourcePath=\"".$sourcePath."\" source=\"".$source."\"";
 				
 				$logger = new Logger();
 				$logger->log("attaching eContent $commandToRun", PEAR_LOG_INFO);
-				//$commandToRun .= " > process.out 2> process.err < /dev/null &";
+				//echo $commandToRun;die();
 				$handle = popen($commandToRun, 'r');
 				pclose($handle);
 				header("Location: {$configArray['Site']['path']}/EContent/AttachEContentLog");
@@ -67,15 +72,19 @@ class AttachEContent extends Admin
 		}
 		
 		//Load source filter
-		$sourceFilter = array();
 		$sources = $this->loadEContentSources();
+		$sourcesACS = $this->loadACSEContentSources();
+		
 		$interface->assign('sourceFilter', $sources);
+		$interface->assign('sourceFilterACS', $sourcesACS);
 
 		$interface->setTemplate('attachEContent.tpl');
 		$interface->display('layout.tpl');
 	}
 	
 	function processExternalLinks($source){
+		
+		
 		$eContentAttachmentLogEntry = new EContentAttachmentLogEntry();
 		$eContentAttachmentLogEntry->dateStarted = time();
 		$eContentAttachmentLogEntry->sourcePath = 'Attaching External links to ' . $source;
@@ -110,6 +119,16 @@ class AttachEContent extends Admin
 		$sources = array();
 		$econtentRecord = new EContentRecord();
 		$econtentRecord->query("SELECT DISTINCT source FROM econtent_record ORDER BY source");
+		while ($econtentRecord->fetch()){
+			$sources[] =  $econtentRecord->source;
+		}
+		return $sources;
+	}
+	
+	public function loadACSEContentSources(){
+		$sources = array();
+		$econtentRecord = new EContentRecord();
+		$econtentRecord->query("SELECT DISTINCT source FROM econtent_record WHERE accessType='acs' ORDER BY source");
 		while ($econtentRecord->fetch()){
 			$sources[] =  $econtentRecord->source;
 		}

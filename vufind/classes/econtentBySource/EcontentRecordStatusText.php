@@ -11,9 +11,9 @@ class EcontentRecordStatusText extends BaseEcontentRecordHelpers implements IEco
 	const checkedOutToYou = "Checked Out to you";
 	const usageNote = "Must be checked out to read";
 	
-	public function getString($patronId = NULL)
+	public function getString(IUser $user = NULL)
 	{
-		if($patronId == NULL)
+		if($user == NULL)
 		{
 			if($this->econtentRecordDetails->isCheckOutAvailable())
 			{
@@ -23,7 +23,7 @@ class EcontentRecordStatusText extends BaseEcontentRecordHelpers implements IEco
 		}
 		else
 		{
-			$patronHasCheckedItOut = $this->econtentRecordDetails->isCheckedOutByPatron($patronId);
+			$patronHasCheckedItOut = $this->econtentRecordDetails->isCheckedOutByPatron($user);
 			if($patronHasCheckedItOut)
 			{
 				return $this->getMsgCheckedOutToYou();

@@ -61,13 +61,13 @@ function placeOverDriveHold(overDriveId, formatId){
 function addOverDriveRecordToWishList(recordId){
 	if (loggedIn){
 		showProcessingIndicator("Adding the title to your Wish List in OverDrive.  This may take a minute.");
-		var url = path + "/EcontentRecord/AJAX?method=AddOverDriveRecordToWishList&recordId=" + recordId;
+		var url = path + "/EcontentRecord/AJAX?method=AddEcontentRecordToWishList&recordId=" + recordId;
 		$.ajax({
 			url: url,
 			success: function(data){
 				alert(data.message);
 				if (data.result){
-					window.location.href = path + "/MyResearch/OverdriveWishList";
+					window.location.href = path + "/MyResearch/MyEContentWishlist";
 				}else{
 					hideLightbox();
 				}

@@ -22,6 +22,9 @@ require_once 'Action.php';
 
 require_once 'services/MyResearch/lib/Resource.php';
 require_once 'services/MyResearch/lib/User.php';
+require_once('Drivers/EContentDriver.php');
+require_once dirname(__FILE__).'/../../../classes/notifications/ReturnEcontentNotification.php';
+require_once dirname(__FILE__).'/../../../classes/notifications/NotificationsConstants.php';
 
 class ReturnTitle extends Action
 {
@@ -34,15 +37,19 @@ class ReturnTitle extends Action
 		global $user;
 		
 		$id = $_REQUEST['id'];
-
 		//Setup JSON response
 		header('Content-type: text/plain');
 		header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
 		
-		require_once('Drivers/EContentDriver.php');
 		$driver = new EContentDriver();
 		$result = $driver->returnRecord($id);
+		
+		if( $result['success'] && $user->isOptInReviewNotification())
+		{
+			$returnEcontentNotification = new ReturnEcontentNotification();
+			$returnEcontentNotification->sendNotification($user->id, $id, UniqueIdentifier::get(NotificationsPrefixes::returnEcontent));
+		}
 		
 		echo json_encode($result);
 		exit();

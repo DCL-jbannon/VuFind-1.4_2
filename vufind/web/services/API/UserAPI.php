@@ -1228,12 +1228,15 @@ class UserAPI extends Action {
 		}
 		global $user;
 		$user = UserAccount::validateAccount($username, $password);
-		if ($user && !PEAR::isError($user)){
+		if ($user && !PEAR::isError($user))
+		{
 			require_once('Drivers/EContentDriver.php');
 			$driver = new EContentDriver();
 			$holdMessage = $driver->placeHold($recordId, $user);
 			return array('success'=> $holdMessage['result'], 'holdMessage'=>$holdMessage['message']);
-		}else{
+		}
+		else
+		{
 			return array('success'=>false, 'message'=>'Login unsuccessful');
 		}
 	}

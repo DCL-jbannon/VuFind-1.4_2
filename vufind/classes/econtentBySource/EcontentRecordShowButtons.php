@@ -5,7 +5,7 @@ require_once dirname(__FILE__).'/BaseEcontentRecordHelpers.php';
 class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEcontentRecordShowButtons
 {
 
-	public function showCheckOut($patronId = NULL)
+	public function showCheckOut(IUser $user = NULL)
 	{
 		$checkOutAvailable = $this->econtentRecordDetails->isCheckOutAvailable();
 		
@@ -14,12 +14,12 @@ class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEc
 			return false;
 		}
 		
-		if($patronId === NULL)
+		if($user === NULL)
 		{
 			return true;
 		}
 		
-		$checkedOutByPatron = $this->econtentRecordDetails->isCheckedOutByPatron($patronId);
+		$checkedOutByPatron = $this->econtentRecordDetails->isCheckedOutByPatron($user);
 		if ($checkedOutByPatron)
 		{
 			return false;
@@ -27,7 +27,7 @@ class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEc
 		return true;
 	}
 	
-	public function showPlaceHold($patronId = NULL)
+	public function showPlaceHold(IUser $user = NULL)
 	{
 		$placeHoldAvailable = $this->econtentRecordDetails->isPlaceHoldAvailable();
 		if(!$placeHoldAvailable)
@@ -35,12 +35,12 @@ class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEc
 			return false;
 		}
 		
-		if($patronId === NULL)
+		if($user === NULL)
 		{
 			return true;
 		}
 		
-		$checkedOutByPatron = $this->econtentRecordDetails->isCheckedOutByPatron($patronId);
+		$checkedOutByPatron = $this->econtentRecordDetails->isCheckedOutByPatron($user);
 		if($checkedOutByPatron)
 		{
 			return false;
@@ -48,7 +48,7 @@ class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEc
 		return true;
 	}
 	
-	public function showAddToWishList($patronId = NULL)
+	public function showAddToWishList(IUser $user = NULL)
 	{
 		$addToWishListAvailable = $this->econtentRecordDetails->isAddWishListAvailable();
 		if(!$addToWishListAvailable)
@@ -56,14 +56,14 @@ class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEc
 			return false;
 		}
 		
-		if ($patronId !== NULL)
+		if ($user !== NULL)
 		{
-			$checkedOutByPatron = $this->econtentRecordDetails->isCheckedOutByPatron($patronId);
+			$checkedOutByPatron = $this->econtentRecordDetails->isCheckedOutByPatron($user);
 			if ($checkedOutByPatron)
 			{
 				return false;
 			}
-			$placedHold = $this->econtentRecordDetails->isCancelHoldAvailable($patronId);
+			$placedHold = $this->econtentRecordDetails->isCancelHoldAvailable($user);
 			if($placedHold)
 			{
 				return false;
@@ -79,7 +79,7 @@ class EcontentRecordShowButtons extends BaseEcontentRecordHelpers implements IEc
 		}
 	}
 	
-	public function showAccessOnline()
+	public function showAccessOnline(IUser $user = NULL)
 	{
 		return $this->econtentRecordDetails->isAccessOnlineAvailable();
 	}

@@ -101,12 +101,16 @@ function GetEContentHoldingsInfo(id, type, callback) {
 }
 
 function SaveEContentComment(id, strings) {
-	if (loggedIn){
+	
+	var notuid = getNotificationId();
+	
+	if (loggedIn || notuid != '')
+	{
 		$('#userecontentreview' + id).slideUp();
 		var comment = $('#econtentcomment' + id).val();
 	
 		var url = path + "/EcontentRecord/" + encodeURIComponent(id) + "/AJAX";
-		var params = "method=SaveComment&comment=" + encodeURIComponent(comment);
+		var params = "method=SaveComment&comment=" + encodeURIComponent(comment) + "&notuid="+notuid;
 		var fullUrl = url + "?" + params;
 		$.ajax({
 			url: fullUrl,

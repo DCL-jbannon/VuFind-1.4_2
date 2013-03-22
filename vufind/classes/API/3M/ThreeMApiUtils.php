@@ -61,8 +61,8 @@ class ThreeMAPIUtils {
 	
 	/**
 	 * Dates in UTC Format
-	 * @param unknown_type $dateStart
-	 * @param unknown_type $dateEnd
+	 * @param string $dateStart
+	 * @param string $dateEnd
 	 */
 	public function getUTCDaysDiference($dateStart, $dateEnd)
 	{

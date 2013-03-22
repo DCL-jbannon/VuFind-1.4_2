@@ -1,9 +1,11 @@
 package org.vufind;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.Connection;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.ini4j.Ini;
@@ -58,20 +60,27 @@ public class MarcIndexer implements IMarcRecordProcessor, IRecordProcessor {
 
 	@Override
 	public void finish() {
+		boolean indexIsOk = true;
 		//Make sure that the index is good and swap indexes
-		results.addNote("calling final commit on index");
-		URLPostResponse response = Util.postToURL("http://localhost:" + solrPort + "/solr/biblio2/update/", "<commit />", logger);
-		if (!response.isSuccess()){
-			results.addNote("Error committing changes " + response.getMessage());
+		results.addNote("calling final commit on index biblio2");
+		try {
+			updateServer.commit();
+		} catch (Exception e) {
+			results.addNote("Error committing changes to biblio2" + e.getMessage());
+			logger.error("Error committing changes to biblio2", e);
+			indexIsOk = false;
 		}
-		results.addNote("optimizing index");
-		response = Util.postToURL("http://localhost:" + solrPort + "/solr/biblio2/update/", "<optimize />", logger);
-		if (!response.isSuccess()){
-			results.addNote("Error optimizing index " + response.getMessage());
+		results.addNote("optimizing index biblio2");
+		try {
+			updateServer.optimize();
+		} catch (Exception e) {
+			results.addNote("Error optimizing index biblio2 " + e.getMessage());
+			logger.error("Error optimizing index biblio2", e);
+			indexIsOk = false;
 		}
-		if (checkMarcImport()){
+		if (indexIsOk && checkMarcImport()){
 			results.addNote("index passed checks, swapping cores so new index is active.");
-			response = Util.getURL("http://localhost:" + solrPort + "/solr/admin/cores?action=SWAP&core=biblio2&other=biblio", logger);
+			URLPostResponse response = Util.getURL("http://localhost:" + solrPort + "/solr/admin/cores?action=SWAP&core=biblio2&other=biblio", logger);
 			if (!response.isSuccess()){
 				results.addNote("Error swapping cores " + response.getMessage());
 			}else{
@@ -101,7 +110,7 @@ public class MarcIndexer implements IMarcRecordProcessor, IRecordProcessor {
 					SolrInputDocument doc = recordInfo.getSolrDocument();
 					if (doc != null){
 						//Post to the Solr instance
-						updateServer.add(doc, 5000);
+						updateServer.add(doc);
 						results.incAdded();
 						/*URLPostResponse response = Util.postToURL("http://localhost:" + solrPort + "/solr/biblio2/update/", xmlDoc, logger);
 						if (response.isSuccess()){

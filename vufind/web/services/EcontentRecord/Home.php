@@ -23,14 +23,17 @@ require_once 'sys/eContent/EContentRecord.php';
 require_once 'RecordDrivers/EcontentRecordDriver.php';
 require_once 'sys/SolrStats.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
+require_once dirname(__FILE__).'/../../../classes/Utils/NotificationUtils.php';
 
-class Home extends Action{
+class Home extends Action
+{
 	private $db;
 	private $id;
 	private $isbn;
 	private $issn;
 
-	function launch(){
+	function launch()
+	{
 		global $interface;
 		global $timer;
 		global $configArray;
@@ -49,18 +52,22 @@ class Home extends Action{
 		}
 
 		$location = $locationSingleton->getActiveLocation();
-		if (isset($library)){
+		if (isset($library))
+		{
 			$interface->assign('showTextThis', $library->showTextThis);
 			$interface->assign('showEmailThis', $library->showEmailThis);
 			$interface->assign('showFavorites', $library->showFavorites);
 			$interface->assign('linkToAmazon', $library->linkToAmazon);
 			$interface->assign('enablePurchaseLinks', $library->linkToAmazon);
 			$interface->assign('enablePospectorIntegration', $library->enablePospectorIntegration);
-			if ($location != null){
+			if ($location != null)
+			{
 				$interface->assign('showAmazonReviews', (($location->showAmazonReviews == 1) && ($library->showAmazonReviews == 1)) ? 1 : 0);
 				$interface->assign('showStandardReviews', (($location->showStandardReviews == 1) && ($library->showStandardReviews == 1)) ? 1 : 0);
 				$interface->assign('showHoldButton', (($location->showHoldButton == 1) && ($library->showHoldButton == 1)) ? 1 : 0);
-			}else{
+			}
+			else
+			{
 				$interface->assign('showAmazonReviews', $library->showAmazonReviews);
 				$interface->assign('showStandardReviews', $library->showStandardReviews);
 				$interface->assign('showHoldButton', $library->showHoldButton);
@@ -69,18 +76,23 @@ class Home extends Action{
 			$interface->assign('showRatings', $library->showRatings);
 			$interface->assign('showComments', $library->showComments);
 			$interface->assign('tabbedDetails', $library->tabbedDetails);
-		}else{
+		}
+		else
+		{
 			$interface->assign('showTextThis', 1);
 			$interface->assign('showEmailThis', 1);
 			$interface->assign('showFavorites', 1);
 			$interface->assign('linkToAmazon', 1);
 			$interface->assign('enablePurchaseLinks', 1);
 			$interface->assign('enablePospectorIntegration', 0);
-			if ($location != null){
+			if ($location != null)
+			{
 				$interface->assign('showAmazonReviews', $location->showAmazonReviews);
 				$interface->assign('showStandardReviews', $location->showStandardReviews);
 				$interface->assign('showHoldButton', $location->showHoldButton);
-			}else{
+			}
+			else
+			{
 				$interface->assign('showAmazonReviews', 1);
 				$interface->assign('showStandardReviews', 1);
 				$interface->assign('showHoldButton', 1);
@@ -226,7 +238,18 @@ class Home extends Action{
 				$interface->assign('hasMarcRecord', true);
 				$this->loadNotes($eContentRecord);
 			}
-
+			
+			//Move functionality
+			$interface->assign('moveFunction', $eContentRecord->isBriefRecord());
+			
+			//Rate and Review with no login????
+			$interface->assign("notuid","");
+			$interface->assign("allowRRWithOutLogin", false);
+			if(NotificationUtils::isValidNotificationUID(RequestUtils::getRequest("notuid")))
+			{
+				$interface->assign("allowRRWithOutLogin", true);
+				$interface->assign("notuid",RequestUtils::getRequest("notuid"));
+			}
 			// Display Page
 			$interface->display('layout.tpl');
 

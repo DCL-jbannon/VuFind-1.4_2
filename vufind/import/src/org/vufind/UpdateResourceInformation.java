@@ -21,6 +21,7 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 	private boolean removeTitlesNotInMarcExport = false;
 	
 	private PreparedStatement resourceUpdateStmt = null;
+	private PreparedStatement resourceUpdateStmtNoMarc = null;
 	private PreparedStatement resourceInsertStmt = null;
 	private PreparedStatement deleteResourceStmt = null;
 	
@@ -102,6 +103,7 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 		try {
 			// Setup prepared statements
 			resourceUpdateStmt = vufindConn.prepareStatement("UPDATE resource SET title = ?, title_sort = ?, author = ?, isbn = ?, upc = ?, format = ?, format_category = ?, marc_checksum=?, marc = ?, shortId = ?, date_updated=?, deleted=0 WHERE id = ?");
+			resourceUpdateStmtNoMarc = vufindConn.prepareStatement("UPDATE resource SET title = ?, title_sort = ?, author = ?, isbn = ?, upc = ?, format = ?, format_category = ?, marc_checksum=?, shortId = ?, date_updated=?, deleted=0 WHERE id = ?");
 			resourceInsertStmt = vufindConn.prepareStatement("INSERT INTO resource (title, title_sort, author, isbn, upc, format, format_category, record_id, shortId, marc_checksum, marc, source, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)", PreparedStatement.RETURN_GENERATED_KEYS);
 			deleteResourceStmt = vufindConn.prepareStatement("UPDATE resource SET deleted = 1 WHERE id IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
 			deleteResoucePermanentStmt = vufindConn.prepareStatement("DELETE from resource where id = ?");
@@ -141,8 +143,8 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 			locationSubfield = configIni.get("Reindex", "locationSubfield");
 			
 			//Cleanup duplicate resources
-			getDistinctRecordIdsStmt = vufindConn.prepareStatement("SELECT distinct record_id FROM resource", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			getRelatedRecordsStmt = vufindConn.prepareStatement("SELECT id, deleted FROM resource where record_id = ?", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			getDistinctRecordIdsStmt = vufindConn.prepareStatement("SELECT distinct record_id FROM resource where source='VuFind'", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			getRelatedRecordsStmt = vufindConn.prepareStatement("SELECT id, deleted FROM resource where record_id = ? AND source='VuFind'", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			transferCommentsStmt = vufindConn.prepareStatement("UPDATE comments set resource_id = ? where resource_id = ?");
 			transferTagsStmt = vufindConn.prepareStatement("UPDATE resource_tags set resource_id = ? where resource_id = ?");
 			transferRatingsStmt = vufindConn.prepareStatement("UPDATE user_rating set resourceid = ? where resourceid = ?");
@@ -177,7 +179,7 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 
 	private void cleanupDulicateResources() {
 		try {
-			logger.debug("Cleaning up resources table");
+			logger.info("Cleaning up resources table");
 			results.addNote("Cleaning up resources table");
 			results.saveResults();
 			
@@ -206,8 +208,8 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 						int curIndex = 0;
 						for (Long curRecordId : relatedRecords.keySet()){
 							if (curIndex != 0){
-								System.out.println("Deleting all resources (except first) for record id " + ilsId);
-								logger.debug("Deleting all resources (except first) for record id " + ilsId);
+								//System.out.println("Deleting all resources (except first) for record id " + ilsId);
+								logger.info("Deleting all resources (except first) for record id " + ilsId);
 								deleteResourcePermanently(curRecordId);
 								
 							}
@@ -217,8 +219,8 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 						//We have an active record
 						for (Long curRecordId : relatedRecords.keySet()){
 							if (curRecordId != firstActiveRecordId){
-								System.out.println("Transferring user info for " + curRecordId + " to " + firstActiveRecordId + " because it is redundant");
-								logger.debug("Transferring user info for " + curRecordId + " to " + firstActiveRecordId + " because it is redundant");
+								//System.out.println("Transferring user info for " + curRecordId + " to " + firstActiveRecordId + " because it is redundant");
+								logger.info("Transferring user info for " + curRecordId + " to " + firstActiveRecordId + " because it is redundant");
 								transferUserInfo(curRecordId, firstActiveRecordId);
 								deleteResourcePermanently(curRecordId);
 							}
@@ -231,7 +233,7 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 				//TODO: Move records to eContent as needed 
 				
 				if (++resourcesProcessed % 100000 == 0){
-					logger.debug("Processed " + resourcesProcessed + " resources");
+					logger.info("Processed " + resourcesProcessed + " resources");
 					results.addNote("Processed " + resourcesProcessed + " resources");
 					results.saveResults();
 				}
@@ -267,27 +269,27 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 			transferCommentsStmt.setLong(1, idToTransferTo);
 			transferCommentsStmt.setLong(2, idToTransferFrom);
 			int numCommentsMoved = transferCommentsStmt.executeUpdate();
-			if (numCommentsMoved > 0) System.out.println("Moved " + numCommentsMoved + " comments");
+			if (numCommentsMoved > 0) logger.info("Moved " + numCommentsMoved + " comments");
 			//Transfer tags
 			transferTagsStmt.setLong(1, idToTransferTo);
 			transferTagsStmt.setLong(2, idToTransferFrom);
 			int numTagsMoved = transferTagsStmt.executeUpdate();
-			if (numTagsMoved > 0) System.out.println("Moved " + numTagsMoved + " tags");
+			if (numTagsMoved > 0) logger.info("Moved " + numTagsMoved + " tags");
 			//Transfer ratings
 			transferRatingsStmt.setLong(1, idToTransferTo);
 			transferRatingsStmt.setLong(2, idToTransferFrom);
 			int numRatingsMoved = transferRatingsStmt.executeUpdate();
-			if (numRatingsMoved > 0) System.out.println("Moved " + numRatingsMoved + " ratings");
+			if (numRatingsMoved > 0) logger.info("Moved " + numRatingsMoved + " ratings");
 			//Transfer reading history
 			transferReadingHistoryStmt.setLong(1, idToTransferTo);
 			transferReadingHistoryStmt.setLong(2, idToTransferFrom);
 			int numReadingHistoryMoved = transferReadingHistoryStmt.executeUpdate();
-			if (numReadingHistoryMoved > 0) System.out.println("Moved " + numReadingHistoryMoved + " reading history entries");
+			if (numReadingHistoryMoved > 0) logger.info("Moved " + numReadingHistoryMoved + " reading history entries");
 			//Transfer User Resource Information 
 			transferUserResourceStmt.setLong(1, idToTransferTo);
 			transferUserResourceStmt.setLong(2, idToTransferFrom);
 			int numUserResourceMoved = transferUserResourceStmt.executeUpdate();
-			if (numUserResourceMoved > 0) System.out.println("Moved " + numUserResourceMoved + " user resource (list) entries");
+			if (numUserResourceMoved > 0) logger.info("Moved " + numUserResourceMoved + " user resource (list) entries");
 			
 			results.incUpdated();
 		} catch (SQLException e) {
@@ -344,20 +346,38 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 					String author = recordInfo.getAuthor();
 					
 					// Update resource SQL
-					resourceUpdateStmt.setString(1, Util.trimTo(200, title));
-					resourceUpdateStmt.setString(2, Util.trimTo(200, recordInfo.getSortTitle()));
-					resourceUpdateStmt.setString(3, Util.trimTo(255, author));
-					resourceUpdateStmt.setString(4, Util.trimTo(13, recordInfo.getIsbn()));
-					resourceUpdateStmt.setString(5, Util.trimTo(13, recordInfo.getFirstFieldValueInSet("upc")));
-					resourceUpdateStmt.setString(6, Util.trimTo(50, recordInfo.getFirstFieldValueInSet("format")));
-					resourceUpdateStmt.setString(7, Util.trimTo(50, recordInfo.getFirstFieldValueInSet("format_category")));
-					resourceUpdateStmt.setLong(8, recordInfo.getChecksum());
-					resourceUpdateStmt.setString(9, recordInfo.getRawRecord());
-					resourceUpdateStmt.setString(10, recordInfo.getShortId());
-					resourceUpdateStmt.setLong(11, new Date().getTime() / 1000);
-					resourceUpdateStmt.setLong(12, resourceId);
-
-					int rowsUpdated = resourceUpdateStmt.executeUpdate();
+					String marcString = recordInfo.getRawRecord();
+					int rowsUpdated = 0;
+					if (marcString == null || marcString.length() == 0) {
+						logger.error("MarcRecordDetails.getRawRecord() returned NULL or empty for record " + recordInfo.getId());
+						results.addNote("MarcRecordDetails.getRawRecord() returned NULL or empty for record " + recordInfo.getId());
+						resourceUpdateStmtNoMarc.setString(1, Util.trimTo(200, title));
+						resourceUpdateStmtNoMarc.setString(2, Util.trimTo(200, recordInfo.getSortTitle()));
+						resourceUpdateStmtNoMarc.setString(3, Util.trimTo(255, author));
+						resourceUpdateStmtNoMarc.setString(4, Util.trimTo(13, recordInfo.getIsbn()));
+						resourceUpdateStmtNoMarc.setString(5, Util.trimTo(13, recordInfo.getFirstFieldValueInSet("upc")));
+						resourceUpdateStmtNoMarc.setString(6, Util.trimTo(50, recordInfo.getFirstFieldValueInSet("format")));
+						resourceUpdateStmtNoMarc.setString(7, Util.trimTo(50, recordInfo.getFirstFieldValueInSet("format_category")));
+						resourceUpdateStmtNoMarc.setLong(8, recordInfo.getChecksum());
+						resourceUpdateStmtNoMarc.setString(9, recordInfo.getShortId());
+						resourceUpdateStmtNoMarc.setLong(10, new Date().getTime() / 1000);
+						resourceUpdateStmtNoMarc.setLong(11, resourceId);
+						rowsUpdated = resourceUpdateStmtNoMarc.executeUpdate();
+					} else {
+						resourceUpdateStmt.setString(1, Util.trimTo(200, title));
+						resourceUpdateStmt.setString(2, Util.trimTo(200, recordInfo.getSortTitle()));
+						resourceUpdateStmt.setString(3, Util.trimTo(255, author));
+						resourceUpdateStmt.setString(4, Util.trimTo(13, recordInfo.getIsbn()));
+						resourceUpdateStmt.setString(5, Util.trimTo(13, recordInfo.getFirstFieldValueInSet("upc")));
+						resourceUpdateStmt.setString(6, Util.trimTo(50, recordInfo.getFirstFieldValueInSet("format")));
+						resourceUpdateStmt.setString(7, Util.trimTo(50, recordInfo.getFirstFieldValueInSet("format_category")));
+						resourceUpdateStmt.setLong(8, recordInfo.getChecksum());
+						resourceUpdateStmt.setString(9, marcString);
+						resourceUpdateStmt.setString(10, recordInfo.getShortId());
+						resourceUpdateStmt.setLong(11, new Date().getTime() / 1000);
+						resourceUpdateStmt.setLong(12, resourceId);
+						rowsUpdated = resourceUpdateStmt.executeUpdate();
+					}
 					if (rowsUpdated == 0) {
 						logger.debug("Unable to update resource for record " + recordInfo.getId() + " " + resourceId);
 						results.incErrors();
@@ -458,7 +478,7 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 		} catch (SQLException ex) {
 			// handle any errors
 			logger.error("Error updating resource for record " + recordInfo.getId() + " " + recordInfo.getTitle(), ex);
-			System.out.println("Error updating resource for record " + recordInfo.getId() + " " + recordInfo.getTitle() + " " + ex.toString());
+			//System.out.println("Error updating resource for record " + recordInfo.getId() + " " + recordInfo.getTitle() + " " + ex.toString());
 			results.addNote("Error updating resource for record " + recordInfo.getId() + " " + recordInfo.getTitle() + " " + ex.toString());
 			results.incErrors();
 		}finally{
@@ -606,7 +626,7 @@ public class UpdateResourceInformation implements IMarcRecordProcessor, IEConten
 				}
 			}else{
 				//Insert a new resource
-				System.out.println("Adding resource for eContentRecord " + econtentId);
+				logger.debug("Adding resource for eContentRecord " + econtentId);
 				addResourceStmt.setString(1, econtentId);
 				addResourceStmt.setString(2, Util.trimTo(255, title));
 				addResourceStmt.setString(3, "eContent");

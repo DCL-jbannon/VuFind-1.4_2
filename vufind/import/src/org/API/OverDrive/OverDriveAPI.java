@@ -14,7 +14,7 @@ public class OverDriveAPI implements IOverDriveAPI
 	private Integer tokenTS;
 	private JSONObject resultLogin;
 	private JSONObject resultLibraryInfo = new JSONObject();
-	private static final Integer tokenValidFor = 3400000; //millisecons 3400 seconds
+	private static final Integer tokenValidFor = 3400000; //Milliseconds 3400 seconds
 	
 
 	public OverDriveAPI(String clientKey, String clientSecret, long libraryId)

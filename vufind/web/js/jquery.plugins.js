@@ -1002,15 +1002,20 @@ units : 5,
 step : 1
 };
 
-$.fn.rater.rate = function($this, opts, rating) {
+$.fn.rater.rate = function($this, opts, rating){
 	var $on = $this.find('.ui-rater-starsOn');
 	var $off = $this.find('.ui-rater-starsOff');
-	if (loggedIn){
+	
+	
+	var notuid = getNotificationId();
+	
+	if (loggedIn || notuid != '')
+	{
 		$off.fadeTo(600, 0.4, function() {
 			$.ajax( {
 				url : opts.postHref,
 				type : "POST",
-				data : 'id=' + opts.id + '&rating=' + rating,
+				data : 'id=' + opts.id + '&rating=' + rating + "&notuid=" + notuid,
 				complete : function(req) {
 					if (req.status == 200) { // success
 						opts.rating = parseFloat(req.responseText);

@@ -9,5 +9,6 @@
     <core name="econTrial" instanceDir="econTrial\"/>
     <core name="testIdclReader" instanceDir="testIdclReader\"/>
     <core name="testEcontent" instanceDir="testEcontent\"/>
+    <core name="econtent2" instanceDir="econtent2\"/>
   </cores>
 </solr>

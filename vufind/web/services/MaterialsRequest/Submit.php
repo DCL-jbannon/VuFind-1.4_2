@@ -51,8 +51,14 @@ class Submit extends Action
 				$interface->assign('error', 'Sorry, we could not log you in.  Please enter a valid barcode and pin number submit a materials request.');
 				$processForm = false;
 			}
+			else
+			{
+				$locations = $locationSingleton->getPickupBranches($user, $user->homeLocationId);
+				$interface->assign('pickupLocations', $locations);
+			}
 		}
-		if ($processForm){
+		if ($processForm)
+		{
 			//Check to see if the user type is ok to submit a request
 			$enableMaterialsRequest = true;
 			if (isset($configArray['MaterialsRequest']['allowablePatronTypes'])){
@@ -71,6 +77,8 @@ class Submit extends Action
 				$interface->assign('success', false);
 				$interface->assign('error', 'Sorry, you must accept the copyright agreement before submitting a materials request.');
 			}else{
+				
+				
 				//Check to see how many active materials request results the user has already.
 				$materialsRequest = new MaterialsRequest();
 				$materialsRequest->createdBy = $user->id;
@@ -80,10 +88,17 @@ class Submit extends Action
 				$materialsRequest->selectAdd();
 				$materialsRequest->selectAdd('materials_request.*, description as statusLabel');
 				$materialsRequest->find();
-				if ($materialsRequest->N >= 5){
+				if ($materialsRequest->N >= 5)
+				{
 					$interface->assign('success', false);
 					$interface->assign('error', "You\'ve already reached your maximum limit of five requests open at one time. Once we've processed your existing requests, you'll be able to submit again. To check the status of your current requests, visit your account page [link to account page].");
-				}else{
+				}
+				else if ($user->hasReachMaxRequestPerWeek())
+				{
+					$interface->assign('success', false);
+					$interface->assign('error', "You've already reached your maximum limit of five requests per week.");
+				}
+				else {	
 					//Materials request can be submitted.
 					$materialsRequest = new MaterialsRequest();
 					$materialsRequest->phone = isset($_REQUEST['phone']) ? strip_tags($_REQUEST['phone']) : '';

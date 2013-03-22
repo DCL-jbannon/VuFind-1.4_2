@@ -9,7 +9,7 @@ class EcontentDetailsFactoryTests extends PHPUnit_Framework_TestCase
 		
 	public function setUp()
 	{
-		$this->econtentRecordMock = $this->getMock("IEContentRecord", array("is3M", "find"));
+		$this->econtentRecordMock = $this->getMock("IEContentRecord", array("is3M", "find", "isOverDrive"));
 		parent::setUp();		
 	}
 	
@@ -38,6 +38,26 @@ class EcontentDetailsFactoryTests extends PHPUnit_Framework_TestCase
 		$this->econtentRecordMock->expects($this->once())
 									->method("is3M")
 									->will($this->returnValue(true));
+		$actual = EcontentDetailsFactory::get($this->econtentRecordMock);
+		$this->assertEquals($expected, get_class($actual));
+	}
+	
+	/**
+	 * method get
+	 * when econtentIsOverDrive
+	 * should returnOverDriveRecordDetails
+	 */
+	public function test_get_econtentIsOverDrive_returnOverDriveRecordDetails()
+	{
+		$expected = "OverDriveRecordDetails";
+		$this->econtentRecordMock->expects($this->once())
+								->method("is3M")
+								->will($this->returnValue(false));
+		
+		$this->econtentRecordMock->expects($this->once())
+								->method("isOverDrive")
+								->will($this->returnValue(true));
+		
 		$actual = EcontentDetailsFactory::get($this->econtentRecordMock);
 		$this->assertEquals($expected, get_class($actual));
 	}

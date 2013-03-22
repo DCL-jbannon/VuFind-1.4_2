@@ -2,6 +2,7 @@
 require_once dirname(__FILE__).'/Solr.php';
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
+require_once 'sys/Logger.php';
 abstract class SolrDataObject extends DB_DataObject{
 	/**
 	 * Return an array describing the structure of the object fields, etc.

@@ -1,5 +1,5 @@
 <script type="text/javascript" src="{$path}/js/validate/jquery.validate.js" ></script>
-<script type="text/javascript" src="{$path}/services/MaterialsRequest/ajax.js" ></script>
+<script type="text/javascript" src="{$path}/services/MaterialsRequest/ajax.js?t012920123" ></script>
 <div id="page-content" class="content">
 	<div id="main-content">
 		<h2>{translate text='Materials Request'}</h2>
@@ -8,7 +8,8 @@
 				<p>If you cannot find a title in our catalog, you can request the title via this form.
 				Please enter as much information as possible so we can find the exact title you are looking for. 
 				For example, if you are looking for a specific season of a TV show, please include that information.</p>
-				<p>Please note, Materials Requests can only be placed by Douglas County Residents.</p>
+				<p class='error'><strong>Please limit your requests to 5 per week and submit only 1 title per request form.</strong></p>
+				<p><strong>Please note, Materials Requests can only be placed by Douglas County Residents.</strong></p>
 			</div>
 			<form id="materialsRequestForm" action="{$path}/MaterialsRequest/Submit" method="post">
 				{include file="MaterialsRequest/request-form-fields.tpl"}
