@@ -91,7 +91,7 @@ class Submit extends Action
 				if ($materialsRequest->N >= 5)
 				{
 					$interface->assign('success', false);
-					$interface->assign('error', "You\'ve already reached your maximum limit of five requests open at one time. Once we've processed your existing requests, you'll be able to submit again. To check the status of your current requests, visit your account page [link to account page].");
+					$interface->assign('error', "You\'ve already reached your maximum limit of five requests for the week. Once we've processed your existing requests, you'll be able to submit again. To check the status of your current requests, visit your account page [link to account page].");
 				}
 				else if ($user->hasReachMaxRequestPerWeek())
 				{
