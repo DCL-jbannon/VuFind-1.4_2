@@ -701,5 +701,33 @@
     <healthcheck type="file">server-enabled</healthcheck>
     -->
   </admin>
+  
+  <requestHandler name="/replication" class="solr.ReplicationHandler" >
+    <lst name="master">
+        <!--Replicate on 'startup' and 'commit'. 'optimize' is also a valid value for replicateAfter. -->
+        <str name="replicateAfter">startup</str>
+        <str name="replicateAfter">commit</str>
+
+        <!--Create a backup after 'optimize'. Other values can be 'commit', 'startup'. It is possible to have multiple entries of this config string.  Note that this is just for backup, replication does not require this. -->
+        <!-- <str name="backupAfter">optimize</str> -->
+
+        <!--If configuration files need to be replicated give the names here, separated by comma -->
+        <str name="confFiles">schema.xml,stopwords.txt,elevate.xml</str>
+        <!--The default value of reservation is 10 secs.See the documentation below . Normally , you should not need to specify this -->
+        <str name="commitReserveDuration">00:00:10</str>
+    </lst>
+    <!-- keep only 1 backup.  Using this parameter precludes using the "numberToKeep" request parameter. (Solr3.6 / Solr4.0)-->
+    <!-- (For this to work in conjunction with "backupAfter" with Solr 3.6.0, see bug fix https://issues.apache.org/jira/browse/SOLR-3361 )-->
+    <str name="maxNumberOfBackups">10</str>
+    
+    <!-- In solrconfig.xml on the master server, in the replication request handler, include a line like the following: -->
+    <str name="confFiles">solrconfig_slave.xml:solrconfig.xml,x.xml,y.xml</str> 
+    <!--
+       This ensures that the local configuration 'solrconfig_slave.xml' will be saved as 'solrconfig.xml' on the slave. All other files will be saved with their original names. (Note that the "confFiles" value is set to something else in the example shown above.)
+       On the master server, the file name of the slave configuration file can be anything, as long as the name is correctly identified in the "confFiles" string; then it will be saved as whatever file name appears after the colon ':'.
+    -->
+    
+   </requestHandler>
+
 
 </config>

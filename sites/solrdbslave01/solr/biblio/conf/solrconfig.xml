@@ -670,5 +670,12 @@
     <healthcheck type="file">server-enabled</healthcheck>
     -->
   </admin>
+  
+  <requestHandler name="/replication" class="solr.ReplicationHandler" >
+  <lst name="slave">
+    <str name="masterUrl">http://solrdb:8080/solr/biblio/replication</str>
+    <str name="pollInterval">00:05:00</str>
+  </lst>
+  </requestHandler>
 
 </config>
