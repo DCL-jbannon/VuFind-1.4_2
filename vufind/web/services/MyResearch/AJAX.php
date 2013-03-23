@@ -23,7 +23,7 @@ require_once 'services/MyResearch/lib/Suggestions.php';
 require_once 'services/MyResearch/lib/User_resource.php';
 require_once 'services/MyResearch/lib/User_list.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
-require_once dirname(__FILE__).'/../../drivers/EContentDriver.php';
+require_once dirname(__FILE__).'/../../Drivers/EContentDriver.php';
 
 class AJAX extends Action {
 
