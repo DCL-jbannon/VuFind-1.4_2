@@ -3,7 +3,7 @@ require_once dirname(__FILE__).'/../../../vufind/classes/API/OverDrive/OverDrive
 
 class OverDriveSSTests extends PHPUnit_Framework_TestCase
 {
-	const baseUrl = "www.emedia2go.org";
+	const baseUrl = "dcl.lib.overdrive.com";
 	const baseSecureURL = "https://secure38.libraryreserve.com/";
 	const theme = "/10/50/en/";
 	const libraryCardILS = "douglascounty";
@@ -221,7 +221,7 @@ class OverDriveSSTests extends PHPUnit_Framework_TestCase
 	public function test_050_returnTitle_hasNotBeenDownloaded_executesCorrectly()
 	{
 		$actual = $this->service->returnTitle(self::$session, self::itemToCheckOut);
-		$this->assertTrue($actual);
+		$this->assertTrue($actual, $this->service->getErrorMessage());
 	}
 	
 	/**

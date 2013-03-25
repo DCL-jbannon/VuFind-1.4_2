@@ -98,8 +98,11 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 					$attr = $xpath->query($query);
 
 					$result->Checkouts[$i-1]['Link'] = "";
+					$result->Checkouts[$i-1]['OverDriveReadLink'] = false;
 					$downIndex = 1;
 					$hasBeenDownloaded = false;
+					$linkToAccessEcontent = "";
+					$fulfillODReadLink = false;
 					foreach ($attr->item(0)->childNodes as $downElement)
 					{
 						if( isset($downElement->tagName) && ($downElement->tagName == 'li') )
@@ -110,13 +113,40 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 								$attrLink = $xpath->query($queryLink);
 								if(isset($attrLink->item(0)->value))
 								{
+									$linkToAccessEcontent = $baseUrl.$attrLink->item(0)->value;
 									$result->Checkouts[$i-1]['Link'] = $baseUrl.$attrLink->item(0)->value;
 									$hasBeenDownloaded = true;
+									if($fulfillODReadLink)
+									{
+										$result->Checkouts[$i-1]['OverDriveReadLink'] = preg_replace("/FormatID=[0-9]{3}/","FormatID=610", $result->Checkouts[$i-1]['Link']);
+									}
 								}
 							}
 							$downIndex++;
+							
+							if($downElement->getAttribute('value') == 610)
+							{
+								if(!empty($result->Checkouts[$i-1]['Link']))
+								{
+									$result->Checkouts[$i-1]['OverDriveReadLink'] = preg_replace("/FormatID=[0-9]{3}/","FormatID=610", $result->Checkouts[$i-1]['Link']);
+								}
+								else
+								{
+									$fulfillODReadLink = true;
+								}
+							}
 						}
+						
 					}
+					
+					//OverDrive Read??
+					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[3]/div[3]/a/@href";
+					$attr = $xpath->query($query);
+					if($attr->item(0) != NULL)
+					{
+						$result->Checkouts[$i-1]['OverDriveReadLink'] = $baseUrl.$attr->item(0)->value;
+					}
+					
 					$result->Checkouts[$i-1]['ChooseFormat'] = !$hasBeenDownloaded;
 					
 					$i++;

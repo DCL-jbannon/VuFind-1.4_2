@@ -47,6 +47,28 @@ class EcontentRecordLinksTests extends BaseHelperClassesTests
 	}
 	
 	/**
+	 * method getLinksItemChekedOut
+	 * when returnGetAccessUrlsTypeIsArrayWithLabels
+	 * should returnCorrectly
+	 */
+	public function test_getLinksItemChekedOuts_returnGetAccessUrlsTypeIsArrayWithLabels_returnCorrectly()
+	{
+		$expected[0]['url'] = self::accessUrl;
+		$expected[0]['text'] = "Access eContent";
+		$expected[1]['url'] = "aDummyLinkWithLabel";
+		$expected[1]['text'] = "aDummyLabel";
+		
+		$returnAccessUrl = array(self::accessUrl, array("label"=>"aDummyLabel", "link"=>"aDummyLinkWithLabel"));
+		$this->econtentRecordDetailsMock->expects($this->once())
+										->method("getAccessUrls")
+										->with($this->equalTo($this->userMock))
+										->will($this->returnValue($returnAccessUrl));
+	
+		$actual = $this->service->getLinksItemChekedOut($this->userMock, false);
+		$this->assertEquals($expected, $actual);
+	}
+	
+	/**
 	 * method getCheckOutsLinks
 	 * when returnLinkIsSetToFalse
 	 * should returnCorrectly

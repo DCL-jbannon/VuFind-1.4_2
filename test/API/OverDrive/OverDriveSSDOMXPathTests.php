@@ -157,24 +157,28 @@ class OverDriveSSDOMXPathTests extends PHPUnit_Framework_TestCase
 									   "Title"=>    "The Murder Book",
 									   "Expires" => "Mar 20 2013  3:44PM",
 									   "Link" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=fbb87483-e23a-4b7c-9351-70460b801df8&FormatID=50",
+									   "OverDriveReadLink" => false,
 									   "ChooseFormat"=>false);
 		
 		$expected->Checkouts[] = array("ItemId" =>  "8EF8AECF-EDCE-43AD-A23E-3A8BB8D7BCB1", 
 									   "Title"=>    "2011 Baby Names Almanac", 
 				                       "Expires" => "Mar 27 2013 10:28AM",
-									   "Link" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=8ef8aecf-edce-43ad-a23e-3a8bb8d7bcb1&FormatID=420",
+									   "Link" =>        $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=8ef8aecf-edce-43ad-a23e-3a8bb8d7bcb1&FormatID=420&url=blabla.html",
+									   "OverDriveReadLink" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=8ef8aecf-edce-43ad-a23e-3a8bb8d7bcb1&FormatID=610&url=blabla.html",
 									   "ChooseFormat"=>false);
 		
 		$expected->Checkouts[] = array("ItemId" =>  "E90724B0-EFED-4FD2-AB42-113EC41B78CD", 
 				                       "Title"=>    "A Dog Is a Dog", 
 				                       "Expires" => "Mar 26 2013  6:12PM",
 									   "Link" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=e90724b0-efed-4fd2-ab42-113ec41b78cd&FormatID=420",
+									   "OverDriveReadLink" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=e90724b0-efed-4fd2-ab42-113ec41b78cd&FormatID=610",
 									   "ChooseFormat"=>false);
 		
 		$expected->Checkouts[] = array("ItemId" =>  "5191E036-DB83-4E74-A719-12472B8ADA8A",
 									   "Title"=>    "How to Raise the Perfect Dog",
 									   "Expires" => "Mar 26 2013  5:17PM",
 									   "Link" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=5191e036-db83-4e74-a719-12472b8ada8a&FormatID=420",
+									   "OverDriveReadLink" => false,
 									   "ChooseFormat"=>false);
 
 		$expected->Holds[] = array("ItemId" => "67AAFEF1-3292-4DC0-B6C5-0D35F466C511",
@@ -202,6 +206,7 @@ class OverDriveSSDOMXPathTests extends PHPUnit_Framework_TestCase
 		
 		$actual = $this->service->getPatronCirculation($source, $baseUrl);
 		$this->assertEquals($expected, $actual);
+		//print_r($actual);
 	}
 	
 	
@@ -219,6 +224,7 @@ class OverDriveSSDOMXPathTests extends PHPUnit_Framework_TestCase
 									   "Title"=>    "The Story of Christmas",
 									   "Expires" => "Mar 29 2013  4:28PM",
 									   "Link" => "",
+				                       "OverDriveReadLink" => "",
 									   "ChooseFormat" => true);
 		$expected->Holds = array();
 		$expected->AvailableHolds = array();

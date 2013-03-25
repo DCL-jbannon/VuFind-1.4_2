@@ -225,6 +225,10 @@ class OverDriveRecordDetails extends BaseEcontentDetails implements IEcontentRec
 			{
 				if(!$itemCheckedOut['ChooseFormat'])
 				{
+					if($itemCheckedOut['OverDriveReadLink'] !== false)
+					{
+						return array($itemCheckedOut['Link'], array("label"=>"OverDrive Read", "link" => $itemCheckedOut['OverDriveReadLink']));
+					}
 					return $itemCheckedOut['Link'];
 				}
 				else

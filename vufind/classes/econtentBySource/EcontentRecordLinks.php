@@ -19,8 +19,17 @@ class EcontentRecordLinks extends BaseEcontentRecordHelpers
 		{
 			foreach ($urls as $url)
 			{
-				$links[$i]['url'] = $url;
-				$links[$i]['text'] = "Access eContent";
+				if(is_array($url))
+				{
+					$links[$i]['url'] = $url['link'];
+					$links[$i]['text'] = $url['label'];
+				}
+				else
+				{
+					$links[$i]['url'] = $url;
+					$links[$i]['text'] = "Access eContent";
+				}
+				
 				$i++;
 			}
 		}

@@ -697,7 +697,6 @@ public function getStatusSummaries($ids){
 			}
 
 			$overDriveAPIServ->getMultipleItemsDetail($itemsId, $username);
-				
 			foreach ($results->Checkouts as $item)
 			{
 				$id = $item['ItemId'];
@@ -720,6 +719,7 @@ public function getStatusSummaries($ids){
 							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
 					);
 				}
+
 			}
 		}
 		

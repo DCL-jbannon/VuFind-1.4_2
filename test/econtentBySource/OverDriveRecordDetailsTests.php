@@ -547,6 +547,24 @@ class OverDriveRecordDetailsTests extends BaseEcontentDetailsTests
 	}
 	
 	/**
+	 * method getAccessUrls
+	 * when hasODReadOption
+	 * should executesCorrectly
+	 */
+	public function test_getAccessUrls_hasODReadOption_executesCorrectly()
+	{
+		$overDriveId = "BBBBBBAA-9B92-423E-B413-D9A17BF33AF9";
+		$expected = array("aDummyLink-BBBBBBAA",array("label"=>"OverDrive Read","link"=>"aDummyLinkOverDriveRead-BBBBBBAA"));
+		$patronCirculation = $this->overDriveMother->getPatronCirculation();
+		$this->prepareGetUserUsername();
+		$this->prepareGetOverDriveID($overDriveId);
+		$this->prepareGetPatronCirculation($patronCirculation);
+	
+		$actual = $this->service->getAccessUrls($this->userMock);
+		$this->assertEquals($expected, $actual);
+	}
+	
+	/**
 	* method getAccessUrls 
 	* when itemCheckedOutNotChooseFormat
 	* should executesCorrectly

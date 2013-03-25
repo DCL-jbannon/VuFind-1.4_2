@@ -69,4 +69,4 @@ public abstract class BaseDBTests /*extends DBTestCase*/
 			}
 		}
 	}
-s}
+}

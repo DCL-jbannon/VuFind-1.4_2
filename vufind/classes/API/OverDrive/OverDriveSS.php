@@ -201,7 +201,7 @@ class OverDriveSS implements IOverDriveSS
 		$result = $this->exec();
 		
 		$urlAfterEarlyReturn = $this->odDOM->getUrlHTML302($result);
-		if(preg_match("/\/www\.emedia2go.org\/".$session."\/10\/50\/en\/MyAccount\.htm/", $urlAfterEarlyReturn))
+		if(preg_match("/\/".$this->baseServerName."\/".$session."\/10\/50\/en\/MyAccount\.htm/", $urlAfterEarlyReturn))
 		{
 			return true;
 		}

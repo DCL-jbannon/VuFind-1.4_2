@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <solr sharedLib="lib" persistent="true">
   <cores adminPath="/admin/cores">
-    <core name="biblio" instanceDir="biblio2\"/>
+    <core name="biblio" instanceDir="biblio\"/>
     <core name="econtent" instanceDir="econtent\"/>
     <core name="authority" instanceDir="authority\"/>
     <core name="genealogy" instanceDir="genealogy\"/>
-    <core name="biblio2" instanceDir="biblio\"/>
+    <core name="biblio2" instanceDir="biblio2\"/>
     <core name="econTrial" instanceDir="econTrial\"/>
     <core name="testIdclReader" instanceDir="testIdclReader\"/>
     <core name="testEcontent" instanceDir="testEcontent\"/>
