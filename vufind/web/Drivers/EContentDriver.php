@@ -346,6 +346,7 @@ public function getStatusSummary($id, $holdings)
 		
 		$statusSummary['showAccessOnline'] = true;
 		$statusSummary['formatType'] = $freeEContentRecordService->getFormatType($eContentRecord);
+		$statusSummary['holdQueueLength'] = 0;
 	}
 	else
 	{
@@ -355,9 +356,10 @@ public function getStatusSummary($id, $holdings)
 		
 		$statusSummary['showAccessOnline'] = ($checkedOut && count($holdings) > 0);
 		$statusSummary['formatType'] = '';
+		$statusSummary['holdQueueLength'] = $this->getWaitList($id);
 	}
 	
-	$statusSummary['holdQueueLength'] = $this->getWaitList($id);
+	
 	$statusSummary['onHold'] = $onHold;
 	$statusSummary['checkedOut'] = $checkedOut;
 	$statusSummary['holdPosition'] = $holdPosition;
