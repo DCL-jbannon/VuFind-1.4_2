@@ -118,7 +118,7 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 									$hasBeenDownloaded = true;
 									if($fulfillODReadLink)
 									{
-										$result->Checkouts[$i-1]['OverDriveReadLink'] = preg_replace("/FormatID=[0-9]{3}/","FormatID=610", $result->Checkouts[$i-1]['Link']);
+										$result->Checkouts[$i-1]['OverDriveReadLink'] = preg_replace("/FormatID=([0-9]{3}|[0-9]{2})/","FormatID=610", $result->Checkouts[$i-1]['Link']);
 									}
 								}
 							}

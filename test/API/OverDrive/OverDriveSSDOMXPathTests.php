@@ -170,7 +170,7 @@ class OverDriveSSDOMXPathTests extends PHPUnit_Framework_TestCase
 		$expected->Checkouts[] = array("ItemId" =>  "E90724B0-EFED-4FD2-AB42-113EC41B78CD", 
 				                       "Title"=>    "A Dog Is a Dog", 
 				                       "Expires" => "Mar 26 2013  6:12PM",
-									   "Link" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=e90724b0-efed-4fd2-ab42-113ec41b78cd&FormatID=420",
+									   "Link" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=e90724b0-efed-4fd2-ab42-113ec41b78cd&FormatID=42",
 									   "OverDriveReadLink" => $baseUrl."BANGPurchase.dll?Action=Download&ReserveID=e90724b0-efed-4fd2-ab42-113ec41b78cd&FormatID=610",
 									   "ChooseFormat"=>false);
 		
