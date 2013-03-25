@@ -702,22 +702,24 @@ public function getStatusSummaries($ids){
 			{
 				$id = $item['ItemId'];
 				$eContentRecord = OverDriveUtils::getEcontentRecordFromOverDriveID($id);
-				$details = EcontentDetailsFactory::get($eContentRecord);
-				$daysUntilDue = ceil((strtotime($item['Expires']) - mktime()) / (24 * 60 * 60));
-				
-				$return['transactions'][] = array(
-						'id' => $eContentRecord->id,
-						'recordId' => 'econtentRecord' . $eContentRecord->id,
-						'source' => $eContentRecord->source,
-						'title' => $eContentRecord->title,
-						'author' => $eContentRecord->author,
-						'duedate' => $item['Expires'],
-						'checkoutdate' => '',
-						'daysUntilDue' => $daysUntilDue,
-						'holdQueueLength' => $details->getHoldLength(),
-						'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
-				);
-				
+				if($eContentRecord !== false)
+				{
+					$details = EcontentDetailsFactory::get($eContentRecord);
+					$daysUntilDue = ceil((strtotime($item['Expires']) - mktime()) / (24 * 60 * 60));
+					
+					$return['transactions'][] = array(
+							'id' => $eContentRecord->id,
+							'recordId' => 'econtentRecord' . $eContentRecord->id,
+							'source' => $eContentRecord->source,
+							'title' => $eContentRecord->title,
+							'author' => $eContentRecord->author,
+							'duedate' => $item['Expires'],
+							'checkoutdate' => '',
+							'daysUntilDue' => $daysUntilDue,
+							'holdQueueLength' => $details->getHoldLength(),
+							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
+					);
+				}
 			}
 		}
 		

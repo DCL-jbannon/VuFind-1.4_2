@@ -18,7 +18,7 @@
  *
  */
 
-require_once 'Action.php';
+require_once dirname(__FILE__).'/../../Action.php';
 require_once 'sys/SolrStats.php';
 require_once 'sys/Pager.php';
 
