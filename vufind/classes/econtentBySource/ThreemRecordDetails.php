@@ -229,6 +229,6 @@ class ThreemRecordDetails extends BaseEcontentDetails implements IEcontentRecord
 	
 	private function getUserId($user)
 	{
-		return $user->getId();
+		return $user->getUsername();
 	}
 }

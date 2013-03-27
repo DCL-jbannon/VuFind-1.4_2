@@ -12,7 +12,7 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	private $memcacheServicesMock;
 	
 	const threemId = "aDummy3MId";
-	const patrondId = "aDummyPatronId";
+	const patrondId = "aDummyPatronUsername";
 		
 	public function setUp()
 	{

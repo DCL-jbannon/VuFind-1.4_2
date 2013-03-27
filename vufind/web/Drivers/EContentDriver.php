@@ -1086,9 +1086,11 @@ public function getStatusSummaries($ids){
 	{
 		global $configArray;
 		
-		$econtentDetails = EcontentDetailsFactory::get($econtentRecord);		
+		$econtentDetails = EcontentDetailsFactory::get($econtentRecord);	
+		
 		if($econtentDetails !== false)
 		{
+			
 			if($econtentRecord->isOverDrive())
 			{
 				$result = $econtentDetails->checkout($user, $formatId);
