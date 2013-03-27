@@ -1113,9 +1113,8 @@ public function getStatusSummaries($ids){
 			}
 			return $return;
 		}
-			
-		
-		
+
+		$id = $econtentRecord->id;
 		$return = array();
 		
 		$return['title'] = $econtentRecord->title;
@@ -1125,6 +1124,7 @@ public function getStatusSummaries($ids){
 		$checkouts->status = 'out';
 		$checkouts->recordId = $id;
 		$checkouts->find();
+		
 		if ($checkouts->N > 0){
 			$return['result'] = false;
 			$return['message'] = "That record is already checked out to you, unable to check it out again.";
@@ -1177,11 +1177,11 @@ public function getStatusSummaries($ids){
 					$return['message'] = "The title was checked out to you successfully.  You may read it from the My eContent page within your account.";
 					
 					//Record that the record was checked out
-					$this->recordEContentAction($id, "Checked Out", $eContentRecord->accessType);
+					$this->recordEContentAction($id, "Checked Out", $econtentRecord->accessType);
 					
 					//Add the records to the reading history for the user 
 					if ($user->trackReadingHistory == 1){
-						$this->addRecordToReadingHistory($eContentRecord, $user);
+						$this->addRecordToReadingHistory($econtentRecord, $user);
 						
 					}
 				}
