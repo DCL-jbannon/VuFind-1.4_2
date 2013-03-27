@@ -59,7 +59,10 @@ class SearchAPIService implements ISearchAPIService
 			{
 				$record = $this->resourceDAO->getByRecordId($id);
 			}
-			$result[] = $this->recordDTO->getDTO($record);
+			if(is_a($record, "IGenericRecord"))
+			{
+				$result[] = $this->recordDTO->getDTO($record);
+			}
 		}
 		return $result;
 	}

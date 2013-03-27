@@ -8,19 +8,16 @@ class OverDriveMonitor extends BaseMonitor
 
 	private $itemId;
 	
-	public function __construct($clientKey, $clientSecret, $libraryId, $itemId, $baseUrl, $theme, $libraryCardILS, $baseSecureUrl)
+	public function __construct($itemId)
 	{
-		$this->itemId = $itemId;
+		global $configArray;
 		
-		/*$configArray['OverDrive']['url'] = self::baseUrl;
-		$configArray['OverDrive']['theme'] = self::baseUrl;
-		$configArray['OverDrive']['LibraryCardILS'] = self::baseUrl;
-		$configArray['OverDrive']['baseSecureUrl'] = self::baseUrl;
+		$configArray['Caching']['memcache_host'] = 'localhost';
+		$configArray['Caching']['memcache_port'] = '11211';
+		$configArray['Caching']['memcache_connection_timeout'] = 1;
 		
-		$configArray['OverDriveAPI']['clientKey'] = self::clientKey;
-		$configArray['OverDriveAPI']['clientSecret'] = self::clientSecret;
-		$configArray['OverDriveAPI']['libraryId'] = self::LibraryId;*/
 		
+		$this->itemId = $itemId;	
 		$this->service = new OverDriveServicesAPI();
 	}
 	

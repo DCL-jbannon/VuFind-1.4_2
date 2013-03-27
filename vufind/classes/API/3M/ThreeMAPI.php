@@ -6,11 +6,15 @@ interface IThreeMAPI{}
 class ThreeMAPI implements IThreeMAPI
 {
 	private $threemAPIWrapper;
+	private $threemAPIUtils;
 	
-	public function __construct(IThreeMAPIWrapper $threeAPIWrapper = NULL)
+	public function __construct(IThreeMAPIWrapper $threeAPIWrapper = NULL, IThreeMUtils $threemAPIUtils = NULL)
 	{
 		if(!$threeAPIWrapper) $threeAPIWrapper = new ThreeMAPIWrapper();
 		$this->threemAPIWrapper = $threeAPIWrapper;
+		
+		if(!$threemAPIUtils) $threemAPIUtils = new ThreeMAPIUtils();
+		$this->threemAPIUtils = $threemAPIUtils;
 	}
 	
 	public function getItemDetails($itemId)

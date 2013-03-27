@@ -219,18 +219,28 @@ class OverDriveResultsMother
 											   "Title"=>    "Australia's North West",
 											   "Expires" => "Mar 15 2013  1:15PM",
 											   "Link" => "aDummyLink-0E325B48",
+				                               "OverDriveReadLink" => false,
+											   "ChooseFormat"=>false);
+		
+		$patronCiculation->Checkouts[] = array("ItemId" =>  "BBBBBBAA-9B92-423E-B413-D9A17BF33AF9",
+											   "Title"=>    "aDummyTitle",
+											   "Expires" => "Mar 29 2025  1:12PM",
+											   "Link" => "aDummyLink-BBBBBBAA",
+											   "OverDriveReadLink" => "aDummyLinkOverDriveRead-BBBBBBAA",
 											   "ChooseFormat"=>false);
 		
 		$patronCiculation->Checkouts[] = array("ItemId" =>  "EA87339B-9B92-423E-B413-D9A17BF33AF9",
 											   "Title"=>    "The Cat Who Said Cheese",
 											   "Expires" => "Mar 29 2013  1:12PM",
 											   "Link" => "aDummyLink-EA87339B",
+				                               "OverDriveReadLink" => false,
 											   "ChooseFormat"=>false);
 		
 		$patronCiculation->Checkouts[] = array("ItemId" =>  "833283EE-3A23-45FB-B5DF-217DEC6C2D02",
 											   "Title"=>    "The Cat Who Said Cheese",
 											   "Expires" => "Mar 25 2019  2:12AM",
 											   "Link" => "",
+				                               "OverDriveReadLink" => false,
 											   "ChooseFormat"=>true);
 		
 		$patronCiculation->Holds[] = array("ItemId" => "8489B13C-FAFD-4751-81EE-1F0F090EFFEE",

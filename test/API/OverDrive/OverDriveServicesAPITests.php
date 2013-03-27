@@ -424,6 +424,7 @@ class OverDriveServicesAPITests extends PHPUnit_Framework_TestCase
 	{
 		$this->overDriveAPIMock->expects($this->once())
 								->method("getSession")
+								->with($this->equalTo($username))
 								->will($this->returnCallback(
 																function()
 																{

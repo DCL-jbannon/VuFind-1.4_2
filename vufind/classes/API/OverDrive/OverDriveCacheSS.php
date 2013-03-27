@@ -7,6 +7,9 @@ class OverDriveCacheSS implements IOverDriveSS
 {
 	const keyGetItemDetails = "OverDriveCacheSS_getItemDetails_";
 	const keyGetPatronCirculation = "OverDriveCacheSS_getPatronCirculation_";
+	const keyLogin = "OverDriveCacheSS_login_";
+	const keySessionNoUsername = "OverDriveCacheSS_session_noUsername";
+	const keySessionUsername = "OverDriveCacheSS_session_";
 	
 	private $overDriveSS;
 	private $memcacheServices;
@@ -49,14 +52,23 @@ class OverDriveCacheSS implements IOverDriveSS
 		return $result;
 	}
 
-	public function getSession()
+	public function getSession($username = NULL)
 	{
-		return $this->overDriveSS->getSession();
+		$this->logger->log("OverDriveCacheSS getSession ".$username, PEAR_LOG_INFO);	
+		if($username === NULL)
+		{
+			return $this->memcacheServices->call($this->overDriveSS, "getSession", array($username), OverDriveCacheSS::keySessionNoUsername, 300);
+		}
+		else
+		{
+			return $this->memcacheServices->call($this->overDriveSS, "getSession", array($username), OverDriveCacheSS::keySessionUsername.$username, 300);
+		}
 	}
 	
 	public function login($session, $username)
 	{
-		return $this->overDriveSS->login($session, $username);
+		$this->logger->log("OverDriveCacheSS login ".$session ." ".$username, PEAR_LOG_INFO);
+		return $this->memcacheServices->call($this->overDriveSS, "login", array($session, $username), OverDriveCacheSS::keyLogin.$session.$username, 300);
 	}
 	
 	public function checkOut($session, $itemId, $formatId, $download = true)

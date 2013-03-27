@@ -204,7 +204,7 @@ class ThreeMAPIWrapper implements IThreeMAPIWrapper
 	{
 		$resultBody = curl_exec($this->ch);
 		$result = curl_getinfo($this->ch,CURLINFO_HTTP_CODE);
-		//var_dump($resultBody);
+		//var_dump($resultBody);die();
 		$this->closeChannel();
 		return $result;
 	}

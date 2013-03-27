@@ -230,13 +230,14 @@ class ThreeMAPITests extends PHPUnit_Framework_TestCase
 	* when called	
 	* should returnResult
 	*/
-	public function test_getPatronCirculation_PatronIdIsNotValid_returnFalse()
+	public function test_getPatronCirculation_called_returnResult()
 	{
-		$expected = $this->threeMMother->getPatronCirculationResults();
+		$expected = $this->threeMMother->getPatronCirculationResults(true, true);
 		$this->threeMAPIWrapper->expects($this->once())
 								->method("getPatronCirculation")
 								->with($this->equalTo(self::patronId))
 								->will($this->returnValue($expected));
+
 		$actual = $this->service->getPatronCirculation(self::patronId);
 		$this->assertEquals($expected, $actual);
 	}

@@ -15,6 +15,7 @@ class ServerAPITests extends PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
+		//$this->ch = curl_init("http://vufindtest.douglascountylibraries.org/APIV2/Home");
 		$this->ch = curl_init("http://dcl.localhost/APIV2/Home");
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($this->ch, CURLOPT_USERAGENT, "DCL Integration Tests");
@@ -174,7 +175,7 @@ class ServerAPITests extends PHPUnit_Framework_TestCase
 	{
 		$this->setMethodHeader("searchKeyword");
 		$this->setAccessTokenHeader(self::$accessToken);
-		$this->setJSONContent(array("searchTerm"=>"Downloadables 3M", "page"=>1, "formatCategory" => ""));
+		$this->setJSONContent(array("searchTerm"=>"Downloadables 3M", "page"=>12, "formatCategory" => ""));
 	
 		$actual = $this->exec();
 		$this->assertEquals("3M Cloud Library", $actual[0]->secondAuthor);
@@ -249,7 +250,7 @@ class ServerAPITests extends PHPUnit_Framework_TestCase
 		
 		//curl_setopt($this->ch, CURLOPT_PROXY, "127.0.0.1:8888");
 		$result = curl_exec($this->ch);
-		var_dump($result);
+		//var_dump($result);
 		return json_decode($result);
 	}
 	

@@ -5,7 +5,7 @@ require_once dirname(__FILE__).'/../../../web/sys/Logger.php';
 
 interface IOverDriveSS
 {
-	public function getSession();
+	public function getSession($username = NULL);
 	public function login($session, $username);
 	public function checkOut($session, $itemId, $formatId, $download = true);
 	public function returnTitle($session, $itemId);
@@ -74,7 +74,7 @@ class OverDriveSS implements IOverDriveSS
 		$this->logger = new Logger();
 	}
 	
-	public function getSession()
+	public function getSession($username = NULL)//To make compatible with OverDriveCacheSS. Username not use in this method
 	{
 		$this->logger->log("OverDriveSS getSession", PEAR_LOG_INFO);
 		

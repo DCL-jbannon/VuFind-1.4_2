@@ -70,9 +70,9 @@ class OverDriveAPI implements IOverDriveAPI
 	}
 	
 	//OVERDRIVE SCREEN SCRAPING
-	public function getSession()
+	public function getSession($username = NULL)
 	{
-		self::$session = $this->odss->getSession();
+		self::$session = $this->odss->getSession($username);
 		return self::$session;
 	}
 	

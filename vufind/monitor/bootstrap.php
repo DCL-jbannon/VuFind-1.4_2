@@ -1,5 +1,5 @@
 <?php
-global $trans;
+global $trans, $configArray;
 require_once dirname(__FILE__).'/functions.php';
 require_once dirname(__FILE__).'/../classes/monitor/CoversDirectoryMonitor.php';
 require_once dirname(__FILE__).'/../classes/monitor/FreegalMonitor.php';
@@ -30,4 +30,5 @@ if(!isset($_GET['method']))
 }
 
 $config = parse_ini_file(dirname(__FILE__).'/../../sites/dcl.localhost/conf/monitor.ini', true);
+$configArray = $config;
 ?>

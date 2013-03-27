@@ -49,7 +49,7 @@ class MarcRecordFields implements IMarcRecordFields
 		$marcString = $this->cleanMarcString($marcString);
 		$fileMarc = new FileMarc($marcString, File_MARC::SOURCE_STRING);
 		
-		$fileMarcRecord = $fileMarc->next();
+		@$fileMarcRecord = $fileMarc->next();
 		if($fileMarcRecord !== false)
 		{
 			$this->marcSubfield = new MarcSubField($fileMarcRecord);

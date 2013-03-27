@@ -1,4 +1,5 @@
 <?php
+global $configArray;
 require_once dirname(__FILE__).'/bootstrap.php';
 
 $execTime = 0;
@@ -114,10 +115,7 @@ function get3MMonitor($config)
 
 function getOverDriveMonitor($config)
 {
-  return new OverDriveMonitor($config['OverDriveAPI']['clientKey'],
-										$config['OverDriveAPI']['clientSecret'],
-										$config['OverDriveAPI']['libraryId'],
-										$config['OverDriveAPI']['itemId']);
+  return new OverDriveMonitor($config['OverDriveAPI']['itemId']);
 }
 
 function getMysqlMonitor($config)

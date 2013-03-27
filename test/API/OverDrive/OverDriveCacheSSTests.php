@@ -106,19 +106,49 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 	
 	/**
 	* method getSession 
-	* when called
+	* when usernameNULL
 	* should executesCorrectly
 	*/
-	public function test_getSession_called_executesCorrectly()
+	public function test_getSession_usernameNULL_executesCorrectly()
 	{
 		$expected = "aDummyResult";
-		$this->overDriveSSMock->expects($this->once())
-							  ->method("getSession")
-							  ->will($this->returnValue($expected));
+				
+		$this->memcacheServicesMock->expects($this->once())
+									->method("call")
+									->with($this->equalTo($this->overDriveSSMock),
+											$this->equalTo("getSession"),
+											$this->equalTo(array(NULL)),
+											$this->equalTo(OverDriveCacheSS::keySessionNoUsername),
+											$this->equalTo(300))
+									->will($this->returnValue($expected));
 		
-		$actual = $this->service->getSession();
+		$actual = $this->service->getSession(NULL);
 		$this->assertEquals($expected, $actual);
 	}
+	
+	/**
+	 * method getSession
+	 * when usernameNotNULL
+	 * should executesCorrectly
+	 */
+	public function test_getSession_usernameNotNULL_executesCorrectly()
+	{
+		$username = "aDummyUsername";
+		$expected = "aDummyResult";
+	
+		$this->memcacheServicesMock->expects($this->once())
+									->method("call")
+									->with($this->equalTo($this->overDriveSSMock),
+										   $this->equalTo("getSession"),
+										   $this->equalTo(array($username)),
+										   $this->equalTo(OverDriveCacheSS::keySessionUsername.$username),
+										   $this->equalTo(300))
+									->will($this->returnValue($expected));
+	
+		$actual = $this->service->getSession($username);
+		$this->assertEquals($expected, $actual);
+	}
+	
 	
 	/**
 	 * method login
@@ -131,10 +161,14 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 		$session = "aDummySession";
 		$username = "aDummyUsername";
 		
-		$this->overDriveSSMock->expects($this->once())
-								->method("login")
-								->with($this->equalTo($session), $this->equalTo($username))
-								->will($this->returnValue($expected));
+		$this->memcacheServicesMock->expects($this->once())
+									->method("call")
+									->with($this->equalTo($this->overDriveSSMock),
+										   $this->equalTo("login"),
+										   $this->equalTo(array($session, $username)),
+										   $this->equalTo(OverDriveCacheSS::keyLogin.$session.$username),
+										   $this->equalTo(300))
+									->will($this->returnValue($expected));
 	
 		$actual = $this->service->login($session, $username);
 		$this->assertEquals($expected, $actual);

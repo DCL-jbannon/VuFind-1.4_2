@@ -8,7 +8,7 @@ class OverDriveServicesAPI implements IOverDriveServicesAPI
 {
 	private $odapi;
 	
-	public function __construct(IOverDriveAPI $overDriveAPI = NULL, IMemcacheWrapper $memcacheWrapper = NULL)
+	public function __construct(IOverDriveAPI $overDriveAPI = NULL)
 	{	
 		if(!$overDriveAPI) $overDriveAPI = new OverDriveAPI();
 		$this->odapi = $overDriveAPI;
@@ -130,7 +130,7 @@ class OverDriveServicesAPI implements IOverDriveServicesAPI
 	{
 		if(OverDriveAPI::$session === NULL)
 		{
-			$this->odapi->getSession();
+			$this->odapi->getSession($username);
 			$this->odapi->loginSS($username);
 		}
 	}

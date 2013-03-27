@@ -45,9 +45,12 @@ class MemcacheServices implements IMemcacheServices
 		}
 
 		$resultToSerialize = $result = call_user_func_array(array($classInstantiated, $methodToCall), $parameters);
-		if(is_a($result, "SimpleXMLElement"))
+		if(is_object($result))
 		{
-			$resultToSerialize = array("__SimpleXMLElement"=>true, "xml"=>$result->asXML());
+			if(is_a($result, "SimpleXMLElement"))
+			{
+				$resultToSerialize = array("__SimpleXMLElement"=>true, "xml"=>$result->asXML());
+			}
 		}
 		
 		$this->memcacheWrapper->set($key, serialize($resultToSerialize), self::compress, $timeout);
