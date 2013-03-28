@@ -167,7 +167,9 @@ class ManageRequests extends Admin {
 				$dateCreated = mktime()-15552000; //Around 6 months				
 				$materialsRequests->whereAdd("dateCreated > $dateCreated");
 			}
-
+			
+			$materialsRequests->orderBy("dateCreated DESC");
+			
 			$materialsRequests->find();
 			while ($materialsRequests->fetch()){
 				$allRequests[] = clone $materialsRequests;

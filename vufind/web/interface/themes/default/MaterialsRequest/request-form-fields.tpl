@@ -41,9 +41,9 @@
 		<div>
 			<label for="format">Format <span class="requiredIndicator">*</span>:</label>
 			<select name="format" class="required" id="format" onchange="setFieldVisibility();">
-				<option value="" selected='selected'></option>
+				<option value=""></option>
 				{foreach from=$availableFormats item=label key=formatKey}
-					<option value="{$formatKey}"{if $materialsRequest->format==$formatKey}{/if}>{$label}</option>
+					<option value="{$formatKey}"{if $materialsRequest->format==$formatKey}selected='selected'{/if}>{$label}</option>
 				{/foreach}
 			</select>
 		</div>

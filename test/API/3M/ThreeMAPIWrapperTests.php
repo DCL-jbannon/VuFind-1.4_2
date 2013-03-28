@@ -12,7 +12,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	private $base3MUrl = "https://cloudlibraryapi.3m.com";
 	private $service;
 	private $itemId = "ff7z9";
-	private $itemPlaceHoldId = "d1umz9";
+	private $itemPlaceHoldId = "awaxg9";
 	private $itemIdCanNOTCHECK = "keng9";
 	
 	public function setUp()

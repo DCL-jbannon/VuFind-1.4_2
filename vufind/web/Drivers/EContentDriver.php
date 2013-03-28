@@ -619,6 +619,7 @@ public function getStatusSummaries($ids){
 		$eContentCheckout->userId = $user->id;
 		$eContentCheckout->status = 'out';
 		$eContentCheckout->find();
+		
 		$return['transactions'] = array();
 		$return['numTransactions'] = $eContentCheckout->find();
 		while ($eContentCheckout->fetch())

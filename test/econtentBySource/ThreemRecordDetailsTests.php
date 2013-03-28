@@ -540,7 +540,7 @@ class ThreemRecordDetailsTests extends BaseEcontentDetailsTests
 	private function prepareGetUserId()
 	{
 		$this->userMock->expects($this->once())
-						->method("getId")
+						->method("getUsername")
 						->will($this->returnValue(self::patrondId));
 	}
 }
