@@ -12,7 +12,30 @@ class NotificationMailStatsDAO extends BaseDAO
 		return "NotificationMailStats";
 	}
 	
-	public function getReturnEcontentTyopesNumbersByRangeDate($startDate, $endDate)
+	public function getEcontentIdActions($startDate, $endDate)
+	{
+		$sql = "SELECT replace(nsent.notes, \"ID: \", \"\") as econtentId, nstats.type
+				FROM notifications_sent as nsent INNER JOIN notifications_mail_statistics as nstats on nsent.uniqueIdentifier= nstats.uniqueIdentifier
+				WHERE 
+				nsent.type = 'returnEcontent'
+				AND
+				nstats.timestamp >= '".$startDate."'
+				AND
+				nstats.timestamp <= '".$endDate."'
+				ORDER BY econtentId * 1  ASC";
+		
+		$nms = new NotificationMailStats();
+		$nms->query($sql);
+		
+		$results = BaseDAO::noResult();
+		while ($nms->fetch())
+		{
+			$results[] = array($nms->econtentId, $nms->type);
+		}
+		return $results;
+	}
+	
+	public function getReturnEcontentTypesNumbersByRangeDate($startDate, $endDate)
 	{
 		$sql = "SELECT DISTINCT(nms.type), COUNT(nms.type) as count
 				FROM `notifications_mail_statistics`  as nms INNER JOIN notifications_sent as ns ON nms.uniqueIdentifier = ns.uniqueIdentifier

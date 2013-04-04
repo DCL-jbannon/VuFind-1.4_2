@@ -17,29 +17,74 @@ class NotificationMailStatsDAOTests extends DAOTests
 		$this->endDate = date("Y-m-d")." 23:59:59";
 	}
 	
+	/**
+	 * method getEcontentIdActions
+	 * when noResults
+	 * should returnCorrectly
+	 */
+	public function test_getEcontentIdActions_noResults_returnCorrectly()
+	{
+		$expected = BaseDAO::noResult();
+		$actual = $this->service->getEcontentIdActions($this->startDate, $this->endDate);
+		$this->assertEquals($expected, $actual);
+	}
 	
 	/**
-	 * method getReturnEcontentTyopesNumbersByRangeDate
+	* method getEcontentIdActions 
+	* when called
+	* should returnCorrectly
+	*/
+	public function test_getEcontentIdActions_called_returnCorrectly()
+	{
+		$econtentRecordId = 12;
+		$econtentRecordId2 = 45;
+		$expected[] = array($econtentRecordId,  "open");
+		$expected[] = array($econtentRecordId,  "click");
+		$expected[] = array($econtentRecordId2, "rate");
+		
+		$this->insetNotificationSent(NotificationsType::returnEcontent, "aDummyUID", NULL, "ID: ".$econtentRecordId);
+		$this->insetNotificationSent(NotificationsType::returnEcontent, "aDummyUID2", NULL, "ID: ".$econtentRecordId2);
+		
+		$nms = new $this->entityClassName();
+		$nms->setUniqueIdentifier("aDummyUID");
+		$nms->setType(NotificationsTypeMailStatistics::open);
+		$nms->insert();
+		
+		$nms->setUniqueIdentifier("aDummyUID2");
+		$nms->setType(NotificationsTypeMailStatistics::rate);
+		$nms->insert();	
+
+		$nms->setUniqueIdentifier("aDummyUID");
+		$nms->setType(NotificationsTypeMailStatistics::click);
+		$nms->insert();
+		
+		$actual = $this->service->getEcontentIdActions($this->startDate, $this->endDate);
+		$this->assertEquals($expected, $actual);
+		
+	}
+
+	/**
+	 * method getReturnEcontentTypesNumbersByRangeDate
 	 * when noData
 	 * should executesCorrectly
 	 */
-	public function test_getReturnEcontentTyopesNumbersByRangeDate_noData_executesCorrectly()
+	public function test_getReturnEcontentTypesNumbersByRangeDate_noData_executesCorrectly()
 	{	
 		$expected[NotificationsTypeMailStatistics::click] = array("count"=>0);
 		$expected[NotificationsTypeMailStatistics::open] = array("count"=>0);
 		$expected[NotificationsTypeMailStatistics::review] = array("count"=>0);
 		$expected[NotificationsTypeMailStatistics::rate] = array("count"=>0);
 		
-		$actual = $this->service->getReturnEcontentTyopesNumbersByRangeDate($this->startDate, $this->endDate);
+		$actual = $this->service->getReturnEcontentTypesNumbersByRangeDate($this->startDate, $this->endDate);
 		$this->assertEquals($expected, $actual);
 	}
 		
 	/**
-	* method getReturnEcontentTyopesNumbersByRangeDate 
+	* method getReturnEcontentTypesNumbersByRangeDate 
 	* when called
 	* should executesCorrectly
 	*/
-	public function test_getReturnEcontentTyopesNumbersByRangeDate_called_executesCorrectly()
+	public function test_getReturnEcontentTypesNumbersByRangeDate_called_executesCorrectly()
 	{
 		$expected[NotificationsTypeMailStatistics::click] = array("count"=>2);
 		$expected[NotificationsTypeMailStatistics::open] = array("count"=>1);
@@ -60,13 +105,10 @@ class NotificationMailStatsDAOTests extends DAOTests
 		
 		$nms->setType(NotificationsTypeMailStatistics::rate);
 		$nms->insert();
+				
+		$this->insetNotificationSent(NotificationsType::returnEcontent, "aDummyUID");
 		
-		$nms = new NotificationSent();
-		$nms->setUniqueIdentifier("aDummyUID");
-		$nms->setType(NotificationsType::returnEcontent);
-		$nms->insert();
-		
-		$actual = $this->service->getReturnEcontentTyopesNumbersByRangeDate($this->startDate, $this->endDate);
+		$actual = $this->service->getReturnEcontentTypesNumbersByRangeDate($this->startDate, $this->endDate);
 		
 		$this->assertEquals($expected, $actual);
 	}
@@ -92,6 +134,17 @@ class NotificationMailStatsDAOTests extends DAOTests
 	public function getEntityClassName()
 	{
 		return 'NotificationMailStats';
+	}
+	
+	//Privates
+	private function insetNotificationSent($type, $uniqueIdentifier, $userId = NULL, $notes = NULL)
+	{
+		$nms = new NotificationSent();
+		$nms->setUniqueIdentifier($uniqueIdentifier);
+		$nms->setType($type);
+		$nms->setNotes($notes);
+		$nms->setUserId($userId);
+		$nms->insert();
 	}
 
 }

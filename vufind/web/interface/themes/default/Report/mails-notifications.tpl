@@ -55,6 +55,33 @@ $(function() {
 				Total Reviews: {$totalReview}<br/>
 				Total Rates: {$totalRate}<br/>
 			</div>
+			<div id="reportTable">
+				<h1>Econtent List</h1>
+				<table class='myAccountTable'>
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th># Opens</th>
+							<th># Clicks</th>
+							<th># Rates</th>
+							<th># Reviews</th>
+						</tr>
+					</thead>
+					<tbody>
+					{foreach from=$tableEcontent item=econtent}
+						<tr>
+							<td>
+								<a href='/EcontentRecord/{$econtent.entity->id}'>{$econtent.entity->getTitle()}</a>
+							</td>
+							<td>{$econtent.open}</td>
+							<td>{$econtent.click}</td>
+							<td>{$econtent.rate}</td>
+							<td>{$econtent.review}</td>
+						</tr>
+					{/foreach}
+					</tbody>
+				</table>
+			</div>
 					
 		{/if}
 	</div>
