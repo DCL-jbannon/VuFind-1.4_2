@@ -11,7 +11,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->overDriveSSMock = $this->getMock("IOverDriveSS");
-		$this->memcacheServicesMock = $this->getMock("IMemcacheServices", array("call", "set"));
+		$this->memcacheServicesMock = $this->getMock("IMemcacheServices", array("call", "set", "delete"));
 		
 		$this->service = new OverDriveCacheSS("", "", "", "", $this->overDriveSSMock, $this->memcacheServicesMock);
 		parent::setUp();		
@@ -57,7 +57,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 											$this->equalTo("getPatronCirculation"),
 											$this->equalTo(array($session)),
 											$this->equalTo(OverDriveCacheSS::keyGetPatronCirculation.$session),
-											$this->equalTo(30))
+											$this->equalTo(300))
 									->will($this->returnValue($expected));
 	
 		$actual = $this->service->getPatronCirculation($session);
@@ -193,6 +193,8 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->with($this->equalTo($session), $this->equalTo($itemId), $this->equalTo($formatId), $this->equalTo($download))
 								->will($this->returnValue($expected));
 		
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
+		
 		$actual = $this->service->checkOut($session, $itemId, $formatId, $download = true);
 		$this->assertEquals($expected, $actual);
 	}
@@ -213,6 +215,8 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->with($this->equalTo($session), $this->equalTo($itemId))
 								->will($this->returnValue($expected));
 	
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
+		
 		$actual = $this->service->returnTitle($session, $itemId);
 		$this->assertEquals($expected, $actual);
 	}
@@ -234,6 +238,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->method("placeHold")
 								->with($this->equalTo($session), $this->equalTo($itemId), $this->equalTo($formatId), $this->equalTo($email))
 								->will($this->returnValue($expected));
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
 		
 		$actual = $this->service->placeHold($session, $itemId, $formatId, $email);
 		$this->assertEquals($expected, $actual);
@@ -255,6 +260,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->method("cancelHold")
 								->with($this->equalTo($session), $this->equalTo($itemId), $this->equalTo($formatId))
 								->will($this->returnValue($expected));
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
 		
 		$actual = $this->service->cancelHold($session, $itemId, $formatId);
 		$this->assertEquals($expected, $actual);
@@ -275,6 +281,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->method("addToWishList")
 								->with($this->equalTo($session), $this->equalTo($itemId))
 								->will($this->returnValue($expected));
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
 		
 		$actual = $this->service->addToWishList($session, $itemId);
 		$this->assertEquals($expected, $actual);
@@ -296,6 +303,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->method("removeWishList")
 								->with($this->equalTo($session), $this->equalTo($itemId))
 								->will($this->returnValue($expected));
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
 		
 		$actual = $this->service->removeWishList($session, $itemId);
 		$this->assertEquals($expected, $actual);
@@ -320,6 +328,7 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 								->with($this->equalTo($session), $this->equalTo($ebookDays), $this->equalTo($audioBookDays),
 										$this->equalTo($videoDays), $this->equalTo($disneyDays))
 								->will($this->returnValue($expected));
+		$this->prepareDeleteGetPatronCirculationCacheKey($session);
 		
 		$actual = $this->service->changeLendingOptions($session, $ebookDays, $audioBookDays, $videoDays, $disneyDays);
 		$this->assertEquals($expected, $actual);
@@ -365,6 +374,13 @@ class OverDriveCacheSSTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 	
+	//Privates
+	private function prepareDeleteGetPatronCirculationCacheKey($session)
+	{
+		$this->memcacheServicesMock->expects($this->once())
+									->method("delete")
+									->with($this->equalTo(OverDriveCacheSS::keyGetPatronCirculation.$session));
+	}
 		
 }
 ?>

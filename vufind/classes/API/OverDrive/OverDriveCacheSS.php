@@ -37,7 +37,7 @@ class OverDriveCacheSS implements IOverDriveSS
 	public function getPatronCirculation($session)
 	{
 		$this->logger->log("OverDriveCacheSS getPatronCirculation".$session, PEAR_LOG_INFO);
-		return $this->memcacheServices->call($this->overDriveSS, "getPatronCirculation", array($session), self::keyGetPatronCirculation.$session, 30);
+		return $this->memcacheServices->call($this->overDriveSS, "getPatronCirculation", array($session), $this->getPatronCirculationCacheKey($session), 300);
 	}
 	
 	public function getMultipleItemsDetails($session, $itemsId)
@@ -73,36 +73,43 @@ class OverDriveCacheSS implements IOverDriveSS
 	
 	public function checkOut($session, $itemId, $formatId, $download = true)
 	{
-		return $this->overDriveSS->checkOut($session, $itemId, $formatId);	
+		$this->deletePatronCirculationCacheKey($session);
+		return $this->overDriveSS->checkOut($session, $itemId, $formatId);
 	}
 	
 	public function returnTitle($session, $itemId)
 	{
+		$this->deletePatronCirculationCacheKey($session);
 		return $this->overDriveSS->returnTitle($session, $itemId);
 	}
 	
 	public function placeHold($session, $itemId, $formatId, $email)
 	{
+		$this->deletePatronCirculationCacheKey($session);
 		return $this->overDriveSS->placeHold($session, $itemId, $formatId, $email);	
 	}
 	
 	public function cancelHold($session, $itemId, $formatId)
 	{
+		$this->deletePatronCirculationCacheKey($session);
 		return $this->overDriveSS->cancelHold($session, $itemId, $formatId);
 	}
 	
 	public function addToWishList($session, $itemId)
 	{
+		$this->deletePatronCirculationCacheKey($session);
 		return $this->overDriveSS->addToWishList($session, $itemId);	
 	}
 	
 	public function removeWishList($session, $itemId)
 	{
+		$this->deletePatronCirculationCacheKey($session);
 		return $this->overDriveSS->removeWishList($session, $itemId); 	
 	}
 	
 	public function changeLendingOptions($session, $ebookDays, $audioBookDays, $videoDays, $disneyDays)
 	{
+		$this->deletePatronCirculationCacheKey($session);
 		return $this->overDriveSS->changeLendingOptions($session, $ebookDays, $audioBookDays, $videoDays, $disneyDays);
 	}
 	public function getLendingOptions($session)
@@ -113,6 +120,17 @@ class OverDriveCacheSS implements IOverDriveSS
 	public function chooseFormat($session, $itemId, $formatId)
 	{
 		return $this->overDriveSS->chooseFormat($session, $itemId, $formatId);
+	}
+	
+	//privates
+	private function getPatronCirculationCacheKey($session)
+	{
+		return self::keyGetPatronCirculation.$session;
+	}
+	
+	private function deletePatronCirculationCacheKey($session)
+	{
+		$this->memcacheServices->delete($this->getPatronCirculationCacheKey($session));
 	}
 
 }

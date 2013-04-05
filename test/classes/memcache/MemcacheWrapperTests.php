@@ -35,6 +35,24 @@ class MemcacheWrapperTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 	
+	/**
+	* method delete 
+	* when called
+	* should executeCorrectly
+	*/
+	public function test_delete_called_executeCorrectly()
+	{
+		$value = "aDummyValue";
+		$this->service->set(self::key, $value, 0, 3600);
+		$actual = $this->service->get(self::key);
+		$this->assertEquals($value, $actual);
+		$this->service->delete(self::key);
+		$actual = $this->service->get(self::key);
+		$this->assertFalse($actual);
+	}
+	
+		
+	
 	public function tearDown()
 	{
 		$this->service->delete(self::key);

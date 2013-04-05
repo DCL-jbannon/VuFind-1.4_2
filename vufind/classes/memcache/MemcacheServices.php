@@ -15,6 +15,11 @@ class MemcacheServices implements IMemcacheServices
 		$this->memcacheWrapper = $memcacheWrapper;
 	}
 	
+	public function delete($key)
+	{
+		$this->memcacheWrapper->delete($key);
+	}
+	
 	public function set($key, $value, $timeout)
 	{
 		$this->memcacheWrapper->set($key, serialize($value), self::compress, $timeout);

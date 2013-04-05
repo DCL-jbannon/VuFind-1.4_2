@@ -13,12 +13,25 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->classMock = $this->getMock("aDummyClass", array(self::method));
-		$this->memcacheWrapperMock = $this->getMock("IMemcacheWrapper", array("set","get"));
+		$this->memcacheWrapperMock = $this->getMock("IMemcacheWrapper", array("set","get", "delete"));
 
 		$this->service = new MemcacheServices($this->memcacheWrapperMock);
 		parent::setUp();		
 	}
-	
+
+	/**
+	* method delete 
+	* when called
+	* should executesCorrectly
+	*/
+	public function test_delete_called_executesCorrectly()
+	{
+		$key = "aDummyKey";
+		$this->memcacheWrapperMock->expects($this->once())
+									->method("delete")
+									->with($this->equalTo($key));
+		$actual = $this->service->delete($key);
+	}
 	
 	/**
 	* method set 
@@ -41,8 +54,6 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->set($key, $value, $timeout);
 		$this->assertTrue($actual);
 	}
-	
-		
 
 	/**
 	* method call
@@ -60,7 +71,7 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->call($this->classMock, "aDummyMethod", array(1,2));
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	* method call 
 	* when resultIsNotCached
@@ -77,7 +88,7 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->call($this->classMock, "aDummyMethod", array(1,2));
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	* method call 
 	* when customKeyItIsCached
@@ -94,7 +105,7 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->call($this->classMock, "aDummyMethod", array(1,2), $key);
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * method call
 	 * when customKeyTimeoutNotCached
@@ -113,8 +124,7 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->call($this->classMock, "aDummyMethod", array(1,2), $key, $timeout);
 		$this->assertEquals($expected, $actual);
 	}
-	
-	
+
 	/**
 	* method call 
 	* when resultIsASimpleXML
@@ -134,7 +144,7 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->call($this->classMock, "aDummyMethod", array(1,2), $key, $timeout);
 		$this->assertEquals($expected, $actual);
 	}
-	
+
 	/**
 	 * method call
 	 * when getResultCacheIsSimpleXML
@@ -163,7 +173,7 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 											$this->equalTo(MemcacheServices::compress),
 											$this->equalTo($timeout));
 	}
-	
+
 	private function prepareGetMemcache($result, $key)
 	{
 		$this->memcacheWrapperMock->expects($this->once())
@@ -171,13 +181,13 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 								->with($this->equalTo($key))
 								->will($this->returnValue($result));
 	}
-	
+
 	private function prepareNeverCallMethodClass()
 	{
 		$this->classMock->expects($this->never())
 						->method(self::method);
 	}
-	
+
 	private function prepareCallMethod($result)
 	{
 		$this->classMock->expects($this->once())
@@ -185,12 +195,10 @@ class MemcacheServicesTests extends PHPUnit_Framework_TestCase
 						->with($this->equalTo(1), $this->equalTo(2))
 						->will($this->returnValue($result));
 	}
-	
+
 	private function getDefKey()
 	{
 		return get_class($this->classMock)."_".self::method;
 	}
-	
 }
-
 ?>
