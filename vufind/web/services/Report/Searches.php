@@ -56,6 +56,9 @@ class Searches extends AnalyticsReport
 		$startDateTimeStamp = strtotime($startDateSQL);
 		$endDateTimeStamp = strtotime($endDateSQL);		
 
+		
+		set_time_limit(0);
+		
 		//Setup filters
 		$this->setupFilters();
 
@@ -82,6 +85,9 @@ class Searches extends AnalyticsReport
 		}
 		$interface->assign('topSearches', $topSearches);
 
+		echo " ";
+		flush();
+		
 		$search = new Analytics_Search();
 		$search->selectAdd();
 		$search->selectAdd("count(id) as timesSearched");
@@ -105,6 +111,9 @@ class Searches extends AnalyticsReport
 		}
 		$interface->assign('topNoHitSearches', $topNoHitSearches);
 
+		echo " ";
+		flush();
+		
 		$search = new Analytics_Search();
 		$search->selectAdd();
 		$search->selectAdd("lookfor");
@@ -127,6 +136,9 @@ class Searches extends AnalyticsReport
 		}
 		$interface->assign('latestSearches', $latestSearches);
 
+		echo " ";
+		flush();
+		
 		$search = new Analytics_Search();
 		$search->selectAdd();
 		$search->selectAdd("lookfor");
