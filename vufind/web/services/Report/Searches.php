@@ -22,12 +22,39 @@ require_once 'services/Report/AnalyticsReport.php';
 require_once 'sys/Pager.php';
 require_once("PHPExcel.php");
 
-class Searches extends AnalyticsReport{
+class Searches extends AnalyticsReport
+{
 
-	function launch(){
+	function launch()
+	{
 		global $configArray;
 		global $interface;
 		global $user;
+		
+		$startDate = date("m/d/Y", mktime()-86400*7);
+		$endDate = date("m/d/Y", mktime()-86400);
+		
+		if (isset($_POST) && !empty($_POST))
+		{
+			if(empty($_POST['dateFilterStart']) || empty($_POST['dateFilterEnd']))
+			{
+				$interface->assign("msgError", "Please, select 'Start Date' and 'End Date'");
+			}
+			else
+			{
+				$startDate = $_POST['dateFilterStart'];
+				$endDate = $_POST['dateFilterEnd'];
+			}
+		}
+		
+		$interface->assign("startDate", $startDate);
+		$interface->assign("endDate", $endDate);
+		
+		$startDateSQL = $this->getSQLDateFormat($startDate)." 00:00:00";
+		$endDateSQL = $this->getSQLDateFormat($endDate)." 23:59:59";
+		
+		$startDateTimeStamp = strtotime($startDateSQL);
+		$endDateTimeStamp = strtotime($endDateSQL);		
 
 		//Setup filters
 		$this->setupFilters();
@@ -37,6 +64,10 @@ class Searches extends AnalyticsReport{
 		$search->selectAdd("count(id) as timesSearched");
 		$search->selectAdd("lookfor");
 		$search->whereAdd("numResults > 0");
+		
+		$search->whereAdd("searchTime >= ".$startDateTimeStamp);
+		$search->whereAdd("searchTime <= ".$endDateTimeStamp);
+		
 		$search->groupBy('lookfor');
 		$search->orderBy('timesSearched DESC');
 		$search->limit(0, 20);
@@ -56,6 +87,10 @@ class Searches extends AnalyticsReport{
 		$search->selectAdd("count(id) as timesSearched");
 		$search->selectAdd("lookfor");
 		$search->whereAdd("numResults = 0");
+		
+		$search->whereAdd("searchTime >= ".$startDateTimeStamp);
+		$search->whereAdd("searchTime <= ".$endDateTimeStamp);
+		
 		$search->groupBy('lookfor');
 		$search->orderBy('timesSearched DESC');
 		$search->limit(0, 20);
@@ -74,6 +109,10 @@ class Searches extends AnalyticsReport{
 		$search->selectAdd();
 		$search->selectAdd("lookfor");
 		$search->selectAdd("MAX(searchTime) as lastSearch ");
+		
+		$search->whereAdd("searchTime >= ".$startDateTimeStamp);
+		$search->whereAdd("searchTime <= ".$endDateTimeStamp);
+		
 		$search->groupBy('lookfor');
 		$search->orderBy('lastSearch DESC');
 		$search->limit(0, 20);
@@ -93,6 +132,10 @@ class Searches extends AnalyticsReport{
 		$search->selectAdd("lookfor");
 		$search->selectAdd("MAX(searchTime) as lastSearch ");
 		$search->whereAdd("numResults = 0");
+		
+		$search->whereAdd("searchTime >= ".$startDateTimeStamp);
+		$search->whereAdd("searchTime <= ".$endDateTimeStamp);
+		
 		$search->groupBy('lookfor');
 		$search->orderBy('lastSearch DESC');
 		$search->limit(0, 20);
@@ -110,5 +153,11 @@ class Searches extends AnalyticsReport{
 		$interface->setPageTitle('Report - Searches');
 		$interface->setTemplate('searches.tpl');
 		$interface->display('layout.tpl');
+	}
+	
+	private function getSQLDateFormat($date)
+	{
+		$partsDate = explode("/", $date);
+		return $partsDate[2]."-".$partsDate[0]."-".$partsDate[1];
 	}
 }

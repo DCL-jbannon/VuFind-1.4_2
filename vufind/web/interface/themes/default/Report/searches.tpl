@@ -1,7 +1,45 @@
+<script type="text/javascript">
+{literal}
+$(function() {
+		$( "#dateFilterStart" ).datepicker(
+		{	
+			maxDate: "+0D",
+			numberOfMonths: 2,
+			onClose: function( selectedDate )
+					 {
+						$( "#dateFilterEnd" ).datepicker( "option", "minDate", selectedDate );
+					 }
+		});
+	});
+$(function() {
+	$( "#dateFilterEnd" ).datepicker({numberOfMonths: 2, maxDate: "+0D"});
+});
+{/literal}
+</script>
+
 {strip}
 <script type="text/javascript" src="/js/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="/js/analyticReports.js"></script>
 <div id="page-content" class="content">
+     <div id="filterLeftColumna">
+						{if $msgError neq ''}
+							<span style='color:#FF0000;font-weight:bold;'>{$msgError}</span><br/><br/>
+						{/if}
+						Please, select a range of dates<br/><br/>
+						<form method="POST" action="" id="reportSearches" class="search">
+								<div id="startDate">
+									Start Date: 
+									<input id="dateFilterStart" name="dateFilterStart" value="{$startDate}" />
+								</div>
+								<div id="endDate">
+									End Date:&nbsp; 
+									<input id="dateFilterEnd" name="dateFilterEnd" value="{$endDate}" />
+								</div>
+								
+								<input type="submit" id="filterSubmit" value="Go">
+						</form>
+					</div>
+					
 	<div id="topSearchesContainer" class="reportContainer">
 		<h2>Top Searches</h2>
 		<ol class='reportOrderedList'>
