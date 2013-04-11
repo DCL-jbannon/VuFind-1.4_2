@@ -34,13 +34,17 @@ public class FindFile
 		
 		for (int i = 0; i < files.length; i++)
 		{
+			
 	       if(!files[i].isDirectory())
 	       {
 	    	   String filename = files[i].getName();
+	    	   
 	    	   for(int j=0; j<filenamesToSearch.size();j++)
-	    	   { 
+	    	   {
+	    		   
 	    		   if(filename.equalsIgnoreCase((String) filenamesToSearch.get(j).get(0)))
 	    		   {
+	    			   
 	    			   if(this.hasThreeValues(j, filenamesToSearch ))
 	    			   {
 	    				   //Could be null

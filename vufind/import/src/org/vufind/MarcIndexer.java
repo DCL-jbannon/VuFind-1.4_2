@@ -101,7 +101,8 @@ public class MarcIndexer implements IMarcRecordProcessor, IRecordProcessor {
 				results.incSkipped();
 				return true;
 			}
-
+			
+			
 			if (!recordInfo.isEContent()){
 				//Create the XML document for the record
 				try {

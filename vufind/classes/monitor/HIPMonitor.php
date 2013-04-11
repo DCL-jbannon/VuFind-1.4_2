@@ -16,7 +16,7 @@ class HIPMonitor extends BaseMonitor
 		$configArray['Catalog']['hipProfile'] = $hipProfile;
 		$configArray['Catalog']['selfRegProfile'] = $selfRegProfile;
 		$configArray['Catalog']['useDb'] = true;
-		$configArray['System']['operatingSystem'] = 'windows';
+		//$configArray['System']['operatingSystem'] = 'windows';
 		
 		$this->patron['username'] = $username;
 		$this->patron['cat_password'] = $pwd;

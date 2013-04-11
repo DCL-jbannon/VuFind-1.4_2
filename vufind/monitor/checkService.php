@@ -71,7 +71,7 @@ if(!is_array($service))
 {
 	$service->exec();
 	$time = getFormatTime($service->getExecutionTime());
-	saveStats($_GET['method'], $time);
+	saveStats($_GET['method'], $time, $configArray);
 	echo $_GET['method'].": ".$time;
 }
 else
@@ -80,7 +80,7 @@ else
 	{
 		$monitorInfo[0]->exec();
 		$time = getFormatTime($monitorInfo[0]->getExecutionTime());
-		saveStats($monitorInfo[1], $time);
+		saveStats($monitorInfo[1], $time, $configArray);
 		echo $monitorInfo[1].": ".$time."<br/>";
 	}
 }
@@ -90,11 +90,18 @@ function getFormatTime($time)
 	return number_format((float)$time, 4, ".", ",");
 }
 
-function saveStats($method, $time)
+function saveStats($method, $time, $config)
 {
 	global $trans;
 	$output = array();
-	exec(dirname(__FILE__)."/rrdtool/rrdtool.exe updatev ./bbdd/".$method.".rrd N:".$time."", &$output);
+	if ($config['System']['operatingSystem'] == 'windows')
+	{
+		exec(dirname(__FILE__)."/rrdtool/rrdtool.exe updatev ./bbdd/".$method.".rrd N:".$time."", &$output);
+	}
+	else
+	{
+		exec('/usr/bin/rrdtool updatev /var/www/VuFind-Plus/vufind/monitor/bbdd'.$method.".rrd N:".$time."", &$output);
+	}
 	//exec(dirname(__FILE__).'/rrdtool/rrdtool.exe graphv ./graphs/'.$method.'.png -a PNG --title="'.$trans[$method].' Response Time" --start=end-24h --end=now --vertical-label "Response Time" "DEF:resp_time='.$method.'.rrd:'.$method.':AVERAGE" "GPRINT:resp_time:AVERAGE:\'%.0lf sec\'" AREA:resp_time#DD000044:"Response Time" --width=800 --height=250', &$output2);
 	//var_dump($output);
 }

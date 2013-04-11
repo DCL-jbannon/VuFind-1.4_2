@@ -26,6 +26,9 @@ require_once dirname(__FILE__).'/API/Server/ServerAPIItemServicesTests.php';
 require_once dirname(__FILE__).'/API/Server/ServerAPISearchServicesTests.php';
 require_once dirname(__FILE__).'/API/Server/DTO/RecordDTOTests.php';
 
+/** SirsiDynix API RELATED **/
+require_once dirname(__FILE__).'/API/SirsiDynix/SisriDynixAPIWrapperTests.php';
+
 class SuiteAPIsTests
 {
 	public static function suite()

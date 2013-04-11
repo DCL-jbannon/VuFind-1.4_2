@@ -116,6 +116,9 @@ public class EcontentAttachments implements IProcessHandler
 		this.creatLogEntry(); //Not in Testing Mode	
 		
 		ArrayList<ArrayList<String>> resultItemLess = this.dbEcontentRecordServices.getACSEcontentItemLessBySource(this.source);
+		
+		this.addNote(resultItemLess.size() + " eContent Record itemless");
+		
 		ArrayList<ArrayList<String>> resultCoverLess = this.dbEcontentRecordServices.getEcontentNoCoverBySource(this.source);
 		
 		this.listEpubPdf = this.getListFoundFilesOnPath(resultItemLess, this.listEpubPdf, this.fileExtToAttachACS);
@@ -141,6 +144,7 @@ public class EcontentAttachments implements IProcessHandler
 		{
 			ArrayList<String> eRecord = result.get(i);
 			String isbn = this.isbnUtils.detectGetISBN(eRecord.get(3));
+
 			if(!isbn.isEmpty())
 			{
 				for(int k = 0; k < extensions.size(); k++)
@@ -156,6 +160,8 @@ public class EcontentAttachments implements IProcessHandler
 	@SuppressWarnings("unchecked")
 	private void attachCovers() throws IOException, SQLException
 	{
+		this.addNote("<strong>COVERS</strong>");
+		
 		this.listImages = this.findFile.getListFilesExist(this.sourcePath,this.listImages);
 		if(this.listImages.size() > 0)
 		{
@@ -172,10 +178,13 @@ public class EcontentAttachments implements IProcessHandler
 					this.fileUtils.copyFilesByPath(absolutePath, this.originalFolder + "/" + nameFileToAttach);
 					this.dbEcontentRecordServices.updateEcontentCover(record.get(0), nameFileToAttach);
 					this.numCovers++; //Not Testing Mode
+					
+					this.addNote("Attached cover : " + nameFileToAttach);
+					this.updateLogEntry();
 				}
 			}
 		}
-		this.addNote("<strong>COVERS</strong>");
+		
 		this.addNote("Number of covers attached: " + this.numCovers);
 	}
 	
@@ -184,11 +193,14 @@ public class EcontentAttachments implements IProcessHandler
 	{
 		dclFileutils = new org.dcl.Utils.FileUtils();
 		this.listEpubPdf = this.findFile.getListFilesExist(this.sourcePath,this.listEpubPdf);
+		
 		if(this.listEpubPdf.size() > 0)
 		{
 			for(int z=0; z < this.listEpubPdf.size(); z++)
 			{
+		
 				ArrayList<Object> object = this.listEpubPdf.get(z);
+				
 				if(object.get(2) instanceof File)
 				{
 					File fileToAttach = (File) object.get(2);

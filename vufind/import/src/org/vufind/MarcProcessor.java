@@ -227,7 +227,7 @@ public class MarcProcessor {
 		}
 
 		// Load ratings for print and eContent titles
-/*		logger.info("Loading ratings");
+		logger.info("Loading ratings");
 		try {
 			PreparedStatement printRatingsStmt = vufindConn
 					.prepareStatement(
@@ -251,7 +251,7 @@ public class MarcProcessor {
 			logger.error("Unable to load ratings for resource", e);
 			return false;
 		}
-*/
+
 		// Load information from library table
 		try {
 			PreparedStatement librarySystemFacetStmt = vufindConn.prepareStatement("SELECT libraryId, facetLabel, eContentLinkRules from library");

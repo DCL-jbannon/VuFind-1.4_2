@@ -30,5 +30,15 @@ if(!isset($_GET['method']))
 }
 
 $config = parse_ini_file(dirname(__FILE__).'/../../sites/dcl.localhost/conf/monitor.ini', true);
+
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+{
+   $config['System']['operatingSystem'] == 'windows'
+}
+else
+{
+   $config['System']['operatingSystem'] == 'linux';
+
+}
 $configArray = $config;
 ?>
