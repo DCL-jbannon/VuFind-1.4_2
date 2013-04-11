@@ -9,14 +9,7 @@ class OverDriveMonitorTests extends BaseMonitorTests
 	{	
 		global $configArray;
 		parent::setUp();
-		$this->service = new OverDriveMonitor($this->config['OverDriveAPI']['clientKey'], 
-											  $this->config['OverDriveAPI']['clientSecret'], 
-											  $this->config['OverDriveAPI']['libraryId'],
-											  $this->config['OverDriveAPI']['itemId'],
-											  $this->config['OverDrive']['url'],
-											  $this->config['OverDrive']['theme'],
-											  $this->config['OverDrive']['LibraryCardILS'],
-											  $this->config['OverDrive']['baseSecureUrl']);
+		$this->service = new OverDriveMonitor("5d591878-2f9a-44e2-a6c7-d5655a0fc718");
 	}
 	
 	public function tearDown()
