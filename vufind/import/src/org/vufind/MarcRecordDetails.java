@@ -185,7 +185,7 @@ public class MarcRecordDetails {
 
 	public void loadUrls() {
 		if (urlsLoaded) return;
-		logger.info("Loading urls from 856 field");
+		logger.debug("Loading urls from 856 field");
 		@SuppressWarnings("unchecked")
 		List<VariableField> eightFiftySixFields = record.getVariableFields("856");
 		for (VariableField eightFiftySixField : eightFiftySixFields) {
@@ -231,10 +231,10 @@ public class MarcRecordDetails {
 				} else if (url.matches("(?i).*?(idm.oclc.org/login|ezproxy).*?")) {
 					isSourceUrl = true;
 				} else {
-					logger.info("Unknown URL " + url + " " + text);
+					logger.debug("Unknown URL " + url + " " + text);
 				}
 				if (isSourceUrl){
-					System.out.println("Found source url");
+					logger.debug("Found source url");
 					boolean addedUrl = false;
 					long libraryId = marcProcessor.getLibraryIdForLink(url);
 					if (libraryId == -1){

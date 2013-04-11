@@ -101,8 +101,7 @@ public class MarcIndexer implements IMarcRecordProcessor, IRecordProcessor {
 				results.incSkipped();
 				return true;
 			}
-			
-			
+
 			if (!recordInfo.isEContent()){
 				//Create the XML document for the record
 				try {
@@ -112,19 +111,6 @@ public class MarcIndexer implements IMarcRecordProcessor, IRecordProcessor {
 						//Post to the Solr instance
 						updateServer.add(doc);
 						results.incAdded();
-						/*URLPostResponse response = Util.postToURL("http://localhost:" + solrPort + "/solr/biblio2/update/", xmlDoc, logger);
-						if (response.isSuccess()){
-							if (recordStatus == MarcProcessor.RECORD_NEW){
-								results.incAdded();
-							}else{
-								results.incUpdated();
-							}
-							return true;
-						}else{
-							results.incErrors();
-							results.addNote(response.getMessage());
-							return false;
-						}*/
 						return true;
 					}else{
 						results.incErrors();
@@ -136,7 +122,7 @@ public class MarcIndexer implements IMarcRecordProcessor, IRecordProcessor {
 					return false;
 				}
 			}else{
-				logger.info("Skipping record because it is eContent");
+				logger.debug("Skipping record because it is eContent");
 				results.incSkipped();
 				return false;
 			}

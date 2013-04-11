@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
 import dbTests.DBeContentRecordServicesTests;
 import solr.SolrUtilsTests;
 import solr.SolrWrapperTests;
+import utils.ActiveEcontentUtilsTests;
 import api.OverDrive.OverDriveAPIServicesTests;
 import api.OverDrive.OverDriveAPITests;
 import api.OverDrive.OverDriveAPIUtilsTests;
@@ -26,7 +27,8 @@ import api.OverDrive.OverDriveCollectionIteratorTests;
 		SolrWrapperTests.class,
 		DBeContentRecordServicesTests.class,
 		SolrUtilsTests.class,
-		PopulateSolrOverDriveAPIItemsTests.class
+		PopulateSolrOverDriveAPIItemsTests.class,
+		ActiveEcontentUtilsTests.class
 })
 
 public class AllTests 

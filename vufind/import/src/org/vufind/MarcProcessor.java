@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dcl.utils.ActiveEcontentUtils;
 import org.econtent.DetectionSettings;
 import org.ini4j.Ini;
 import org.marc4j.MarcPermissiveStreamReader;
@@ -226,7 +227,7 @@ public class MarcProcessor {
 		}
 
 		// Load ratings for print and eContent titles
-		logger.info("Loading ratings");
+/*		logger.info("Loading ratings");
 		try {
 			PreparedStatement printRatingsStmt = vufindConn
 					.prepareStatement(
@@ -250,7 +251,7 @@ public class MarcProcessor {
 			logger.error("Unable to load ratings for resource", e);
 			return false;
 		}
-
+*/
 		// Load information from library table
 		try {
 			PreparedStatement librarySystemFacetStmt = vufindConn.prepareStatement("SELECT libraryId, facetLabel, eContentLinkRules from library");
@@ -573,7 +574,7 @@ public class MarcProcessor {
 				marcFiles = new File[] { marcRecordDirectory };
 			}
 
-			if (marcFiles.length > 0) {
+			/*if (marcFiles.length > 0) {
 				// Truncate the active_econtent_records table
 				try {
 					results.addNote("Truncating the active_econtent_records table");
@@ -586,7 +587,7 @@ public class MarcProcessor {
 					results.saveResults();
 					System.exit(0);
 				}
-			}
+			}*/
 
 			// Loop through each marc record
 			boolean useThreads = false;
@@ -682,14 +683,14 @@ public class MarcProcessor {
 							logger.debug("Record is new");
 							recordStatus = RECORD_NEW;
 						}
-
+						
 						for (IMarcRecordProcessor processor : recordProcessors) {
 							// System.out.println("Running processor " +
 							// processor.getClass().getName());
 							logger.debug(recordNumber + " - " + processor.getClass().getName() + " - " + marcInfo.getId());
 							processor.processMarcRecord(this, marcInfo, recordStatus, logger);
 						}
-
+						//logger.info("Adding print title to mysql");
 						// Update the checksum in the database
 						if (recordStatus == RECORD_CHANGED) {
 							updateMarcInfoStmt.setLong(1, marcInfo.getChecksum());
@@ -812,9 +813,9 @@ public class MarcProcessor {
 		ArrayList<String> ids = new ArrayList<String>();
 		try {
 			PreparedStatement inActiveEContentRecordsStmt = econtentConn.prepareStatement(
-				"SELECT DISTINCT e.id FROM econtent_record e " +
-				"WHERE e.status='active' AND e.source <> 'Freegal' AND e.source <> 'OverDriveAPI' AND e.ilsId IS NOT NULL AND e.ilsId <> ' ' AND e.ilsId <> '' AND NOT EXISTS " +
-				"(SELECT 1 FROM active_econtent_records a WHERE a.ilsId=e.ilsId)"
+				"SELECT id FROM econtent_record WHERE " +
+				"status='active' AND source <> 'Freegal' AND source <> 'OverDriveAPI' AND ilsId IS NOT NULL AND ilsId <> ' ' AND ilsId <> '' " +
+				"AND ilsId NOT IN(" + ActiveEcontentUtils.getCommaSeparatedString() + ")"
 			);
 			ResultSet inActiveEContentRecords = inActiveEContentRecordsStmt.executeQuery();
 			while (inActiveEContentRecords.next()) {
