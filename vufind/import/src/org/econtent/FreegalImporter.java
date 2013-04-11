@@ -33,6 +33,8 @@ public class FreegalImporter implements IRecordProcessor {
 		try {
 			EContentRecordDAO dao = EContentRecordDAO.getInstance();
 			Collection<String> genres = freegalAPI.getAllGenres();
+			logger.info("Freegal Gender Number: " + genres.size());
+			
 			for (String genre : genres) {
 				Collection<Album> albums = freegalAPI.getAlbums(genre);
 				for (Album album : albums) {

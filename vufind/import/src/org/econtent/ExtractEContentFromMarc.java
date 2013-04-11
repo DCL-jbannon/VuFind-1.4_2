@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.dcl.utils.ActiveEcontentUtils;
 import org.econtent.GutenbergItemInfo;
 import org.ini4j.Ini;
 import org.vufind.MarcRecordDetails;
@@ -115,12 +116,23 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 	
 	@Override
 	public boolean processMarcRecord(MarcProcessor marcProcessor, MarcRecordDetails recordInfo, int recordStatus, Logger logger) {
+		
+		
 		try {
 			//Check the 856 tag to see if this is a source that we can handle. 
 			results.incRecordsProcessed();
 			if (!recordInfo.isEContent()){
 				logger.debug("Skipping record, it is not eContent");
 				results.incSkipped();
+				return false;
+			}
+
+			String ilsIdToActiveEcontent = recordInfo.getId();
+			ActiveEcontentUtils.addActiveEcontent(ilsIdToActiveEcontent);
+			
+			if(recordStatus == MarcProcessor.RECORD_UNCHANGED)
+			{
+				logger.info("Skipping eContent record because has not changed. Size Active Records: " + ActiveEcontentUtils.getList().size());
 				return false;
 			}
 			
@@ -177,17 +189,24 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 						//Add to database
 						importRecordIntoDatabase = true;
 					}
-					createActiveEContentRecord.setString(1, ilsId);
+					/*createActiveEContentRecord.setString(1, ilsId);
 					int rowsInserted = createActiveEContentRecord.executeUpdate();
 					if (rowsInserted != 1){
 						String error = "Could not insert record with ilsId=" + ilsId + " into active_econtent_records table.";
 						logger.error(error);
 						results.incErrors();
 						results.addNote(error);
-					}
-				}
+					}*/
+				}		
+				
+				
 				
 				boolean recordAdded = false;
+				
+				//logger.info("ECONTENT: " + recordStatus + " " +ilsId);
+				
+				
+				logger.info("ADDING/UPDATING ECONTENT: " + recordStatus + " " +ilsId);
 				if (importRecordIntoDatabase){
 					//Add to database
 					//logger.info("Adding ils id " + ilsId + " to the database.");
@@ -284,7 +303,7 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 					}
 				}
 				
-				logger.info("Finished initial insertion/update recordAdded = " + recordAdded);
+				logger.debug("Finished initial insertion/update recordAdded = " + recordAdded);
 				
 				if (recordAdded){
 					if (source.equalsIgnoreCase("gutenberg")){
@@ -295,9 +314,9 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 						//Automatically setup 856 links as external links
 						setupExternalLinks(recordInfo, eContentRecordId, detectionSettings, logger);
 					}
-					logger.info("Record processed successfully.");
+					logger.debug("Record processed successfully.");
 				}else{
-					logger.info("Record NOT processed successfully.");
+					logger.debug("Record NOT processed successfully.");
 				}
 			}
 			
@@ -339,7 +358,7 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 		
 		//Add the links that are currently available for the record
 		ArrayList<LibrarySpecificLink> sourceUrls = recordInfo.getSourceUrls();
-		logger.info("Found " + sourceUrls.size() + " urls for " + recordInfo.getId());
+		logger.debug("Found " + sourceUrls.size() + " urls for " + recordInfo.getId());
 		for (LibrarySpecificLink curLink : sourceUrls){
 			//Look for an existing link
 			LinkInfo linkForSourceUrl = null;
@@ -403,7 +422,7 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 	
 	private void setupOverDriveItems(MarcRecordDetails recordInfo, long eContentRecordId, DetectionSettings detectionSettings, Logger logger){
 		ArrayList<LibrarySpecificLink> sourceUrls = recordInfo.getSourceUrls();
-		logger.info("Found " + sourceUrls.size() + " urls for overdrive id " + recordInfo.getId());
+		logger.debug("Found " + sourceUrls.size() + " urls for overdrive id " + recordInfo.getId());
 		//Check the items within the record to see if there are any location specific links
 		for(LibrarySpecificLink link : recordInfo.getSourceUrls()){
 			addOverdriveItem(link.getUrl(), link.getLibrarySystemId(), eContentRecordId, detectionSettings, logger);
@@ -422,7 +441,7 @@ public class ExtractEContentFromMarc implements IMarcRecordProcessor, IRecordPro
 			logger.debug(sourceUrl + " was not a link to overdrive content");
 			return;
 		}
-		logger.info("Found overDrive url\r\n" + sourceUrl + "\r\nlibraryId: " + libraryId + "  overDriveId: " + overDriveId);
+		logger.debug("Found overDrive url\r\n" + sourceUrl + "\r\nlibraryId: " + libraryId + "  overDriveId: " + overDriveId);
 
 		try {
 			doesOverDriveIdExist.setLong(1, eContentRecordId);
