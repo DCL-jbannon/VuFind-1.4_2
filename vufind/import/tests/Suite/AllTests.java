@@ -4,13 +4,14 @@ package Suite;
  * http://www.mkyong.com/unittest/junit-4-tutorial-5-suite-test/
  */
 
+import org.dcl.utils.ActiveEcontentUtils;
 import org.econtent.PopulateSolrOverDriveAPIItemsTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import dbTests.DBeContentRecordServicesTests;
+import dcl.utils.ActiveEcontentUtilsTests;
 import solr.SolrUtilsTests;
 import solr.SolrWrapperTests;
-import utils.ActiveEcontentUtilsTests;
 import api.OverDrive.OverDriveAPIServicesTests;
 import api.OverDrive.OverDriveAPITests;
 import api.OverDrive.OverDriveAPIUtilsTests;
