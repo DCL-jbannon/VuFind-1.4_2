@@ -230,7 +230,8 @@ class AJAX extends Action {
 
 		$titles = array();
 		foreach ($listTitles as $title){
-			if ($title->source == 'VuFind'){
+			if (preg_match("/^VuFind$/i", $title->source))
+			{
 				$upc = $title->upc;
 				$formatCategory = $title->format_category;
 			
