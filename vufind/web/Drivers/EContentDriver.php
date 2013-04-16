@@ -669,16 +669,15 @@ public function getStatusSummaries($ids){
 				if($eContentRecord !== false) //The item is not as part of our Marc Record Collection
 				{
 					$details = EcontentDetailsFactory::get($eContentRecord);
-					$daysUntilDue = (strtotime($item->EventEndDateInUTC) - strtotime($item->EventStartDateInUTC)) / (24 * 60 * 60);
-					
+					$daysUntilDue = (strtotime($item->EventEndDateInUTC) - strtotime($item->EventStartDateInUTC)) / (24 * 60 * 60);		
 					$return['transactions'][] = array(
 							'id' => $eContentRecord->id,
 							'recordId' => 'econtentRecord' . $eContentRecord->id,
 							'source' => $eContentRecord->source,
 							'title' => $eContentRecord->title,
 							'author' => $eContentRecord->author,
-							'duedate' => $item->EventEndDateInUTC,
-							'checkoutdate' => $item->EventStartDateInUTC,
+							'duedate' => strtotime($item->EventEndDateInUTC),
+							'checkoutdate' => strtotime($item->EventStartDateInUTC),
 							'daysUntilDue' => $daysUntilDue,
 							'holdQueueLength' => $details->getHoldLength(),
 							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
@@ -686,7 +685,7 @@ public function getStatusSummaries($ids){
 				}
 			}
 		}
-		
+
 		//OverDrive
 		$username = $user->getUsername();
 		$overDriveAPIServ = new OverDriveServicesAPI();
@@ -715,7 +714,7 @@ public function getStatusSummaries($ids){
 							'source' => $eContentRecord->source,
 							'title' => $eContentRecord->title,
 							'author' => $eContentRecord->author,
-							'duedate' => $item['Expires'],
+							'duedate' => strtotime($item['Expires']),
 							'checkoutdate' => '',
 							'daysUntilDue' => $daysUntilDue,
 							'holdQueueLength' => $details->getHoldLength(),

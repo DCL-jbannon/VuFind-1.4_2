@@ -39,6 +39,7 @@ class EContentCheckedOut extends MyResearch
 				PEAR::raiseError($patron);
 
 				$patronResult = $this->catalog->getMyProfile($patron);
+
 				if (!PEAR::isError($patronResult))
 				{
 					$interface->assign('profile', $patronResult);

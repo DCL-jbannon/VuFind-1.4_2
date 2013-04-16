@@ -228,7 +228,11 @@ public class UpdateReadingHistory implements IProcessHandler {
 								continue;
 							}else{
 								// Update the reading history
-								Date checkoutDate = new Date(new Long(checkoutDateStr));
+								long checkoutDate = 0;
+								if(!checkoutDateStr.isEmpty())
+								{
+									checkoutDate = new Date(new Long(checkoutDateStr)).getTime();
+								}
 								updateReadingHistory(userId, "econtentRecord" + bibId, resourceId, checkoutDate);
 							}
 						}
@@ -299,7 +303,13 @@ public class UpdateReadingHistory implements IProcessHandler {
 		}
 	}
 	
-	private void updateReadingHistory(Long userId, String bibId, long resourceId, Date checkoutDate) throws SQLException, IOException {
+	private void updateReadingHistory(Long userId, String bibId, long resourceId, Date checkoutDate) throws SQLException, IOException
+	{
+		long timeCheckOut = checkoutDate.getTime();
+		updateReadingHistory(userId, bibId, resourceId, timeCheckOut);
+	}
+	
+	private void updateReadingHistory(Long userId, String bibId, long resourceId, long timeCheckOut) throws SQLException, IOException {
 		readingHistoryStatement.setLong(1, userId);
 		readingHistoryStatement.setLong(2, resourceId);
 		ResultSet readingHistoryResult = readingHistoryStatement.executeQuery();
@@ -332,7 +342,13 @@ public class UpdateReadingHistory implements IProcessHandler {
 			insertReadingHistoryStmt.setLong(1, userId);
 			insertReadingHistoryStmt.setLong(2, resourceId);
 			insertReadingHistoryStmt.setDate(3, new java.sql.Date(currentDate.getTime()));
-			insertReadingHistoryStmt.setDate(4, new java.sql.Date(checkoutDate.getTime()));
+			
+			if(timeCheckOut == 0)
+			{
+				timeCheckOut = currentDate.getTime();
+			}
+			
+			insertReadingHistoryStmt.setDate(4, new java.sql.Date(timeCheckOut));
 			int updateOk = insertReadingHistoryStmt.executeUpdate();
 			if (updateOk != 1) {
 				logger.error("Failed to add item to reading history");
@@ -340,7 +356,7 @@ public class UpdateReadingHistory implements IProcessHandler {
 			// Make a call to strands to indicate that the item was
 			// checked out.
 			if (strandsApid != null && strandsApid.length() > 0) {
-				String orderid = userId + "_" + (checkoutDate.getTime() / 1000);
+				String orderid = userId + "_" + (timeCheckOut / 1000);
 				//Need to send bibid rather than resource id to strands
 				String url = "http://bizsolutions.strands.com/api2/event/purchased.sbs?needresult=true&apid=" + strandsApid + "&item=" + bibId + "::0.00::1&user=" + userId + "&orderid=" + orderid;
 				logger.debug("Calling strands " + url);
