@@ -44,7 +44,7 @@ public class OverDriveAPIWrapperTests {
 	 * when calledTwice
 	 * should returnCorrectLoginInfo
 	 * @throws Exception 
-	 * The problem was that the response var was append the results if you called more than one time a method of this class.
+	 * The problem was that the response var was appending the results if you called more than one time a method of this class.
 	 */
 	@Test
 	public void test_login_calledTwice_returnCorrectLoginInfo() throws Exception

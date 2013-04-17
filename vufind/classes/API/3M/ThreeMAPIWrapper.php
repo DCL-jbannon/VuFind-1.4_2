@@ -195,9 +195,9 @@ class ThreeMAPIWrapper implements IThreeMAPIWrapper
 	private function exec()
 	{
 		$result = curl_exec($this->ch);	
-		//var_dump($result);
+		//var_dump($result);die();
 		$this->closeChannel();
-		return simplexml_load_string($result);
+		return @simplexml_load_string($result);
 	}
 	
 	private function execReturnHttpCode()

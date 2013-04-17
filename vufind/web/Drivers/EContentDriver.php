@@ -658,7 +658,15 @@ public function getStatusSummaries($ids){
 
 		//3M
 		$threeMAPI = new ThreeMAPI();
-		$results = $threeMAPI->getPatronCirculation($user->getBarcode());
+		try
+		{
+			$results = $threeMAPI->getPatronCirculation($user->getBarcode());
+		}
+		catch(Exception $e)
+		{
+			$results = false;
+		}
+
 		if ($results !== false)
 		{
 			foreach ($results->Checkouts[0] as $item)
@@ -670,18 +678,26 @@ public function getStatusSummaries($ids){
 				{
 					$details = EcontentDetailsFactory::get($eContentRecord);
 					$daysUntilDue = (strtotime($item->EventEndDateInUTC) - strtotime($item->EventStartDateInUTC)) / (24 * 60 * 60);		
-					$return['transactions'][] = array(
-							'id' => $eContentRecord->id,
-							'recordId' => 'econtentRecord' . $eContentRecord->id,
-							'source' => $eContentRecord->source,
-							'title' => $eContentRecord->title,
-							'author' => $eContentRecord->author,
-							'duedate' => strtotime($item->EventEndDateInUTC),
-							'checkoutdate' => strtotime($item->EventStartDateInUTC),
-							'daysUntilDue' => $daysUntilDue,
-							'holdQueueLength' => $details->getHoldLength(),
-							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
-					);
+					
+					try
+					{
+						$return['transactions'][] = array(
+								'id' => $eContentRecord->id,
+								'recordId' => 'econtentRecord' . $eContentRecord->id,
+								'source' => $eContentRecord->source,
+								'title' => $eContentRecord->title,
+								'author' => $eContentRecord->author,
+								'duedate' => strtotime($item->EventEndDateInUTC),
+								'checkoutdate' => strtotime($item->EventStartDateInUTC),
+								'daysUntilDue' => $daysUntilDue,
+								'holdQueueLength' => $details->getHoldLength(),
+								'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
+						);
+					}
+					catch(Exception $e)
+					{
+						//Do nothing
+					}
 				}
 			}
 		}

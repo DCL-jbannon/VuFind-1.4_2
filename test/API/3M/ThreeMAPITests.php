@@ -23,6 +23,17 @@ class ThreeMAPITests extends PHPUnit_Framework_TestCase
 		parent::setUp();		
 	}
 
+	/**
+	 * method getItemDetails
+	 * when wrapperReturnFalse
+	 * should executesCorrectly
+	 * @expectedException DomainException
+	 */
+	public function test_getItemDetails_wrapperReturnFalse_executesCorrectly()
+	{
+		$this->prepareWrapperCallWithItemId("getItemDetails", false);
+		$actual = $this->service->getItemDetails(self::itemId);
+	}
 	
 	/**
 	* method getItemDetails 
@@ -38,6 +49,18 @@ class ThreeMAPITests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 	
+	/**
+	 * method getItemsDetails
+	 * when wrapperReturnFalse
+	 * should executesCorrectly
+	 * @expectedException DomainException
+	 */
+	public function test_getItemsDetails_wrapperReturnFalse_executesCorrectly()
+	{
+		$itemsId = "aDummyId1,aDummyId2,aDummyId3";
+		$this->prepareWrapperCallWithItemId("getItemsDetails", false, $itemsId);
+		$actual = $this->service->getItemsDetails($itemsId);
+	}
 
 	/**
 	* method getItemsDetails 
@@ -166,6 +189,18 @@ class ThreeMAPITests extends PHPUnit_Framework_TestCase
 		$this->assertTrue($actual);
 	}
 	
+	/**
+	 * method getItemCirculation
+	 * when wrapperReturnFalse
+	 * should returnResults
+	 * @expectedException DomainException
+	 */
+	public function test_getItemCirculation_wrapperReturnFalse_returnResults()
+	{
+		$this->prepareWrapperCallWithItemId("getItemCirculation", false);
+		$actual = $this->service->getItemCirculation(self::itemId);
+		$this->assertFalse($actual);
+	}
 	
 	/**
 	 * method getItemCirculation
@@ -193,6 +228,20 @@ class ThreeMAPITests extends PHPUnit_Framework_TestCase
 		
 		$actual = $this->service->getItemCirculation(self::itemId);
 		$this->assertEquals($expected, $actual);
+	}
+	
+	/**
+	 * method getItemsCirculation
+	 * when wrapperReturnFalse
+	 * should returnFalse
+	 * @expectedException DomainException
+	 */
+	public function test_getItemsCirculation_wrapperReturnFalse_returnFalse()
+	{
+		$itemsId = "aDummyItemId1,aDummyItemId2";
+		$this->prepareWrapperCallWithItemId("getItemsCirculation", false, $itemsId);
+		$actual = $this->service->getItemsCirculation($itemsId);
+		$this->assertFalse($actual);
 	}
 	
 	/**

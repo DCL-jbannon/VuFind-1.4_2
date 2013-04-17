@@ -18,7 +18,14 @@ class EcontentDetailsFactory
 			
 		if($econtentRecord->is3M())
 		{
-			return new ThreemRecordDetails($econtentRecord);
+			try
+			{
+				return new ThreemRecordDetails($econtentRecord);
+			}
+			catch(Exception $e)
+			{
+				return false;
+			}
 		}
 		if($econtentRecord->isOverDrive())
 		{

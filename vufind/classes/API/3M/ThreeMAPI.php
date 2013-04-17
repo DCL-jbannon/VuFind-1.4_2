@@ -71,6 +71,11 @@ class ThreeMAPI implements IThreeMAPI
 	
 	private function checkResultForErrorMessage($result)
 	{
+		if($result === false)
+		{
+			throw new DomainException("The xml from 3M API it is not well formed");
+		}
+		
 		$name = (string)$result->getName();
 		if($name == "Error")
 		{
