@@ -1,3 +1,35 @@
+
+$(document).ready(function() {
+  
+	$("#showGoodReadReviews").click(function(){
+		showHideGRR("show");
+	});
+  
+	$("#hideGoodReadReviews").click(function(){
+		showHideGRR("hide");
+	});
+
+});
+
+/**
+ * Show / Hide Good Reads Review. Used in view.tpl at Record and EContentRecord
+ */
+function showHideGRR(action)
+{
+	if(action == 'show')
+	{
+		$("#showGoodReadReviews").hide();
+		$("#iframeGoodReadsReviews").show(500);
+		$("#hideGoodReadReviews").show();
+	}
+	else
+	{
+		$("#iframeGoodReadsReviews").hide(500);
+		$("#showGoodReadReviews").show();
+		$("#hideGoodReadReviews").hide();
+	}
+}
+
 function getNotificationId()
 {
 	if($("#nologinRR"))

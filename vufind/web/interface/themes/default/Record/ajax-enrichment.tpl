@@ -23,3 +23,4 @@
   {/foreach}
 {/if}]]></SimilarTitles>
 <ShowGoDeeperData>{$showGoDeeper}</ShowGoDeeperData>
+<GoodReadReviewsUrl><![CDATA[{$goodReadReviewUrl}]]></GoodReadReviewsUrl>

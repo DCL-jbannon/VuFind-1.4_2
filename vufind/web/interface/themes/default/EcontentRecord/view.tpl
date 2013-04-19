@@ -6,7 +6,7 @@
 {literal}$(document).ready(function(){{/literal}
 	GetEContentHoldingsInfo('{$id|escape:"url"}');
 	{if $isbn || $upc}
-    GetEnrichmentInfoEContent('{$id|escape:"url"}', '0439136350', '{$upc|escape:"url"}');
+    GetEnrichmentInfoEContent('{$id|escape:"url"}', {$isbn}, '{$upc|escape:"url"}');
   {/if}
   {if $isbn && ($showComments || $showAmazonReviews || $showStandardReviews)}
     GetReviewInfo('{$id|escape:"url"}', '{$isbn|escape:"url"}');
@@ -599,6 +599,18 @@ function redrawSaveStatus() {literal}{{/literal}
 						<div id="chili_review_{$issn}" style="display:none" align="center" width="100%"></div>
 						{/if}
 					{/if}
+					
+					{* Good Reads Reviews *}
+					<div id='goodReadsReviews' style='display:none;'>
+						<h2>Good Reads Reviews</h2>
+						<div id='showGoodReadReviews' style='display:block;cursor:pointer;' class='add'>
+							<h3>Show Reviews</h3>
+						</div>
+						<div id='hideGoodReadReviews' style='display:none;cursor:pointer;' class='delete'>
+							<h3>Hide Reviews</h3>
+						</div>
+						<div id='iframeGoodReadsReviews' style='display:none;'></div>
+					</div>
         </div>
       {/if}
       

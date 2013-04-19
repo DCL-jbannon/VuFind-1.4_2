@@ -29,6 +29,11 @@ require_once dirname(__FILE__).'/API/Server/DTO/RecordDTOTests.php';
 /** SirsiDynix API RELATED **/
 require_once dirname(__FILE__).'/API/SirsiDynix/SisriDynixAPIWrapperTests.php';
 
+
+/** Novelist API RELATED **/
+require_once dirname(__FILE__).'/API/Novelist/NovelistWrapperTests.php';
+require_once dirname(__FILE__).'/API/Novelist/NovelistServicesTests.php';
+
 class SuiteAPIsTests
 {
 	public static function suite()
@@ -59,6 +64,14 @@ class SuiteAPIsTests
 		$suite->addTestSuite('ServerAPIRebusListServicesTests');
 		$suite->addTestSuite('ServerAPIItemServicesTests');
 		$suite->addTestSuite('ServerAPISearchServicesTests');
+		
+		/** SirsiDynix API RELATED **/
+		$suite->addTestSuite('SisriDynixAPIWrapperTests');
+		
+		/** Novelist API RELATED **/
+		$suite->addTestSuite('NovelistWrapperTests');
+		$suite->addTestSuite('NovelistServicesTests');
+		
 		return $suite;
 	}
 }

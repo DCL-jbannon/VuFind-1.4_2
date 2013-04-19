@@ -489,7 +489,7 @@ function redrawSaveStatus() {literal}{{/literal}
           
 					{* Chili Fresh Reviews *}
 					{if $chiliFreshAccount && ($isbn || $upc || $issn)}
-						<h4>Chili Fresh Reviews</h4>
+						<h2>Chili Fresh Reviews</h2>
 						{if $isbn}
 						<div class="chili_review" id="isbn_{$isbn10}"></div>
 						<div id="chili_review_{$isbn10}" style="display:none" align="center" width="100%"></div>
@@ -501,6 +501,18 @@ function redrawSaveStatus() {literal}{{/literal}
 						<div id="chili_review_{$issn}" style="display:none" align="center" width="100%"></div>
 						{/if}
 					{/if}
+					
+					{* Good Reads Reviews *}
+					<div id='goodReadsReviews' style='display:none;'>
+						<h2>Good Reads Reviews</h2>
+						<div id='showGoodReadReviews' style='display:block;cursor:pointer;' class='add'>
+							<h3>Show Reviews</h3>
+						</div>
+						<div id='hideGoodReadReviews' style='display:none;cursor:pointer;' class='delete'>
+							<h3>Hide Reviews</h3>
+						</div>
+						<div id='iframeGoodReadsReviews' style='display:none;'></div>
+					</div>
         </div>
       {/if}
       

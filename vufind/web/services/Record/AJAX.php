@@ -21,6 +21,8 @@
 require_once 'Action.php';
 require_once 'sys/Proxy_Request.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
+require_once('Drivers/marmot_inc/GoDeeperData.php');
+require_once dirname(__FILE__).'/../../../classes/API/Novelist/NovelistServices.php';
 
 global $configArray;
 
@@ -372,10 +374,12 @@ class AJAX extends Action {
 
 	}
 
-	function GetEnrichmentInfo(){
+	function GetEnrichmentInfo()
+	{
 		require_once 'Enrichment.php';
 		global $configArray;
 		$isbn = $_REQUEST['isbn'];
+		$isbnRequest = $_REQUEST['isbn'];
 		$upc = $_REQUEST['upc'];
 		$id = $_REQUEST['id'];
 		$enrichmentData = Enrichment::loadEnrichment($isbn);
@@ -454,8 +458,11 @@ class AJAX extends Action {
 			$interface->assign('seriesInfo', json_encode($seriesInfo));
 		}
 
+		//Get GoodReads Reviews Url
+		$novelistServices = new NovelistServices();
+		$interface->assign('goodReadReviewUrl', $novelistServices->getGoodReadsReviewsURL($isbnRequest));
+		
 		//Load go deeper options
-		require_once('Drivers/marmot_inc/GoDeeperData.php');
 		$goDeeperOptions = GoDeeperData::getGoDeeperOptions($isbn, $upc);
 		if (count($goDeeperOptions['options']) == 0){
 			$interface->assign('showGoDeeper', false);

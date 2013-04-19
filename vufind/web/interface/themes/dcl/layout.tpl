@@ -42,7 +42,7 @@
 	    <script type="text/javascript" src="{$path}/js/jquery-1.7.1.min.js"></script>
 	    <script type="text/javascript" src="{$path}/js/jqueryui/jquery-ui-1.8.18.custom.min.js"></script>
 	    <script type="text/javascript" src="{$path}/js/jquery.plugins.js"></script>
-        <script type="text/javascript" src="{$path}/js/scripts.js?t=01312013"></script>
+        <script type="text/javascript" src="{$path}/js/scripts.js?t=04182013"></script>
 	    
 	    {if $enableBookCart}
 	    <script type="text/javascript" src="{$path}/js/bookcart/json2.js"></script>

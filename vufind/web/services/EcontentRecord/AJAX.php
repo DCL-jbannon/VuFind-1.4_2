@@ -6,6 +6,7 @@ require_once dirname(__FILE__).'/../../../classes/Utils/DateTimeUtils.php';
 require_once dirname(__FILE__).'/../../../classes/Utils/NotificationUtils.php';
 require_once 'sys/Notification/NotificationSent.php';
 require_once dirname(__FILE__).'/../../../classes/econtentBySource/EcontentDetailsFactory.php';
+require_once dirname(__FILE__).'/../../../classes/API/Novelist/NovelistServices.php';
 
 global $configArray;
 
@@ -574,6 +575,7 @@ function GetProspectorInfo(){
 		require_once 'Enrichment.php';
 		global $configArray;
 		$isbn = $_REQUEST['isbn'];
+		$isbnRequest = $_REQUEST['isbn'];
 		$upc = $_REQUEST['upc'];
 		$id = $_REQUEST['id'];
 		$enrichmentData = Enrichment::loadEnrichment($isbn);
@@ -633,17 +635,21 @@ function GetProspectorInfo(){
 			$seriesInfo = array('titles' => $titles, 'currentIndex' => $enrichmentData['novelist']['seriesDefaultIndex']);
 					$interface->assign('seriesInfo', json_encode($seriesInfo));
 		}
+		
+		//Get GoodReads Reviews Url
+		$novelistServices = new NovelistServices();
+		$interface->assign('goodReadReviewUrl', $novelistServices->getGoodReadsReviewsURL($isbnRequest));
 	
 		//Load go deeper options
-				require_once('Drivers/marmot_inc/GoDeeperData.php');
-				$goDeeperOptions = GoDeeperData::getGoDeeperOptions($isbn, $upc);
-				if (count($goDeeperOptions['options']) == 0){
-				$interface->assign('showGoDeeper', false);
-				}else{
-				$interface->assign('showGoDeeper', true);
-				}
-	
-				return $interface->fetch('EcontentRecord/ajax-enrichment.tpl');
+		require_once('Drivers/marmot_inc/GoDeeperData.php');
+		$goDeeperOptions = GoDeeperData::getGoDeeperOptions($isbn, $upc);
+		if (count($goDeeperOptions['options']) == 0){
+		$interface->assign('showGoDeeper', false);
+		}else{
+		$interface->assign('showGoDeeper', true);
+		}
+
+		return $interface->fetch('EcontentRecord/ajax-enrichment.tpl');
 	}	
 	
 }

@@ -11,7 +11,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	//private $base3MUrl = "http://localhost:9090";
 	private $base3MUrl = "https://cloudlibraryapi.3m.com";
 	private $service;
-	private $itemId = "ff7z9";
+	private $itemId = "beup89";
 	private $itemPlaceHoldId = "frur9";
 	private $itemIdCanNOTCHECK = "keng9";
 	
@@ -100,6 +100,33 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, (string)$actual->getName());
 	}
 	
+	/**
+	 * method getItemCirculation
+	 * when doesNotExists
+	 * should returnErrorMessage
+	 */
+	public function test_getItemCirculationa_doesNotExists_executesCorrectly()
+	{
+		$expected = "Error";
+		$actual = $this->service->getItemCirculation("IdDoesNotExists");
+		$this->assertEquals($expected, (string)$actual->getName());
+	}
+	
+	/**
+	 * method getItemCirculation
+	 * when called
+	 * should executesCorrectly
+	 */
+	public function test_getItemCirculation_called_executesCorrectly()
+	{
+		$expected = $this->itemId;
+		$actual = $this->service->getItemCirculation($expected);
+		$this->assertEquals($expected, (string)$actual->ItemId);
+	
+		$this->assertTrue(isset($actual->TotalCopies), "TotalCopies property");
+		$this->assertTrue(isset($actual->AvailableCopies), "AvailableCopies property");
+	}
+	
 	
 	/**
 	 * method checkin
@@ -165,31 +192,7 @@ class ThreeMAPIWrapperTests extends PHPUnit_Framework_TestCase
 	}
 	
 	
-	/**
-	 * method getItemCirculation
-	 * when doesNotExists
-	 * should returnErrorMessage
-	 */
-	public function test_getItemCirculationa_doesNotExists_executesCorrectly()
-	{
-		$expected = "Error";
-		$actual = $this->service->getItemCirculation("IdDoesNotExists");
-		$this->assertEquals($expected, (string)$actual->getName());
-	}
 	
-	/**
-	* method getItemCirculation 
-	* when called
-	* should executesCorrectly
-	*/
-	public function test_getItemCirculation_called_executesCorrectly()
-	{
-		$expected = $this->itemId;
-		$actual = $this->service->getItemCirculation($expected);
-		$this->assertEquals($expected, (string)$actual->ItemId);
-		$this->assertTrue(isset($actual->TotalCopies), "TotalCopies property");
-		$this->assertTrue(isset($actual->AvailableCopies), "AvailableCopies property");
-	}
 	
 	/**
 	 * method getItemsCirculation
