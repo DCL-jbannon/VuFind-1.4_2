@@ -6,7 +6,7 @@ class EContentFormatType
 	const eAudio = 'eAudio';
 	const eBook = 'eBook';
 	const eMusic = 'eMusic';
-	const unknown = 'Unknown';
+	const unknown = 'eContent';
 }
 
 ?>
