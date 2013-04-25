@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__).'/OverDriveHttpResponse.php';
+require_once dirname(__FILE__).'/OverDriveAPIException.php';
 
 interface IOverDriveAPIWrapper{}
 
@@ -107,7 +108,7 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 		$validResponseCode = $this->odhr->checkResponseCode($reponseCode);
 		if (!$validResponseCode)
 		{
-			throw new OverDriveTokenExpired();
+			throw new OverDriveTokenExpiredException();
 		}
 		
 		if($result === FALSE)
