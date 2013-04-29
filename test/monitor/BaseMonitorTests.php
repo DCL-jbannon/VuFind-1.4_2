@@ -7,7 +7,7 @@ abstract class BaseMonitorTests extends PHPUnit_Framework_TestCase
 	
 	public function setUp()
 	{
-		$this->config = parse_ini_file(dirname(__FILE__).'/../../sites/dcl.localhost/conf/monitor.ini', true);
+		$this->config = parse_ini_file(dirname(__FILE__).'/../../sites/'.TEST_SERVERNAME.'/conf/monitor.ini', true);
 		parent::setUp();
 	}
 	

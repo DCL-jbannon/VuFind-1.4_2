@@ -1232,7 +1232,7 @@ class NovelistMother
 		    },
 		    "GoodReads": {
 		      "category": "BookInfo",
-		      "average_rating": 3.95,
+		      "average_rating": 3.91,
 		      "work_reviews_count": 310228,
 		      "isbn13": 9780441008537,
 		      "work_text_reviews_count": 13159,

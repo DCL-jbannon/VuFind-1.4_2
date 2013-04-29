@@ -25,7 +25,7 @@ class NovelistWrapperTests extends PHPUnit_Framework_TestCase
 	{
 		$expected = $isbn = "9780441008537";
 		$actual = $this->service->getInfoByISBN($isbn);
-		
+
 		$this->assertEquals($expected, $actual->TitleInfo->primary_isbn);
 	}
 }

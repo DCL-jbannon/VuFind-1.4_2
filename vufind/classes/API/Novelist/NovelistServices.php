@@ -23,5 +23,15 @@ class NovelistServices
 		return false;
 	}
 	
+	public function getGooReadsAverageRating($isbn)
+	{
+		$result = $this->novelistWrapper->getInfoByISBN($isbn);
+		if(isset( $result->FeatureContent->GoodReads))
+		{
+			return $result->FeatureContent->GoodReads->average_rating;
+		}
+		return false;
+	}
+	
 }
 ?>

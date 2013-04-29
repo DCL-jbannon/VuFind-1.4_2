@@ -22,15 +22,13 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	*/
 	public function test_getTitleAuthorImage_called_executesCorrectly()
 	{
-		$expected = "b4b397e81e1ebe92f18c419a61646e55"; //md5_file
 		
 		$imageName = $this->baseFolderGenerateImages."TestTitleAuthor.png";
 		$title = "a Dummy Title From Testing ";
 		$author = "Surname, a Dummy123 Author Name";
-		$this->service->getTitleAuthorImage($title, $author, $imageName);
+		$actual = $this->service->getTitleAuthorImage($title, $author, $imageName);
 		
-		$actual = md5_file($imageName);
-		$this->assertEquals($expected, $actual);
+		$this->assertTrue(is_resource($actual['resource']));
 	}
 	
 	/**
@@ -40,13 +38,10 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	*/
 	public function test_getAuthorImage_called_executesCorrectly()
 	{
-		$expected = "726713a83d85b70d2bc1e351b6181233"; //md5_file
-		$imageName = $this->baseFolderGenerateImages."TestAuthor.png";
+		$imageName = $this->baseFolderGenerateImages."TestAuthor.png";	
+		$actual = $this->service->getAuthorImage("Surname, a Dummy Author Name ", $imageName);
 		
-		$this->service->getAuthorImage("Surname, a Dummy Author Name ", $imageName);
-		
-		$actual = md5_file($imageName);
-		$this->assertEquals($expected, $actual);
+		$this->assertTrue(is_resource($actual['resource']));
 	}
 	
 	/**
@@ -65,30 +60,29 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	* should executesCorrectly
 	* @dataProvider DP_getCover
 	*/
-	public function test_getCover_called_executesCorrectly($type, $expected)
+	public function test_getCover_called_executesCorrectly($type)
 	{
 		$imageName = $this->baseFolderGenerateImages."TestCoverTitleAuthor_".$type.".png";
 		$title = "a Dummy Title From Testing a Dummy Title From Testing a Dummy Title From Testing";
 		$author = "Surname, a Dummy Author Name";
 		
-		$this->service->getCover($title, $author, $type, $imageName);
-		
-		$actual = md5_file($imageName);
-		$this->assertEquals($expected, $actual);
+		$actual = $this->service->getCover($title, $author, $type, $imageName);
+
+		$this->assertTrue(is_resource($actual['resource']));
 	}
 	
 	public function DP_getCover()
 	{
 		return array(
-					array(CoversType::bookCover, "a4c68e413a83e76047e853454425afd1"),
-					array(CoversType::audioCover, "708d899f08bec85e864a780a2c44d5e3"),
-					array(CoversType::blurayCover, "b395dca9907ddecb9c139c9d9f20a778"),
-					array(CoversType::dvdCover, "d1a17c8876fdcc8d76922dcbd2efe497"),
-					array(CoversType::emediaCover, "938e750389517e556ae96f13c88f36fa"),
-					array(CoversType::listCover, "f7c4bb38851d7296be3939c3d8f7da01"),
-					array(CoversType::magazineCover, "58f24b9d63b053a8de46117ae4114a3a"),
-					array(CoversType::musicCover, "fe9c46a63a45ba87498bd1c260bb1698"),
-					array(CoversType::otherCover, "86c61fd2983fd67082e3f557333c0433")
+					array(CoversType::bookCover),
+					array(CoversType::audioCover),
+					array(CoversType::blurayCover),
+					array(CoversType::dvdCover),
+					array(CoversType::emediaCover),
+					array(CoversType::listCover),
+					array(CoversType::magazineCover),
+					array(CoversType::musicCover),
+					array(CoversType::otherCover)
 				);
 	}
 	
@@ -99,16 +93,13 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	*/
 	public function test_getCover_notValidCoverType_createImageWithOtherBlankCoverType()
 	{
-		$expected = "86c61fd2983fd67082e3f557333c0433"; //md5 sum file using the otherCover image
-		
 		$imageName = $this->baseFolderGenerateImages."TestCoverTitleAuthor_NotValidCover.png";
 		$title = "a Dummy Title From Testing a Dummy Title From Testing a Dummy Title From Testing";
 		$author = "Surname, a Dummy Author Name";
 		$type = "aNonValidCoverType";
-		$this->service->getCover($title, $author, $type, $imageName);
+		$actual = $this->service->getCover($title, $author, $type, $imageName);
 		
-		$actual = md5_file($imageName);
-		$this->assertEquals($expected, $actual);
+		$this->assertTrue(is_resource($actual['resource']));
 	}
 	
 	/**
@@ -141,9 +132,7 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 	* should executesCorrectly
 	*/
 	public function test_getTitleImage_called_executesCorrectly()
-	{
-		$expected = "281175b32df9576940bf838ab9a8dce7"; //md5_file
-		
+	{		
 		$imageName = $this->baseFolderGenerateImages."TestTitle.png";
 		$title = "a Dummy Title From Testing";
 		$actual = $this->service->getTitleImage($title, $imageName);
@@ -152,9 +141,6 @@ class TitleNoCoverTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals(280, $actual['width']); //Minimun Width is 280
 		$this->assertEquals(90, $actual['height']);
 		$this->assertTrue(is_resource($actual['resource']));
-		
-		$actual = md5_file($imageName);
-		$this->assertEquals($expected, $actual);
 	}
 	
 	/**

@@ -149,7 +149,8 @@ public class ReindexProcess {
 		logger.info("Finished Reindex for " + serverName);
 	}
 
-	private static void harvestOverDrive() {
+	private static void harvestOverDrive()
+	{
 		// Let get the OverDrive API items
 		logger.info("Importing OverDrive API Items");
 
@@ -166,7 +167,7 @@ public class ReindexProcess {
 		try {
 			service.execute();
 			pr.saveResults();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			logger.error("Error importing OverDrive API Items.", e);
 			pr.addNote("Error importing OverDrive API Items. " + e.getMessage());
 		}

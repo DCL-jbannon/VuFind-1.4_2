@@ -7,8 +7,19 @@ require_once dirname(__FILE__).'/../vufind/web/sys/ConfigArray.php';
 global $servername;
 global $configArray;
 
-$servername = 'dcl.localhost';
-$_SERVER['SERVER_NAME'] = $servername;
+define ('TEST_DBUSER', 'root');
+
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+	define ('TEST_SERVERNAME', 'dcl.localhost');
+	define ('TEST_DBUSERPASS', '');
+	
+} else {
+	define ('TEST_SERVERNAME', 'dclinux.localhost');
+	define ('TEST_DBUSERPASS', 'dev');
+}
+ 
+$servername = TEST_SERVERNAME;
+$_SERVER['SERVER_NAME'] = TEST_SERVERNAME;
 
 $configArray = readConfig();
 

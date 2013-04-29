@@ -504,7 +504,7 @@ function redrawSaveStatus() {literal}{{/literal}
 					
 					{* Good Reads Reviews *}
 					<div id='goodReadsReviews' style='display:none;'>
-						<h2>Good Reads Reviews</h2>
+						<h2>Goodreads Reviews (Average rating: <span id='goodreads-avg-rating'></span>)</h2>
 						<div id='showGoodReadReviews' style='display:block;cursor:pointer;' class='add'>
 							<h3>Show Reviews</h3>
 						</div>

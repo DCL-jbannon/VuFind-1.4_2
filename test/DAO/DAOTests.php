@@ -20,20 +20,20 @@ abstract class DAOTests extends PHPUnit_Framework_TestCase
 		if(self::$mysqli === NULL)
 		{
 			$this->setUpConnection();
-			self::$mysqli = new mysqli('localhost', 'root', '');
+			self::$mysqli = new mysqli('localhost', TEST_DBUSER, TEST_DBUSERPASS);
 			if (self::$mysqli->query("CREATE DATABASE IF NOT EXISTS ".self::vufindTestDatabase) !== TRUE)
 			{
 				die(self::$mysqli->error);
 			}
 			
-			self::$mysqli = new mysqli('localhost', 'root', '', self::vufindTestDatabase);
+			self::$mysqli = new mysqli('localhost', TEST_DBUSER, TEST_DBUSERPASS, self::vufindTestDatabase);
 			if (self::$mysqli->multi_query(file_get_contents(dirname(__FILE__).'/../sql/dclvufind.sql')) !== TRUE)
 			{
 				die(self::$mysqli->error);
 			}
 			
 			self::$mysqli->close();
-			self::$mysqli = new mysqli('localhost', 'root', '', self::vufindTestDatabase);
+			self::$mysqli = new mysqli('localhost', TEST_DBUSER, TEST_DBUSERPASS, self::vufindTestDatabase);
 		}
 		
 		$this->daoClassName = $this->getNameDAOClass();

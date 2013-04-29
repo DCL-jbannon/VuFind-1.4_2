@@ -24,3 +24,4 @@
 {/if}]]></SimilarTitles>
 <ShowGoDeeperData>{$showGoDeeper}</ShowGoDeeperData>
 <GoodReadReviewsUrl><![CDATA[{$goodReadReviewUrl}]]></GoodReadReviewsUrl>
+<GoodReadAVGRating><![CDATA[{$goodReadAVGRating}]]></GoodReadAVGRating>

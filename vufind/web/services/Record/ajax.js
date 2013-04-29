@@ -229,6 +229,7 @@ function GetEnrichmentInfo(id, isbn, upc) {
 			if (goodReadsUrl.length > 0)
 			{
 				$("#iframeGoodReadsReviews").append("<iframe src='" + goodReadsUrl + "' frameBorder='0' style='padding:10px; width:100%;height:350px'><iframe>");  
+				$("#goodreads-avg-rating").html($(data).find("GoodReadAVGRating").text());
 				$('#goodReadsReviews').show();
 			}
 			

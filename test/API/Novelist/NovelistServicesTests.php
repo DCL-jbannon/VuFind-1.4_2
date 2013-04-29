@@ -59,6 +59,26 @@ class NovelistServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->getGoodReadsReviewsURL($isbn);
 		$this->assertEquals($expected, $actual);						
 	}
+	
+	/**
+	* method getGooReadsAverageRating 
+	* when called
+	* should executesCorrectly
+	*/
+	public function test_getGooReadsAverageRating_called_executesCorrectly()
+	{
+		$expected = "3.91";
+		$result = $this->noveListMother->getResultContentByQuery();
+		$isbn = "aDummyISBN";
+		
+		$this->novelistWrapperMock->expects($this->once())
+									->method("getInfoByISBN")
+									->with($this->equalTo($isbn))
+									->will($this->returnValue($result));
+		
+		$actual = $this->service->getGooReadsAverageRating($isbn);
+		$this->assertEquals($expected, $actual);
+	}
 
 }
 ?>

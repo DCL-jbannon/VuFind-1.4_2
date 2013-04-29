@@ -25,7 +25,6 @@ class NovelistWrapper implements INovelistWrapper
 		$url = str_replace("{PUT_HERE_PASSWORD}", $this->password, $url);
 		$url = str_replace("{PUT_HERE_ISBN}", $isbn, $url);
 		$url = str_replace("{PUT_HERE_TS}", mktime(), $url);
-
 		return json_decode(file_get_contents($url));		
 	}
 

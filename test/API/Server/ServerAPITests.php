@@ -16,7 +16,7 @@ class ServerAPITests extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		//$this->ch = curl_init("http://vufindtest.douglascountylibraries.org/APIV2/Home");
-		$this->ch = curl_init("http://dcl.localhost/APIV2/Home");
+		$this->ch = curl_init("http://".TEST_SERVERNAME."/APIV2/Home");
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($this->ch, CURLOPT_USERAGENT, "DCL Integration Tests");
 	}

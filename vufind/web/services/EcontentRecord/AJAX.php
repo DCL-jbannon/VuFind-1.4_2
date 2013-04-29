@@ -639,6 +639,7 @@ function GetProspectorInfo(){
 		//Get GoodReads Reviews Url
 		$novelistServices = new NovelistServices();
 		$interface->assign('goodReadReviewUrl', $novelistServices->getGoodReadsReviewsURL($isbnRequest));
+		$interface->assign('goodReadAVGRating', $novelistServices->getGooReadsAverageRating($isbnRequest));
 	
 		//Load go deeper options
 		require_once('Drivers/marmot_inc/GoDeeperData.php');
