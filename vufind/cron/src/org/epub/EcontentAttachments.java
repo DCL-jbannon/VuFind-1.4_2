@@ -168,19 +168,22 @@ public class EcontentAttachments implements IProcessHandler
 			for(int z=0; z < this.listImages.size(); z++)
 			{
 				ArrayList<Object> object = this.listImages.get(z);
-				if(object.get(2) instanceof File)
+				if(object.size()>2)
 				{
-					File imageToAttach = (File) object.get(2);
-					String absolutePath = imageToAttach.getAbsolutePath();
-					String nameFileToAttach = imageToAttach.getName();
-					ArrayList<String> record = (ArrayList<String>) object.get(1);
-					
-					this.fileUtils.copyFilesByPath(absolutePath, this.originalFolder + "/" + nameFileToAttach);
-					this.dbEcontentRecordServices.updateEcontentCover(record.get(0), nameFileToAttach);
-					this.numCovers++; //Not Testing Mode
-					
-					this.addNote("Attached cover : " + nameFileToAttach);
-					this.updateLogEntry();
+					if(object.get(2) instanceof File)
+					{
+						File imageToAttach = (File) object.get(2);
+						String absolutePath = imageToAttach.getAbsolutePath();
+						String nameFileToAttach = imageToAttach.getName();
+						ArrayList<String> record = (ArrayList<String>) object.get(1);
+						
+						this.fileUtils.copyFilesByPath(absolutePath, this.originalFolder + "/" + nameFileToAttach);
+						this.dbEcontentRecordServices.updateEcontentCover(record.get(0), nameFileToAttach);
+						this.numCovers++; //Not Testing Mode
+						
+						this.addNote("Attached cover : " + nameFileToAttach);
+						this.updateLogEntry();
+					}
 				}
 			}
 		}
@@ -200,32 +203,34 @@ public class EcontentAttachments implements IProcessHandler
 			{
 		
 				ArrayList<Object> object = this.listEpubPdf.get(z);
-				
-				if(object.get(2) instanceof File)
+				if(object.size()>2)
 				{
-					File fileToAttach = (File) object.get(2);
-					String absolutePath = fileToAttach.getAbsolutePath();
-					String nameFileToAttach = fileToAttach.getName();
-					
-					this.addNote("Attaching File " + absolutePath + " to ACS");
-					ArrayList<String> record = (ArrayList<String>) object.get(1);
-					
-					String acsId = this.acsPackage.addFile(fileToAttach , record.get(2));
-					if(acsId != null)
+					if(object.get(2) instanceof File)
 					{
-						this.addNote("The file has been attached successfully: " + nameFileToAttach);
-						this.numUpdates++; //Not Testing Mode
+						File fileToAttach = (File) object.get(2);
+						String absolutePath = fileToAttach.getAbsolutePath();
+						String nameFileToAttach = fileToAttach.getName();
 						
-						String ext = dclFileutils.getFileExtension(nameFileToAttach);
-						String fileNameEcontentItem = this.source + "_" + nameFileToAttach;
-						this.dbEcontentRecordServices.insertEcontentItem(fileNameEcontentItem, acsId, record.get(0), ext);
-						this.fileUtils.copyFilesByPath(absolutePath, this.destPath + "/" + fileNameEcontentItem);
-					}
-					else
-					{
-						this.numErrors++; //Not Testing Mode
-						this.addNote("Cannot Attach the file " + fileToAttach + " to ACS Server");
-						this.addNote("ACS Result: " + this.acsPackage.getMsgError());
+						this.addNote("Attaching File " + absolutePath + " to ACS");
+						ArrayList<String> record = (ArrayList<String>) object.get(1);
+						
+						String acsId = this.acsPackage.addFile(fileToAttach , record.get(2));
+						if(acsId != null)
+						{
+							this.addNote("The file has been attached successfully: " + nameFileToAttach);
+							this.numUpdates++; //Not Testing Mode
+							
+							String ext = dclFileutils.getFileExtension(nameFileToAttach);
+							String fileNameEcontentItem = this.source + "_" + nameFileToAttach;
+							this.dbEcontentRecordServices.insertEcontentItem(fileNameEcontentItem, acsId, record.get(0), ext);
+							this.fileUtils.copyFilesByPath(absolutePath, this.destPath + "/" + fileNameEcontentItem);
+						}
+						else
+						{
+							this.numErrors++; //Not Testing Mode
+							this.addNote("Cannot Attach the file " + fileToAttach + " to ACS Server");
+							this.addNote("ACS Result: " + this.acsPackage.getMsgError());
+						}
 					}
 				}
 				this.updateLogEntry();

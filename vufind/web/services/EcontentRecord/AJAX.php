@@ -239,7 +239,7 @@ function GetProspectorInfo(){
 		}
 		$resource->addComment($_REQUEST['comment'], $user, 'eContent');
 
-		return json_encode(array('result' => 'true', "notuid"=>$ns->getUserId()));
+		return json_encode(array('result' => 'true', "notuid"=>$user->id));
 	}
 
 	function DeleteComment()

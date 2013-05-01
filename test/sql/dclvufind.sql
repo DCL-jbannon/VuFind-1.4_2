@@ -921,4 +921,5 @@ CREATE TABLE IF NOT EXISTS `api_statistics` (
   KEY `clientId` (`clientId`,`method`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE `analytics_page_view` CHANGE `fullUrl` `fullUrl` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+ALTER TABLE `analytics_page_view` CHANGE `fullUrl` `fullUrl` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ;
+ALTER TABLE `econtent_record_detection_settings` ADD `attachPath` TEXT NOT NULL;

@@ -1,8 +1,8 @@
 <?php
 require_once 'DB/DataObject.php';
 require_once 'DB/DataObject/Cast.php';
-require_once 'sys/eContent/EContentItem.php';
-require_once 'sys/eContent/EContentRecord.php';
+require_once dirname(__FILE__).'/EContentItem.php';
+require_once dirname(__FILE__).'/EContentRecord.php';
 
 class EContentRecordDetectionSettings extends DB_DataObject {
 	public $__table = 'econtent_record_detection_settings';    // table name
@@ -33,6 +33,7 @@ class EContentRecordDetectionSettings extends DB_DataObject {
 			'accessType' => array('property'=>'accessType', 'type'=>'enum', 'label'=>'Access Type', 'values'=>$accessTypes, 'description'=>'The type to apply to any items that are generated.'),
 			'add856FieldsAsExternalLinks' => array('property'=>'add856FieldsAsExternalLinks', 'type'=>'checkbox', 'label'=>'Create Links?', 'description'=>'Whether or not automatic external links should be generated based on the 856 tag.'),
 			'item_type' => array('property'=>'item_type', 'type'=>'enum', 'label'=>'Item Type', 'values'=>$itemTypes, 'description'=>'The type to apply to any items that are generated.'),
+			'attachPath' => array('property'=>'attachPath', 'width'=>'200','type'=>'text', 'label'=>'Source Path', 'description'=>'The Source Path for ACS econtent'),
 		);
 		foreach ($structure as $fieldName => $field){
 			$field['propertyOld'] = $field['property'] . 'Old';

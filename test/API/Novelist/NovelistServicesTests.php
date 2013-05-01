@@ -79,6 +79,5 @@ class NovelistServicesTests extends PHPUnit_Framework_TestCase
 		$actual = $this->service->getGooReadsAverageRating($isbn);
 		$this->assertEquals($expected, $actual);
 	}
-
 }
 ?>

@@ -1,7 +1,6 @@
 <?php
 require_once 'PEAR.php';
 require_once 'DB/DataObject.php';
-
 require_once dirname(__FILE__).'/../vufind/web/sys/ConfigArray.php';
 
 global $servername;

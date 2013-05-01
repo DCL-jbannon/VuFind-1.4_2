@@ -44,7 +44,7 @@
     	
     		{foreach from=$wishList item=record}
     			<tr>
-        	<td><a href="{$path}/EcontentRecord/{$record->recordId}/Home">{$record->title}</a></td>
+        	<td><a href="{$path}/EcontentRecord/{$record->recordId|replace:'econtentRecord':''}/Home">{$record->title}</a></td>
 	        	<td>{$record->source}</td>
 	        	<td>{$record->dateAdded|date_format}</td>
 	        	<td>
