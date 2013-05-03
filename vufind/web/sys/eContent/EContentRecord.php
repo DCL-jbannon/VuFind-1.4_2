@@ -1421,10 +1421,16 @@ class EContentRecord extends SolrDataObject implements IEContentRecord,IMarcReco
 	
 	public function getNormalizedMarcRecord()
 	{
-		$marcRecord = trim($this->marcRecord);
-		$marcRecord = preg_replace('/#31;/', "\x1F", $marcRecord);
-		$marcRecord = preg_replace('/#30;/', "\x1E", $marcRecord);
-		return $marcRecord;
+		$marcString = trim($this->marcRecord);		
+		$marcString = preg_replace('/#29;/', "\x1D",  $marcString);
+		$marcString = preg_replace('/#30;/', "\x1E",  $marcString);
+		$marcString = preg_replace('/#31;/', "\x1F",  $marcString);
+		$marcString = preg_replace('/#163;/', "\xA3", $marcString);
+		$marcString = preg_replace('/#169;/', utf8_encode("\xA9"), $marcString);
+		$marcString = preg_replace('/#174;/', "\xAE", $marcString);
+		$marcString = preg_replace('/#230;/', "\xE6", $marcString);
+		
+		return $marcString;
 	}
 	
 	public function isGutenberg()

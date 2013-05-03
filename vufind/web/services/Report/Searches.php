@@ -82,11 +82,14 @@ class Searches extends AnalyticsReport
 			}else{
 				$topSearches[] = "<blank> ({$search->timesSearched})";
 			}
+			echo " ";
+			flush();
 		}
 		$interface->assign('topSearches', $topSearches);
 
 		echo " ";
 		flush();
+		set_time_limit(0);
 		
 		$search = new Analytics_Search();
 		$search->selectAdd();
@@ -108,11 +111,14 @@ class Searches extends AnalyticsReport
 			}else{
 				$topNoHitSearches[] = "<blank> ({$search->timesSearched})";
 			}
+			echo " ";
+			flush();
 		}
 		$interface->assign('topNoHitSearches', $topNoHitSearches);
 
 		echo " ";
 		flush();
+		set_time_limit(0);
 		
 		$search = new Analytics_Search();
 		$search->selectAdd();
@@ -133,11 +139,14 @@ class Searches extends AnalyticsReport
 			}else{
 				$latestSearches[] = "<blank>";
 			}
+			echo " ";
+			flush();
 		}
 		$interface->assign('latestSearches', $latestSearches);
 
 		echo " ";
 		flush();
+		set_time_limit(0);
 		
 		$search = new Analytics_Search();
 		$search->selectAdd();
@@ -159,6 +168,8 @@ class Searches extends AnalyticsReport
 			}else{
 				$latestNoHitSearches[] = "<blank>";
 			}
+			echo " ";
+			flush();
 		}
 		$interface->assign('latestNoHitSearches', $latestNoHitSearches);
 
