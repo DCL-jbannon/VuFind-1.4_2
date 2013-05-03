@@ -36,6 +36,7 @@ class CronLog extends Admin
 		
 		$logEntries = array();
 		$cronLogEntry = new CronLogEntry();
+		$cronLogEntry->whereAdd("notes not like '%org.epub.EcontentAttachments%'");
 		$cronLogEntry->orderBy('startTime DESC');
 		$cronLogEntry->limit(0, 30);
 		$cronLogEntry->find();
