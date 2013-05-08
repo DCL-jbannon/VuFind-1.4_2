@@ -557,9 +557,7 @@
     -->
   <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" />
   
-  <requestHandler name="/update/json" 
-                  class="solr.JsonUpdateRequestHandler" 
-                  startup="lazy" />
+  
 
   <!--
    Analysis request handler.  Since Solr 1.3.  Use to returnhow a document is analyzed.  Useful
@@ -570,6 +568,8 @@
 
   <!-- CSV update handler, loaded on demand -->
   <requestHandler name="/update/csv" class="solr.CSVRequestHandler" startup="lazy" />
+  
+  <requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler" startup="lazy" />
 
 
   <!-- 
