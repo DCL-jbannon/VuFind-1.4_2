@@ -5,7 +5,7 @@
 			{assign var=i value=0}
 			{foreach from=$checkedOut item=record}
 				{if $record.source neq "3M"}
-						{$i++}
+                                                 {assign var=i value=$i+1}
 						{if $record.overdue}
 							{assign var="warningDueDate" value="OVERDUE"} 
 						{/if}
