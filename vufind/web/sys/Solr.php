@@ -1603,7 +1603,7 @@ class Solr implements IndexEngine {
 				}
 			} else {
 				//If we are tokenizing, remove any punctuationd
-				$tmpWord = preg_replace('/[^\w.\']/', '', $words[$i]);
+				$tmpWord = preg_replace('/[\p{P}]/u', '', $words[$i]);
 				if (strlen($tmpWord) > 0){
 					$newWords[] = $tmpWord;
 				}

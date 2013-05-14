@@ -45,12 +45,11 @@
 	*display: inline;
 }
 #footer-social-icons{
-	background-color: white;
-	padding: 5px 7px 3px 2px;
-	width: 100px;
+	padding: 19px 7px 3px 2px;
+	width: 190px;
 }
 .footer-social-icon{
-	padding-left: 5px;
+	padding-left: 0px;
 }
 #footer-contact-info{
 	font-size: 10px;

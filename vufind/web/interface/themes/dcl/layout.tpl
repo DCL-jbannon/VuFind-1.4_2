@@ -138,8 +138,6 @@
       <div style="clear: left;"></div>
       {/if}
 
-      {include file="$module/$pageTemplate"}
-      
       {if $hold_message}
         <script type="text/javascript">
         lightbox();
@@ -153,6 +151,10 @@
         document.getElementById('popupbox').innerHTML = "{$renew_message|escape:"javascript"}";
         </script>
       {/if}
+      
+      {include file="$module/$pageTemplate"}
+
+      
 
     {include file="library-footer.tpl"}
     </div> {* End page body *}
