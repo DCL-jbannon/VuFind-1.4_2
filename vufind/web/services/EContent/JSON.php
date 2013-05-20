@@ -197,24 +197,29 @@ class JSON extends Action
 				 
 				if (in_array($manifestType, array('image/jpeg', 'image/gif', 'image/tif', 'text/css'))){
 					//Javascript or image
-					$pattern = str_replace("~", "\~", preg_quote($manifestHref));
 					if ($manifestType == 'text/css'){
 						//Ignore css for now
 						$replacement = '';
 					}else{
-						$replacement = $configArray['Site']['path'] . "/EContent/" . preg_quote($id) ."/JSON?method=getComponent&component=" . preg_quote($manifestId) . "&item=" . $item;
+						
+						$pattern = str_replace("/OEBPS/", "", $manifestHref);
+						$pattern = str_replace("OEBPS/", "", $pattern);
+						preg_quote($pattern,"/");
+						
+						$replacement = $configArray['Site']['path'] . "/EContent/" . $id ."/JSON?method=getComponent&component=" . $manifestId . "&item=" . $item;
+						$componentText = str_replace($pattern, $replacement, $componentText);
+						
 					}
-					$componentText = preg_replace("~$pattern~", $replacement, $componentText);
+					
 				}else{
 					//Link to another location within the document
 					//convert to a window.reader.moveTo(componentId, location)
 					//$componentText = preg_replace('/<a href=["\']#'. preg_quote($manifestHref) . '["\']/', "<a onclick=\"window.parent.reader.moveTo({componentId: '{$escapedManifestId}', xpath:'//a[@id={$escapedManifestId}]'})\" href=\"#\"", $componentText);
 					/*$pattern = str_replace("~", "\~", '<a (.*?)href=["\']'. preg_quote($manifestHref) . '#(.*?)["\']');
 					$replacement = '<a \\1 onclick=\"window.parent.reader.moveTo({componentId: \'' . addslashes($manifestId) . '\', xpath:\'//a[@id=\\2]\'});return false;" href="#"';
-					$componentText = preg_replace("~$pattern~", $replacement, $componentText);*/
+					$c	omponentText = preg_replace("~$pattern~", $replacement, $componentText);*/
 				}
 			}
-
 			header('Content-type: text/plain');
 			header('Cache-Control: no-cache, must-revalidate'); // HTTP/1.1
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
