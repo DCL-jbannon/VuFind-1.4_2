@@ -410,6 +410,7 @@ class ListAPI extends Action {
 			if (isset($listInfo)){
 				$listId = $listInfo[1];
 			}
+			
 			//The list is a patron generated list
 			$list = new User_list();
 			$list->id = $listId;
@@ -996,14 +997,15 @@ class ListAPI extends Action {
 		unset($_SESSION['shards']);
 		$_SESSION['shards'] = $tpmShardSession;
 		unset($tpmShardSession);
-		
 		$searchObject->init();
 		$titles = array();
+		
 		if (count($ids) > 0)
 		{
 			$searchObject->setQueryIDs($ids);
+			$searchObject->setLimit(100);
 			$result = $searchObject->processSearch();
-			
+
 			$matchingRecords = $searchObject->getResultRecordSet();
 			foreach ($matchingRecords as $record)
 			{
