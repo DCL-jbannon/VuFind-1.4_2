@@ -52,6 +52,6 @@ class RemoveFromWishList extends Action {
 		$details = EcontentDetailsFactory::getById($id);
 		$details->removeWishList($this->user);
 		
-		header('Location: ' . $configArray['Site']['path'] . '/MyResearch/MyEContentWishList');
+		header('Location: ' . $configArray['Site']['path'] . '/MyResearch/MyEContentWishlist');
 	}
 }
