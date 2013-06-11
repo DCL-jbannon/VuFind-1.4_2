@@ -1305,7 +1305,7 @@ public function getStatusSummaries($ids){
 		while ($wishListEntry->fetch()){
 			$wishListItem = clone $wishListEntry;
 			$wishListItem->links[] = array(
-				'url' => $configArray['Site']['path'] . '/EcontentRecord/' . $wishListEntry->recordId . '/RemoveFromWishlist' ,
+				'url' => $configArray['Site']['path'] . '/EcontentRecord/' . $wishListEntry->recordId . '/RemoveFromWishList' ,
 				'text' => 'Remove&nbsp;From&nbsp;Wish&nbsp;List'
 			);
 			$wishListItem->recordId = 'econtentRecord' . $wishListItem->recordId;
@@ -1330,7 +1330,7 @@ public function getStatusSummaries($ids){
 				$wishListItem->source = 'OverDrive';
 				$wishListItem->title = $eContentRecord->getTitle();
 				$wishListItem->links[] = array(
-						'url' => $configArray['Site']['path'] . '/EcontentRecord/' . $eContentRecord->id . '/RemoveFromWishlist' ,
+						'url' => $configArray['Site']['path'] . '/EcontentRecord/' . $eContentRecord->id . '/RemoveFromWishList' ,
 						'text' => 'Remove&nbsp;From&nbsp;Wish&nbsp;List'
 				);
 				$wishList[$eContentRecord->id] = $wishListItem;
