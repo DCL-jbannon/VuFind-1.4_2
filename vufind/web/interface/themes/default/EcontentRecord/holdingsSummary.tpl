@@ -14,6 +14,8 @@
 				Available for use from OverDrive.
 			{elseif $holdingsSummary.source == 'Freegal'}
 				Downloadable from Freegal.
+			{elseif $holdingsSummary.source == '3M'}
+				Available for use from 3M.
 			{elseif ($holdingsSummary.accessType == 'free') || ($holdingsSummary.accessType == 'singleUse')}
 				Available for multiple simultaneous usage.
 			{elseif $holdingsSummary.onHold}
