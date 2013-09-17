@@ -423,7 +423,13 @@ class EContentItem extends DB_DataObject implements IEContentItem{
 		$notes = '';
 		if ($this->libraryId == -1){
 			if ($this->isExternalItem()){
-				$notes = "Available from external provider.";
+			  if($this->id == 66189523 || $this->id == 66189525 ){
+				$notes = "Available from external provider(High-Res image)";
+			}elseif ($this->id == 66189524 || $this->id == 66189526){
+				$notes = "Available from external provider(Standard image)";
+			}
+			}elseif ($this->isExternalItem()){
+				$notes = "Available from external provider";
 			}elseif ($this->getAccessType() == 'free'){
 				$notes = "Must be checked out to read.";
 			}elseif ($this->getAccessType() == 'acs' || $this->getAccessType() == 'singleUse'){
