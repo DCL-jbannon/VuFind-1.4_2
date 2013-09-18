@@ -625,9 +625,15 @@ function redrawSaveStatus() {literal}{{/literal}
 					<div style="font-weight:bold"><a href="#" onclick="loadOtherEditionSummaries('{$id}', true)">{translate text="Other Formats and Languages"}</a></div>
 				</div>
 				{/if}
-        {if $enablePurchaseLinks == 1}
-					<div class='purchaseTitle button'><a href="#" onclick="return showEcontentPurchaseOptions('{$id}');">{translate text='Buy a Copy'}</a></div>
-				{/if}
+				
+		{if $enablePurchaseLinks == 1 && ($eContentRecord->id == 985086 || $eContentRecord->id == 985085) }
+					<div class='free'></div>
+		 {else}
+		  {if $enablePurchaseLinks == 1}
+        		<div class='purchaseTitle button'><a href="#" onclick="_gaq.push(['_trackEvent', 'PurchaseEvent', 'BuyEcontent','{$eContentRecord->title|regex_replace:"/(\/|:)$/":""|escape}']); return showEcontentPurchaseOptions('{$id}');">{translate text='Buy a Copy'}</a></div>
+		  {/if}
+		{/if} 				
+			
        {if $eContentRecord->sourceUrl}
       	<div id="econtentSource">
       		<a href="{$eContentRecord->sourceUrl}">Access original files</a>
