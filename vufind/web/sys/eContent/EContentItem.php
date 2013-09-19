@@ -424,10 +424,12 @@ class EContentItem extends DB_DataObject implements IEContentItem{
 		if ($this->libraryId == -1){
 			if ($this->isExternalItem()){
 			  if($this->id == 66189523 || $this->id == 66189525 ){
-				$notes = "Available from external provider(High-Res image)";
+				$notes = "Available from external provider( epub High-Res image)";
 			}elseif ($this->id == 66189524 || $this->id == 66189526){
-				$notes = "Available from external provider(Standard image)";
+				$notes = "Available from external provider(epub Standard image)";
 			}
+			}elseif ($this->isExternalItem() && ($this->id == 66563875 || $this->id == 66563874 )){
+				$notes = "(epub PDF)";
 			}elseif ($this->isExternalItem()){
 				$notes = "Available from external provider";
 			}elseif ($this->getAccessType() == 'free'){
