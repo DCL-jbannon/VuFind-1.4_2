@@ -99,7 +99,8 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:none;'>Please note that catalog search results might return an error screen. <a target="_blank" href="http://hip.douglascountylibraries.org/ipac20/ipac.jsp?forcelogout=true&amp;profile=rem&amp;lang=eng">Click here to go to the classic catalog</a>.</div>
+		<div class='message-alert' style='display:block;'>Our check-in/check-out system will be undergoing an upgrade from Monday, September 29, 2:00 am. to Tuesday, October 1, 2:00 a.m. During the upgrade no fines will accrue, no holds will expire, and no items will be due for return. You will not be able to view your account, renew items or place holds. If possible, please plan to return borrowed items on another day.
+		</div>
         <div class="clearer">&nbsp;</div>
       </div>
     </div>
