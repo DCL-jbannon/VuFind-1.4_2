@@ -229,3 +229,27 @@ div.message-alert
 	width: 590px;
 	
 }
+
+/* CSS overrides for Horizon Upgrade downtime */
+
+.resulthead:after, #homeLoginForm:after {
+content: "My account is currently unavailable due to our upgrade of the check-in/check-out service. During the upgrade no fines will accrue, no holds will expire, and no items will be due for return. You will not be able to view your account, renew items or place holds, online, in person or by telephone. If possible, please plan to return borrowed items on another day.";
+}
+.resulthead:after {
+font-size: 18px;
+}
+#loginFormWrapper, #needACardWrapper, #retreiveLoginInfo, #menu-account-links, #loginForm, .add_to_cart, div.generic-item-background a {
+display: none!important;
+}
+div.generic-item-background, .checkoutLink, .requestThisLink, .generic-item-background {
+display:none!important;
+}
+.imageColumn:after, .recordcoverWrapper:after {
+content: "Unavailable";
+color: white;
+}
+.imageColumn:after, .recordcoverWrapper:after {
+background: #011753;
+padding: 3px 10px;
+border-radius: 6px;
+}
