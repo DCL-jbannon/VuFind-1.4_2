@@ -99,7 +99,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:block;'>Our check-in/check-out system will be undergoing an upgrade from Monday, September 30, 2:00 am. to Tuesday, October 1, 2:00 a.m. During the upgrade no fines will accrue, no holds will expire, and no items will be due for return. You will not be able to view your account, renew items or place holds, online, in person or by telephone. If possible, please plan to return borrowed items on another day.
+		<div class='message-alert' style='display:none;'>Our check-in/check-out system will be undergoing an upgrade from Monday, September 30, 2:00 am. to Tuesday, October 1, 2:00 a.m. During the upgrade no fines will accrue, no holds will expire, and no items will be due for return. You will not be able to view your account, renew items or place holds, online, in person or by telephone. If possible, please plan to return borrowed items on another day.
 		</div>
         <div class="clearer">&nbsp;</div>
       </div>
