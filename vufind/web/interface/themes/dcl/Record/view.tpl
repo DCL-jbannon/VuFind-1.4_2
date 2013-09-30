@@ -531,7 +531,7 @@ function redrawSaveStatus() {literal}{{/literal}
 		{if $proxy}
 		<a href="{$proxy}/login?url={$internetLink.link|escape:"url"}">{$internetLink.linkText|escape}</a><br/>
 		{else}
-		<a href="{$internetLink.link|escape}">{$internetLink.linkText|escape}</a><br/>
+		<a href="{$internetLink.link|escape}"><font color="#FF0000">{$internetLink.linkText|escape}</font></a><br/>
 		{/if}
 		{/foreach}
 		{/if}
