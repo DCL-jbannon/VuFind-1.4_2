@@ -231,7 +231,7 @@ div.message-alert
 }
 
 /* CSS overrides for Horizon Upgrade downtime */
-
+/*
 .resulthead:after, #homeLoginForm:after {
 content: "My account is currently unavailable due to our upgrade of the check-in/check-out service. During the upgrade no fines will accrue, no holds will expire, and no items will be due for return. You will not be able to view your account, renew items or place holds, online, in person or by telephone. If possible, please plan to return borrowed items on another day.";
 }
@@ -253,3 +253,4 @@ background: #011753;
 padding: 3px 10px;
 border-radius: 6px;
 }
+*/
