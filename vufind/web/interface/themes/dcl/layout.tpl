@@ -99,7 +99,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:block;'>Scheduled maintenance to the catalog from 10 p.m. to 10:30 p.m. tonight may cause intermittent interruptions. We apologize for the inconvenience.
+		<div class='message-alert' style='display:none;'>Scheduled maintenance to the catalog from 10 p.m. to 10:30 p.m. tonight may cause intermittent interruptions. We apologize for the inconvenience.
 		</div>
         <div class="clearer">&nbsp;</div>
       </div>
