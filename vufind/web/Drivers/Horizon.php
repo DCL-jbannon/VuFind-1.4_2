@@ -2945,7 +2945,7 @@ private function parseSip2Fines($finesData){
 	protected function _query($query){
 		global $configArray;
 		if (strcasecmp($configArray['System']['operatingSystem'], 'windows') == 0){
-			return sybase_query($query);
+			return @sybase_query($query);
 		}else{
 			return mssql_query($query);
 		}
