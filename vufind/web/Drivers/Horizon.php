@@ -46,12 +46,12 @@ class Horizon implements DriverInterface{
 					$configArray['Catalog']['username'],
 					$configArray['Catalog']['password']);
 				}else{
-					$this->db = @mssql_connect($configArray['Catalog']['host'] . ':' . $configArray['Catalog']['port'],
+					$this->db = mssql_connect($configArray['Catalog']['host'] . ':' . $configArray['Catalog']['port'],
 					$configArray['Catalog']['username'],
 					$configArray['Catalog']['password']);
 	
 					// Select the databse
-					@mssql_select_db($configArray['Catalog']['database']);
+					mssql_select_db($configArray['Catalog']['database']);
 				}
 			}catch (Exception $e){
 				$logger = new Logger();
