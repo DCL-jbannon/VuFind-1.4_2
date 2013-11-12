@@ -41,7 +41,7 @@ class Horizon implements DriverInterface{
 		if (!isset($configArray['Catalog']['useDb']) || $configArray['Catalog']['useDb'] == true){
 			try{
 				if (strcasecmp($configArray['System']['operatingSystem'], 'windows') == 0 ){
-					sybase_min_client_severity(11);
+					sybase_min_client_severity(100);
 					$this->db = @sybase_connect($configArray['Catalog']['database'] ,
 					$configArray['Catalog']['username'],
 					$configArray['Catalog']['password']);
