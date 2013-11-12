@@ -2945,7 +2945,7 @@ private function parseSip2Fines($finesData){
 	protected function _query($query){
 		global $configArray;
 		if (strcasecmp($configArray['System']['operatingSystem'], 'windows') == 0){
-			return sybase_query($query);
+			return @sybase_query($query);
 		}else{
 			return mssql_query($query);
 		}
@@ -2954,7 +2954,7 @@ private function parseSip2Fines($finesData){
 	protected function _fetch_assoc($result_id){
 		global $configArray;
 		if (strcasecmp($configArray['System']['operatingSystem'], 'windows') == 0){
-			return sybase_fetch_assoc($result_id);
+			return @sybase_fetch_assoc($result_id);
 		}else{
 			return mssql_fetch_assoc($result_id);
 		}
@@ -2963,7 +2963,7 @@ private function parseSip2Fines($finesData){
 	protected function _fetch_array($result_id){
 		global $configArray;
 		if (strcasecmp($configArray['System']['operatingSystem'], 'windows') == 0){
-			return sybase_fetch_array($result_id);
+			return @sybase_fetch_array($result_id);
 		}else{
 			return mssql_fetch_array($result_id);
 		}
