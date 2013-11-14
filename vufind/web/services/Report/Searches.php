@@ -57,7 +57,7 @@ class Searches extends AnalyticsReport
 		$endDateTimeStamp = strtotime($endDateSQL);		
 
 		
-		set_time_limit(0);
+		set_time_limit(600);
 		
 		//Setup filters
 		$this->setupFilters();
@@ -89,7 +89,7 @@ class Searches extends AnalyticsReport
 
 		echo " ";
 		flush();
-		set_time_limit(0);
+		set_time_limit(600);
 		
 		$search = new Analytics_Search();
 		$search->selectAdd();
@@ -118,7 +118,7 @@ class Searches extends AnalyticsReport
 
 		echo " ";
 		flush();
-		set_time_limit(0);
+		set_time_limit(600);
 		
 		$search = new Analytics_Search();
 		$search->selectAdd();
@@ -146,7 +146,7 @@ class Searches extends AnalyticsReport
 
 		echo " ";
 		flush();
-		set_time_limit(0);
+		set_time_limit(600);
 		
 		$search = new Analytics_Search();
 		$search->selectAdd();
