@@ -99,7 +99,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:block;'>All libraries will close at 5:00 p.m. on Nov. 27 and be closed all day on Nov. 28 in observance of the Thanksgiving holiday. 
+		<div class='message-alert' style='display:none;'>All libraries will close at 5:00 p.m. on Nov. 27 and be closed all day on Nov. 28 in observance of the Thanksgiving holiday. 
 		</div>
         <div class="clearer">&nbsp;</div>
       </div>
