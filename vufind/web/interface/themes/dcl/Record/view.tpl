@@ -549,9 +549,15 @@ function redrawSaveStatus() {literal}{{/literal}
 				<div style="font-weight:bold"><a href="#" onclick="loadOtherEditionSummaries('{$id}', false)">{translate text="Other Formats and Languages"}</a></div>
 			</div>
 			{/if}
-			{if $enablePurchaseLinks == 1 && !$purchaseLinks}
-				<div class='purchaseTitle button'><a href="#" onclick="return showPurchaseOptions('{$id}');">{translate text='Buy a Copy'}</a></div>
-			{/if}
+			{if is_array($recordFormat)}        
+      		 {foreach from=$recordFormat item=displayFormat name=loop}
+				{if (($enablePurchaseLinks == 1) && (!$purchaseLinks) && ($displayFormat != 'Photographs'))}	 
+				   <div class='purchaseTitle button'><a href="#" onclick="_gaq.push(['_trackEvent', 'PurchaseEvent', 'BuyACopy','{$recordTitleSubtitle|regex_replace:"/(\/|:)$/":""|escape}']); return showPurchaseOptions('{$id}');">{translate text='Buy a Copy'}</a></div>
+       		    {/if}
+			 {/foreach}
+  			{else}
+           <div class='free'></div>
+   		{/if}
 		</div>
 	</div> {* End of tabs*}
             
