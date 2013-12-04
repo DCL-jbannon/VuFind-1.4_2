@@ -418,7 +418,8 @@ class DCL extends Horizon {
         'ufa'      => 'User fast added item',
         'wr'       => 'Waiting for',
         'wsd'      => 'Waiting at Service',
-        'xcdrm'    => 'No Holds'
+        'xcdrm'    => 'No Holds',
+		'sa'   	   => 'In Archive'
         );
         return isset($statusMap[$statusCode]) ? $statusMap[$statusCode] : 'Unknown';
 	}
