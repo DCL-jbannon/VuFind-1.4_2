@@ -139,11 +139,7 @@ class UInterface extends Smarty implements IUInterface
 		$this->assign('theme', $this->vufindTheme);
 		$this->assign('primaryTheme', reset($themeArray));
 		$this->assign('device', get_device_name());
-		//$timer->logTime('Basic configuration');
-		if (isset($timer)){
-			$timer->logTime('Basic configuration');
-		}
-		
+		$timer->logTime('Basic configuration');
 
 		if (isset($configArray['OpenURL']) && isset($configArray['OpenURL']['url'])) {
 			// Trim off any parameters (for legacy compatibility -- default config
