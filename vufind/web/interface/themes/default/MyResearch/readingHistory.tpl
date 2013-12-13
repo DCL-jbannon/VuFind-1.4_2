@@ -220,7 +220,26 @@
 				{/foreach}
 	        </tbody>
       </table>           
-	      
+	      	          {if $transList}
+							<div id="pager" class="pager">
+								{if $pageLinks.all}<div class="myAccountPagination pagination">Page: {$pageLinks.all}</div>{/if}
+								
+								
+								
+								<span id="sortOptions">
+								Sort By:
+								<select class="sortMethod" id="sortMethod" name="accountSort" onchange="changeAccountSort($(this).val())">
+									{foreach from=$sortOptions item=sortOptionLabel key=sortOption}
+										<option value="{$sortOption}" {if $sortOption == $defaultSortOption}selected="selected"{/if}>{$sortOptionLabel}</option>
+									{/foreach}
+								</select>
+								</span>
+								
+								<div class='sortOptions'>
+									Hide Covers <input type="checkbox" onclick="$('.imageColumn').toggle();"/>
+								</div>
+							</div>    
+					{/if}
 				<script type="text/javascript">
 			        $(document).ready(function() {literal} { {/literal}
 			          doGetRatings();
