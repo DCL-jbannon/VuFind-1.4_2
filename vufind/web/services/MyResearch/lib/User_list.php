@@ -56,7 +56,7 @@ class User_list extends SolrDataObject
 	function format_boost(){
 		return 100;
 	}
-	function language_bost(){
+	function language_boost(){
 		return 500;
 	}
 	function getObjectStructure(){
