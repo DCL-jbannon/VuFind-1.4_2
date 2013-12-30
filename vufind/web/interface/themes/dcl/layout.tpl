@@ -99,7 +99,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:none;'>All Library locations will close at 3:00 p.m. on December 24 and be closed December 25 for the Christmas holiday.  
+		<div class='message-alert' style='display:block;'>All libraries will close at 3:00 p.m. on Dec. 31 and be closed all day on Jan. 1 in observance of the New Year's holiday.  
 		</div>
         <div class="clearer">&nbsp;</div>
       </div>
