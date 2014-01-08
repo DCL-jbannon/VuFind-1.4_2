@@ -137,6 +137,7 @@ class DCL extends Horizon {
 		$collectionCode = strtolower($collectionCode);
 		$collectionMap = array(
         'aebf' => 'Adult ebook fiction',
+		'agn'  => 'Adult Graphic Novel',
         'aebnf' => 'Adult ebook nonfiction',
         'eaeb' => 'Easy ebook (fiction & nonfiction)',
         'jebf' => 'Juv. ebook fiction',
