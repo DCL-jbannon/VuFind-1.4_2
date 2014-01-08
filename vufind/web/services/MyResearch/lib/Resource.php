@@ -27,7 +27,8 @@ class Resource extends DB_DataObject implements IResource,IMarcRecordFieldsReade
 	public $format_category;
 	//public $marc;
 	public $marc_checksum;
-	public $source = 'VuFind';               // string(50)  not_null
+	public $source;
+	//public $source = 'VuFind';               // string(50)  not_null
 
 	/* Static get */
 	function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Resource',$k,$v); }
@@ -37,7 +38,12 @@ class Resource extends DB_DataObject implements IResource,IMarcRecordFieldsReade
 	
 	public function getPermanentPath()
 	{
-		return '/Record/'.$this->id;
+	   $sourceType = $this->source;
+		if($sourceType != 'eContent')
+		{
+			return '/Record/'.$this->id;
+		}
+		else {return '/EcontentRecord/'.$this->id;}
 	}
 	
 	public function getUniqueSystemID()
