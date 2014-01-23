@@ -276,6 +276,7 @@ function dieWithFailImage($id = NULL)
 		{
 			$resource = new Resource();
 			$resource->record_id = $id;
+            $resource->source = 'VuFind';
 			if ($resource->find(true))
 			{
 				$resource->fetch();
