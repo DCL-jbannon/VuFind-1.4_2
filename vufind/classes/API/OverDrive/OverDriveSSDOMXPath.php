@@ -75,7 +75,7 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 		//checkOuts
 		$query = ".//*[@id='bookshelfBlockGrid']";
 		$entries = $xpath->query($query);
-		if($entries->length > 0)
+		if($entries->length > 0 || $entries != NULL)
 		{
 			$i = 1;
 			foreach($entries->item(0)->childNodes as $elementList)
@@ -84,18 +84,27 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 				{
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[2]/div[2]/a/@href";
 					$attr = $xpath->query($query);
-					$result->Checkouts[$i-1]['ItemId'] = strtoupper($this->regularExpressions->getFieldValueFromURL($attr->item(0)->value, "ID"));
+					if($attr->item(0) != NULL)
+					{
+					  $result->Checkouts[$i-1]['ItemId'] = strtoupper($this->regularExpressions->getFieldValueFromURL($attr->item(0)->value, "ID"));
+					}
 					
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[2]/div[2]/a/@title";
 					$attr = $xpath->query($query);
-					$result->Checkouts[$i-1]['Title'] = $attr->item(0)->value;
-					
+					if($attr->item(0) != NULL)
+					{
+					  $result->Checkouts[$i-1]['Title'] = $attr->item(0)->value;
+					}
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[3]/div[5]/noscript";
 					$attr = $xpath->query($query);
-					$result->Checkouts[$i-1]['Expires'] = $attr->item(0)->childNodes->item(0)->wholeText;
-					
+					if($attr->item(0) != NULL)
+					{
+					  $result->Checkouts[$i-1]['Expires'] = $attr->item(0)->childNodes->item(0)->wholeText;
+					}
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[3]/div/div/ul";
 					$attr = $xpath->query($query);
+					if($attr->item(0) != NULL)
+					{
 
 					$result->Checkouts[$i-1]['Link'] = "";
 					$result->Checkouts[$i-1]['OverDriveReadLink'] = false;
@@ -138,7 +147,7 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 						}
 						
 					}
-					
+				}
 					//OverDrive Read??
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[3]/div[3]/a/@href";
 					$attr = $xpath->query($query);
@@ -246,6 +255,8 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 		
 		$query = '//*[@id="copiesExpand"]/ul';
 		$entries = $xpath->query($query);
+	if($entries->item(0) != NULL)
+	{
 		$elements = $entries->item(0)->childNodes;
 		$i=1;
 		foreach ($elements as $element)
@@ -276,6 +287,7 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 				}
 			}
 		}
+	}
 		
 		//CAN PLACE HOLD OR BORROW
 		
