@@ -66,9 +66,9 @@ class OverDriveRecordDetails extends BaseEcontentDetails implements IEcontentRec
 	{
 		$overDriveId = $this->getId();
 		$result = $this->getItemDetails($overDriveId);
-		if(is_array($result))
+		if(isset($result->OnHoldCount))
 		{
-		 return $result->OnHoldCount;
+			return $result->OnHoldCount;
 		}
 		else{return 0;}
 	}
@@ -96,9 +96,12 @@ class OverDriveRecordDetails extends BaseEcontentDetails implements IEcontentRec
 		$patronCirculation = $this->getPatronCirculation($user);
 		foreach ($patronCirculation->Checkouts as $itemCheckedOut)
 		{
-			if($itemCheckedOut['ItemId'] == $overDriveId)
+			if(isset($itemCheckedOut['ItemId']))
 			{
-				return true;
+				if($itemCheckedOut['ItemId'] == $overDriveId)
+				{
+					return true;
+				}
 			}
 		}
 		
