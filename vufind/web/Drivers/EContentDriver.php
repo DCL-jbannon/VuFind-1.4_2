@@ -705,19 +705,26 @@ public function getStatusSummaries($ids){
 		//OverDrive
 		$username = $user->getUsername();
 		$overDriveAPIServ = new OverDriveServicesAPI();
-		$results = $overDriveAPIServ->getPatronCirculation($username);
-		if ($results !== false)
+		$results = $overDriveAPIServ->getPatronCirculation($username);		
+		
+		if ($results !== false || is_array($return))
 		{
 			$itemsId = array();
+			
 			foreach ($results->Checkouts as $item)
 			{
-				$itemsId[] = $item['ItemId'];
+				if(isset($item['ItemId']))
+				{
+				 $itemsId[] = $item['ItemId'];
+				}
 			}
 
 			$overDriveAPIServ->getMultipleItemsDetail($itemsId, $username);
 			foreach ($results->Checkouts as $item)
-			{
-				$id = $item['ItemId'];
+			{			
+				if(isset($item['ItemId']))
+				{	
+				 $id = $item['ItemId'];				
 				$eContentRecord = OverDriveUtils::getEcontentRecordFromOverDriveID($id);
 				if($eContentRecord !== false)
 				{
@@ -737,6 +744,7 @@ public function getStatusSummaries($ids){
 							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
 					);
 				}
+			}
 
 			}
 		}
