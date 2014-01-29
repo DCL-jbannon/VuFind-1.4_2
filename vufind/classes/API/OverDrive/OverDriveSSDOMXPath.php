@@ -72,7 +72,7 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 		$doc = $this->loadDOMByHTML($source);
 		$xpath = $this->getDOMXPath($doc);
 		
-		//checkOuts
+		//checkOuts from overdrive
 		$query = ".//*[@id='bookshelfBlockGrid']";
 		$entries = $xpath->query($query);
 		if($entries->length > 0 || $entries != NULL)
