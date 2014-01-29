@@ -705,44 +705,38 @@ public function getStatusSummaries($ids){
 		//OverDrive
 		$username = $user->getUsername();
 		$overDriveAPIServ = new OverDriveServicesAPI();
-		$results = $overDriveAPIServ->getPatronCirculation($username);				
-		if ($results !== false || is_array($return))
+		$results = $overDriveAPIServ->getPatronCirculation($username);
+		if ($results !== false)
 		{
 			$itemsId = array();
 			foreach ($results->Checkouts as $item)
 			{
-				if(isset($item['ItemId']))
-				{
-				 $itemsId[] = $item['ItemId'];
-				}
+				$itemsId[] = $item['ItemId'];
 			}
 
 			$overDriveAPIServ->getMultipleItemsDetail($itemsId, $username);
 			foreach ($results->Checkouts as $item)
-			{			
-			  if(isset($item['ItemId']))
-			  {	
-					$id = $item['ItemId'];				
-					$eContentRecord = OverDriveUtils::getEcontentRecordFromOverDriveID($id);
-					if($eContentRecord !== false)
-					{
-						$details = EcontentDetailsFactory::get($eContentRecord);
-						$daysUntilDue = ceil((strtotime($item['Expires']) - mktime()) / (24 * 60 * 60));
-						
-						$return['transactions'][] = array(
-								'id' => $eContentRecord->id,
-								'recordId' => 'econtentRecord' . $eContentRecord->id,
-								'source' => $eContentRecord->source,
-								'title' => $eContentRecord->title,
-								'author' => $eContentRecord->author,
-								'duedate' => strtotime($item['Expires']),
-								'checkoutdate' => '',
-								'daysUntilDue' => $daysUntilDue,
-								'holdQueueLength' => $details->getHoldLength(),
-								'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
-						);
-					}
-			  }
+			{
+				$id = $item['ItemId'];
+				$eContentRecord = OverDriveUtils::getEcontentRecordFromOverDriveID($id);
+				if($eContentRecord !== false)
+				{
+					$details = EcontentDetailsFactory::get($eContentRecord);
+					$daysUntilDue = ceil((strtotime($item['Expires']) - mktime()) / (24 * 60 * 60));
+					
+					$return['transactions'][] = array(
+							'id' => $eContentRecord->id,
+							'recordId' => 'econtentRecord' . $eContentRecord->id,
+							'source' => $eContentRecord->source,
+							'title' => $eContentRecord->title,
+							'author' => $eContentRecord->author,
+							'duedate' => strtotime($item['Expires']),
+							'checkoutdate' => '',
+							'daysUntilDue' => $daysUntilDue,
+							'holdQueueLength' => $details->getHoldLength(),
+							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
+					);
+				}
 
 			}
 		}
