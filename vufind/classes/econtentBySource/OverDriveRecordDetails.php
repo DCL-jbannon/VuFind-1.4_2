@@ -66,11 +66,7 @@ class OverDriveRecordDetails extends BaseEcontentDetails implements IEcontentRec
 	{
 		$overDriveId = $this->getId();
 		$result = $this->getItemDetails($overDriveId);
-		if(is_array($result))
-		{
-		 return $result->OnHoldCount;
-		}
-		else{return 0;}
+		return $result->OnHoldCount;
 	}
 	
 	public function getWishListSize(){return 0;}
