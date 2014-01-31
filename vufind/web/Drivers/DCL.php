@@ -284,7 +284,7 @@ class DCL extends Horizon {
         'spvjnf'   => 'Spanish Video-juv.non-fiction',
         'vspvnf'   => 'Spanish Video-ad.non-fiction',
         'spyf'     => 'Spanish-ya Fiction',
-        'sto'      => 'Storytime Materials',
+        //'sto'      => 'Storytime Materials',
         'tin'      => 'Teen Interest Non-fiction',
         'tnf'      => 'Teen area non-fiction',
         'unk'      => 'Unknown collection for item',
