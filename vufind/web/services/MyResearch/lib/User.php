@@ -42,7 +42,7 @@ class User extends DB_DataObject implements IUser
 	const roleRebusListAdmin = "rebusList-admin";
 	const roleRebusListLibrarian = "rebusList-librarian";
 	const roleRebusListStaff = "rebusList-staff";
-	const maxRequestPerWeek = 5;
+	const maxRequestPerWeek = 10;
 	
 	/* Static get */
 	function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('User',$k,$v); }
