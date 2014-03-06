@@ -88,7 +88,7 @@ class Submit extends Action
 				$materialsRequest->selectAdd();
 				$materialsRequest->selectAdd('materials_request.*, description as statusLabel');
 				$materialsRequest->find();
-				if ($materialsRequest->N >= 5)
+				if ($materialsRequest->N >= 10)
 				{
 					$interface->assign('success', false);
 					$interface->assign('error', "You have already reached your maximum limit of 5 material requests per week. To check the status of your current requests, visit your account page.");
