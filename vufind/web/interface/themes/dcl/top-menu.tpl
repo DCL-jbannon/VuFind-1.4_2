@@ -9,7 +9,7 @@
 		{/if}
 		</div>
 		<span class="top-menu-item"><a title="Contact Us" href="http://answers.douglascountylibraries.org/">Ask Us</a></span>
-		<span class="top-menu-item"><a href="https://epayments.douglascountylibraries.org/eCommerceWebModule/Home">Pay Fines</a></span>
+		<!--<span class="top-menu-item"><a href="https://epayments.douglascountylibraries.org/eCommerceWebModule/Home">Pay Fines</a></span> -->
 		<span class="top-menu-item"><a title="Literacy" href="http://douglascountylibraries.org/AboutUs/Literacy">Literacy</a></span>
 		<span class="top-menu-item"><a title="Small Business Help" href="http://douglascountylibraries.org/Research/iGuides/SmallBusiness">BizInfo</a></span>
 		<span class="top-menu-item"><a title="Douglas County History Research Center" href="http://history.douglascountylibraries.org">DCHRC</a></span>
