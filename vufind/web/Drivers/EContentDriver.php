@@ -1433,11 +1433,34 @@ public function getStatusSummaries($ids){
 		{
 			$freeEContentRecordService = new FreeEcontentRecordServices();
 			$format = $freeEContentRecordService->getFormatType($eContentRecord);
+			if ($format == 'eContent')
+			{
+				if(preg_match('/cpdownloadinteractiveepub/i', $eContentItem->link) > 0){
 			
-			$links[] = array(
+					$links[] = array(	'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
+					'text' => 'Read from iPad',
+					);
+			
+				}
+				else
+				{
+					$links[] = array(
+							'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
+							'text' => 'Access eBook',
+					);
+				}
+			}
+			else
+			{
+				$links[] = array(
+						'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
+						'text' => 'Access&nbsp;'.$format,
+				);
+			}
+			/*$links[] = array(
 							'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
 							'text' => 'Access&nbsp;'.$format,
-			);
+			);*/
 		}
 		return $links;
 	}
