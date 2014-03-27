@@ -80,8 +80,13 @@
 		    	<tr>
 		    		<td>
 		    			{if $record.canSuspendHolds}
-		    				<input type="checkbox" class="unavailableHoldSelect" name="unavailableHold[{$record.id}]" />
-		    			{/if}
+		    				<input type="checkbox" class="unavailableHoldSelect" name="unavailableHold[{$record.id}]" />		    			
+		    			  {else}
+		    			     {if $record.source == 'OverDrive' || $record.source == '3M' }		    			         
+		    						<input type="checkbox" class="button" name="suspendSelected" value="Suspend Selected" title="{$record.source} does not provide the capability to suspend holds" disabled="disabled" />		    					  
+		    			     {/if}	   
+		    			{/if} 			
+		    			
 		    		</td>
 	        	<td><a href="{$path}/EcontentRecord/{$record.id}/Home">{$record.title}</a></td>
 	        	<td>{$record.source}</td>
