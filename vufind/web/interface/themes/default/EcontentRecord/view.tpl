@@ -19,7 +19,7 @@
 	{/if}
 	{if (isset($title)) }
 	  //alert("{$title}");
-	{/if}
+	{/if}	
 {literal}});{/literal}
 
 function redrawSaveStatus() {literal}{{/literal}
@@ -404,9 +404,14 @@ function redrawSaveStatus() {literal}{{/literal}
               <a href="{$path}/Search/Results?lookfor=%22{$subjectListItem|escape:'url'}%22&amp;type=Subject">{$subjectListItem|escape}</a>
             <br />
           {/foreach}
-        </div>
+        </div>        
       </div>
       {/if}
+      {if ($eContentRecord->source == 'Lerner Interactive')}
+          <div class="resultInformation">
+	     	 <div id="lernerInter"></div>	            
+	     </div>
+	  {/if}
       
     </div>
    
