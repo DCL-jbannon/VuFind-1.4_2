@@ -5,7 +5,10 @@ class FreeEcontentRecordServices {
 	
 	public function getFormatType(IEContentRecord $eContentRecord)
 	{
-		if ( (preg_match('/ebooks/i', $eContentRecord->genre) > 0) 
+		if($eContentRecord->sourceUrl == '')
+		{
+			return EContentFormatType::unknown;
+		}elseif ( (preg_match('/ebooks/i', $eContentRecord->genre) > 0) 
 				|| 
 			 (preg_match('/electronic (bk|book)/i', $eContentRecord->isbn) > 0))
 		{
@@ -26,7 +29,7 @@ class FreeEcontentRecordServices {
 		{
 			return EContentFormatType::eMusic;
 		}
-		
+			
 		return EContentFormatType::unknown;
 	}
 	
