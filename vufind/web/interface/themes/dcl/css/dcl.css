@@ -230,6 +230,16 @@ div.message-alert
 	
 }
 
+#lernerInter a.button {
+    display: block;
+    width: 96px;
+}
+#lernerInter {
+    position: absolute;
+    right: 222px;
+    top: 234px;
+}
+
 /* CSS overrides for Horizon Upgrade downtime */
 /*
 .resulthead:after, #homeLoginForm:after {
