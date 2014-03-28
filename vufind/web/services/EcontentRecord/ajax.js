@@ -50,6 +50,13 @@ function GetEContentHoldingsInfo(id, type, callback) {
 			if (holdingsData) {
 				if (holdingsData.length > 0) {
 					$("#holdingsPlaceholder").html(holdingsData);
+					var jqObj = jQuery(holdingsData);
+				    jqObj.find("thead").remove();
+				    jqObj.find("tr td:contains('Interactive')").remove();
+					jqObj.find("tr td a:contains('Edit')").remove();
+					jqObj.find("tr td a:contains('Delete')").remove();
+					var finalobj = jqObj.find(".button").append();
+					$("#lernerInter").empty().append(finalobj);					
 				}
 			}
 			var samplesData = $(data).find("Samples").text();
