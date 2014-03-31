@@ -1446,7 +1446,7 @@ public function getStatusSummaries($ids){
 				{
 					$links[] = array(
 							'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
-							'text' => 'Access eBook',
+							'text' => 'Read online',
 					);
 				}
 			}
