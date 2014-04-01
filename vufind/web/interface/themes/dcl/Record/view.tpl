@@ -263,17 +263,12 @@ function redrawSaveStatus() {literal}{{/literal}
       {/if}
       
       {* Place hold link *}   {* Added code to take care of place hold button for photograhs by Ike *}
-      {if is_array($recordFormat)}        
-       {foreach from=$recordFormat item=displayFormat name=loop}
-		{if $displayFormat != 'Photographs'}
+      {*if is_array($recordFormat)*}       
+      {if $isbn || $upc}
 	  <div class='requestThisLink' id="placeHold{$id|escape:"url"}" style="display:none">
-	    <a href="{$path}/Record/{$id|escape:"url"}/Hold"><img src="{$path}/interface/themes/default/images/place_hold.png" alt="Place Hold"/></a>
+	    <a href='{$path}/Record/{$id|escape:"url"}/Hold?TE=PHPT&EV={$id|escape:"url"}.{$recordTitleSubtitle|regex_replace:"/(\/|:)$/":""|escape}' ><img src="{$path}/interface/themes/default/images/place_hold.png" alt="Place Hold"/></a>
 	  </div>
 	  {/if}
-	  {/foreach}
-          {else}
-           <div class='requestThisLink' id="placeHold{$id|escape:"url"}" style="display:none"></div>
-          {/if}
 	  {if $showOtherEditionsPopup}
 		<div id="otherEditionCopies">
 			<div style="font-weight:bold"><a href="#" onclick="loadOtherEditionSummaries('{$id}', false)">{translate text="Other Formats and Languages"}</a></div>
