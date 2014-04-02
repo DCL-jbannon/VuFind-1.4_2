@@ -264,7 +264,7 @@ function redrawSaveStatus() {literal}{{/literal}
       
       {* Place hold link *}   {* Added code to take care of place hold button for photograhs by Ike *}
       {*if is_array($recordFormat)*}       
-      {if $isbn || $upc}
+      { if $isbn && $upc && !issn }
 	  <div class='requestThisLink' id="placeHold{$id|escape:"url"}" style="display:none">
 	    <a href='{$path}/Record/{$id|escape:"url"}/Hold?TE=PHPT&EV={$id|escape:"url"}.{$recordTitleSubtitle|regex_replace:"/(\/|:)$/":""|escape}' ><img src="{$path}/interface/themes/default/images/place_hold.png" alt="Place Hold"/></a>
 	  </div>
