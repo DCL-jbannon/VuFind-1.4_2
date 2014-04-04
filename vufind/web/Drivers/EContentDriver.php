@@ -1442,6 +1442,23 @@ public function getStatusSummaries($ids){
 					);
 			
 				}
+				elseif (preg_match('/lernerbooks/i', $eContentItem->link) > 0)
+				{
+	                  $links[] = array(
+							'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
+							'text' => 'Read online',
+					);
+
+
+				}
+				elseif(preg_match('/hoopladigital/i', $eContentItem->link) > 0 )
+				{
+						$links[] = array(
+							'url' =>  $configArray['Site']['path'] . "/EcontentRecord/{$eContentItem->recordId}/Link?itemId={$eContentItem->id}",
+							'text' => 'Instantly available on hoopla',
+					);
+                         
+				}
 				else
 				{
 					$links[] = array(
