@@ -11,7 +11,7 @@
     {foreach from=$summFormats item=format}
        {if (($format != 'Photographs') && ($format != 'Comic Book')) }
      	 <div class='requestThisLink' id="placeHold{if $summShortId}{$summShortId}{else}{$summId|escape}{/if}" style="display:none">
-     	     <a href="{$url}/Record/{$summId|escape:"url"}/Hold?TE=PHPT&EV={$summId|escape:"url"}.{$summTitle|escape:"url"}"><img src="{$path}/interface/themes/default/images/place_hold.png" alt="Place Hold"/></a>
+     	   <a href="{$url}/Record/{$summId|escape:"url"}/Hold"><img src="{$path}/interface/themes/default/images/place_hold.png" alt="Place Hold"/></a>
     	 </div>
        {/if}
     {/foreach}  
