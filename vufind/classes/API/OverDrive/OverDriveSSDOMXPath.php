@@ -72,22 +72,28 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 		$doc = $this->loadDOMByHTML($source);
 		$xpath = $this->getDOMXPath($doc);
 		
-		//checkOuts from overdrive
+		//checkOuts
 		$query = ".//*[@id='bookshelfBlockGrid']";
 		$entries = $xpath->query($query);
-		if($entries->length > 0 || $entries != NULL)
+		if(!empty($entries) && $entries->length > 0)
 		{
 			$i = 1;
+			
 			foreach($entries->item(0)->childNodes as $elementList)
 			{
+				if(isset($elementList))
+				{
 				if(get_class($elementList) == 'DOMElement')
 				{
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[2]/div[2]/a/@href";
 					$attr = $xpath->query($query);
-					if($attr->item(0) != NULL)
+					if($attr->item(0) != NULL && $attr->item(0)->value != null)
 					{
 					  $result->Checkouts[$i-1]['ItemId'] = strtoupper($this->regularExpressions->getFieldValueFromURL($attr->item(0)->value, "ID"));
-					}
+					} else {
+                        //Don't increment $i since we didn't add a node
+                        continue;
+                    }
 					
 					$query = ".//*[@id='bookshelfBlockGrid']/li[".$i."]/div[2]/div[2]/a/@title";
 					$attr = $xpath->query($query);
@@ -161,13 +167,14 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 					$i++;
 				}
 			}
+		  }
 		}
 		
 		//Holds
 		$query = '//*[@id="myAccount2Tab"]/div[3]/div/ul';
 		$entries = $xpath->query($query);
 		
-		if($entries->length > 0)
+		if(!empty($entries) && $entries->length > 0)
 		{
 			$i = 1;
 			$indexHolds = 0;
@@ -255,7 +262,7 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 		
 		$query = '//*[@id="copiesExpand"]/ul';
 		$entries = $xpath->query($query);
-	if($entries->item(0) != NULL)
+	if($entries->item(0) != NULL && isset($entries))
 	{
 		$elements = $entries->item(0)->childNodes;
 		$i=1;
@@ -349,6 +356,8 @@ class OverDriveSSDOMXPath implements IOverDriveSSDOMXPath
 	{
 		libxml_use_internal_errors(true); // http://stackoverflow.com/questions/9149180/domdocumentloadhtml-error
 		$doc = new DOMDocument();
+        $doc->strictErrorChecking = false;
+        $doc->recover=true;
 		$doc->loadHTML($source);
 		libxml_use_internal_errors(false);
 		return $doc;
