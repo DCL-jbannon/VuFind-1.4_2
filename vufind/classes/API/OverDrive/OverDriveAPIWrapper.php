@@ -41,7 +41,7 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 	{
 		$url = $productsUrl.'?limit='.$limit.'&offset='.$offset;
 		$this->ch = curl_init();
-		$this->setOptionsCallWithAccesToken($accessToken);
+		$this->setOptionsCallWithAccessToken($accessToken);
 		curl_setopt($this->ch, CURLOPT_URL, $url);
 		return $this->exec("getDigitalCollection");
 	}
@@ -50,7 +50,7 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 	{
 		$this->ch = curl_init();
 		$url = $this->baseAPIUrl.'/v1/libraries/'.$libraryId;
-		$this->setOptionsCallWithAccesToken($accessToken);
+		$this->setOptionsCallWithAccessToken($accessToken);
 		curl_setopt($this->ch, CURLOPT_URL, $url);
 		return $this->exec('getInfoDCLLibrary');
 	}
@@ -78,7 +78,7 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 		
 		$this->ch = curl_init();
 		$url = $productsUrl.'/'.$itemId.'/'.$action;
-		$this->setOptionsCallWithAccesToken($accessToken);
+		$this->setOptionsCallWithAccessToken($accessToken);
 		curl_setopt($this->ch, CURLOPT_URL, $url);
 		
 		try
@@ -94,7 +94,6 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 			return false;
 		}
 	}
-	
 	
 	/**
 	 * Description: Cuer_exec, check for errors and return the string json decoced
@@ -120,7 +119,7 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 	}
 	
 	/****** Privates functions **********/
-	private function setOptionsCallWithAccesToken($accessToken)
+	private function setOptionsCallWithAccessToken($accessToken)
 	{
 		curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
 		curl_setopt($this->ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer ".$accessToken));
@@ -128,7 +127,8 @@ class OverDriveAPIWrapper implements IOverDriveAPIWrapper{
 		curl_setopt($this->ch, CURLOPT_HEADER, FALSE);
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, 30);
 	}
 		
 }
-?>
