@@ -37,12 +37,12 @@ class OverDriveSS implements IOverDriveSS
 	private $logger;
 	
 	private $userAgent = "Douglas County Libraries OverDrive Screen Scraping Version 1.0";
-	private $loginUrl = "/{SESSIONID}{theme}BANGAuthenticate.dll"; //Secure URL
-	private $downloadUrl = "/{SESSIONID}{theme}BANGPurchase.dll?Action=Download&ReserveID={itemID}&FormatID={formatId}"; //Secure URL
+	private $loginUrl = "/{theme}BANGAuthenticate.dll"; //Secure URL
+	private $downloadUrl = "/{theme}BANGPurchase.dll?Action=Download&ReserveID={itemID}&FormatID={formatId}"; //Secure URL
 	private $earlyReturnUrl = "/{SESSIONID}{theme}BANGPurchase.dll?Action=EarlyReturn&TransactionID={transID}&ReserveID={itemID}&URL=MyAccount.htm";
-	private $myAccountUrl = "/{SESSIONID}{theme}MyAccount.htm?PerPage=80";
-	private $placeHoldUrl = "/{SESSIONID}{theme}BANGAuthenticate.dll?Action=LibraryWaitingList";
-	private $cancelHoldUrl = "/{SESSIONID}{theme}BANGAuthenticate.dll?Action=RemoveFromWaitingList&id={itemID}&format={formatId}&url=waitinglistremove.htm";
+	private $myAccountUrl = "/{theme}MyAccount.htm?PerPage=80";
+	private $placeHoldUrl = "/{theme}BANGAuthenticate.dll?Action=LibraryWaitingList";
+	private $cancelHoldUrl = "/{theme}BANGAuthenticate.dll?Action=RemoveFromWaitingList&id={itemID}&format={formatId}&url=waitinglistremove.htm";
 	private $addToWishListUrl = "/{SESSIONID}{theme}BANGCart.dll?Action=WishListAdd&ID={itemID}";
 	private $removeWishListUrl = "/{SESSIONID}{theme}BANGCart.dll?Action=WishListRemove&ID={itemID}";
 	private $lendingOptionsUrl = "/{SESSIONID}{theme}BANGAuthenticate.dll?Action=EditUserLendingPeriodsFormatClass";
@@ -55,7 +55,7 @@ class OverDriveSS implements IOverDriveSS
 		$this->baseUrl = "http://".$baseUrl;
 		$this->theme = $theme;
 		$this->libraryCardILS = $libraryCardILS;
-		$this->baseSecureUrl = $baseSecureUrl.$baseUrl;
+		$this->baseSecureUrl = $baseSecureUrl;
 
 		$this->odDOM = new OverDriveSSDOMXPath();
 		$this->odUtils = new OverDriveSSUtils();
@@ -90,20 +90,25 @@ class OverDriveSS implements IOverDriveSS
 	public function login($session, $username)
 	{
 		$this->logger->log("OverDriveSS login ".$username, PEAR_LOG_INFO);
-		
-		$url = $this->baseSecureUrl.$this->setSessionInURL($session, $this->loginUrl);
+
+        //TODO it looks like the session was critical if you don't want to support cookies
+
+		//$url = $this->baseSecureUrl.$this->setSessionInURL($session, $this->loginUrl);
+        $url = $this->baseSecureUrl.$this->loginUrl;
 		$data = array('URL' => 'Default.htm', 
 					  'LibraryCardILS' => $this->libraryCardILS,
 					  'LibraryCardNumber' => $username);
 		
 		$this->init($url);
+        //$this->setFollowLocation();
+        $this->setSessionCookieInCurl($session);
 		$this->setPostData($data);
 		$this->setNoCheckSSL();
 		
 		$result = $this->exec();
 		
-		$urlAfterLoginAttemp = $this->odDOM->getUrlHTML302($result);
-		if($urlAfterLoginAttemp === "/".$this->baseServerName."/".$session."/10/50/en/Default.htm")
+		$urlAfterLoginAttempt = $this->odDOM->getUrlHTML302($result);
+		if(strpos($urlAfterLoginAttempt, "error")===false)
 		{
 			return true;
 		}
@@ -114,32 +119,18 @@ class OverDriveSS implements IOverDriveSS
 	{
 		$this->logger->log("OverDriveSS checkOut ".$itemId, PEAR_LOG_INFO);
 		
-		$url = $this->baseUrl."/".$session.$this->theme."BANGPurchase.dll?Action=OneClickCheckout&ForceLoginFlag=0&ReserveID=".$itemId."&URL=MyAccount.htm%3FPerPage=80";
+		$url = $this->baseSecureUrl.$this->theme."BANGPurchase.dll?Action=OneClickCheckout&ForceLoginFlag=0&ReserveID=".$itemId."&URL=MyAccount.htm%3FPerPage=80";
 		$this->init($url);
-
+        $this->setNoCheckSSL();
+        $this->setSessionCookieInCurl($session);
 		$result = $this->exec();
 		$urlAfterCheckOut = $this->odDOM->getUrlHTML302($result);
-		if(preg_match("/^\/".$session."\/10\/50\/en\/Download\.htm\?TransactionID=/", $urlAfterCheckOut) && $download)
+		if(strpos($urlAfterCheckOut, "TransactionID")!== false && $download)
 		{
-			/*I DO NOT KNOW HOW TO TEST THIS AND THEN RETURN THE ITEM*/
-			$downloadUrl = $this->setSessionInURL($session, $this->downloadUrl);
-			$downloadUrl = str_replace("{itemID}", $itemId, $downloadUrl);
-			$downloadUrl = str_replace("{formatId}", $formatId, $downloadUrl);
-			
-			$downloadUrl = $this->baseSecureUrl.$downloadUrl;
-			$this->init($downloadUrl);
-			$this->setNoCheckSSL();
-			$result = $this->exec();
-			
-			$urlAfterDownload = $this->odDOM->getUrlHTML302($result);
-			if(preg_match("/^http:\/\/ofs.contentreserve.com\/bin\/OFSGatewayModule.dll\/DogIsaDog\.azw\?RetailerID\=douglascounty/", $urlAfterDownload))
-			{
-				return true;
-			}
-			return true;
+            return $this->chooseFormat($session, $itemId, $formatId);
 		}
 
-		if(preg_match("/^\/".$session."\/10\/50\/en\/Download\.htm\?TransactionID=/", $urlAfterCheckOut) && !$download)
+		if(strpos($urlAfterCheckOut, "TransactionID") !== false && !$download)
 		{
 			return true;
 		}
@@ -166,13 +157,15 @@ class OverDriveSS implements IOverDriveSS
 	 */
 	public function chooseFormat($session, $itemId, $formatId)
 	{
-		$downloadUrl = $this->setSessionInURL($session, $this->downloadUrl);
-		$downloadUrl = str_replace("{itemID}", $itemId, $downloadUrl);
-		$downloadUrl = str_replace("{formatId}", $formatId, $downloadUrl);
-			
-		$downloadUrl = $this->baseSecureUrl.$downloadUrl;
+        $downloadUrl = $this->downloadUrl;
+        $downloadUrl = str_replace("{itemID}", $itemId, $downloadUrl);
+        $downloadUrl = str_replace("{formatId}", $formatId, $downloadUrl);
+
+        $downloadUrl = $this->baseSecureUrl.$downloadUrl;
+
 		$this->init($downloadUrl);
 		$this->setNoCheckSSL();
+        $this->setSessionCookieInCurl($session);
 		$result = $this->exec();
 			
 		$urlAfterDownload = $this->odDOM->getUrlHTML302($result);
@@ -217,7 +210,7 @@ class OverDriveSS implements IOverDriveSS
 	{
 		$this->logger->log("OverDriveSS placeHold ".$itemId, PEAR_LOG_INFO);
 		
-		$url = $this->setSessionInURL($session, $this->placeHoldUrl);
+		$url = $this->placeHoldUrl;
 		$placeHoldUrl = $this->baseSecureUrl.$url;
 		$data = array('URL'    => 'WaitingListConfirm.htm',
 					  'Format' => $formatId,
@@ -228,9 +221,10 @@ class OverDriveSS implements IOverDriveSS
 		$this->init($placeHoldUrl);
 		$this->setPostData($data);
 		$this->setNoCheckSSL();
+        $this->setSessionCookieInCurl($session);
 		$result = $this->exec();
 		$urlAfterPlaceHold = $this->odDOM->getUrlHTML302($result);
-		if(preg_match("/\/".$this->baseServerName."\/".$session."\/10\/50\/en\/WaitingListConfirm\.htm/", $urlAfterPlaceHold))
+		if(strpos($urlAfterPlaceHold, "WaitingListConfirm") !== false)
 		{
 			return true;
 		}
@@ -241,16 +235,18 @@ class OverDriveSS implements IOverDriveSS
 	{
 		$this->logger->log("OverDriveSS cancelHold ".$itemId, PEAR_LOG_INFO);
 		
-		$url = $this->setSessionInURL($session, $this->cancelHoldUrl);
+		$url = $this->cancelHoldUrl;
 		$url = str_replace("{itemID}", strtolower($itemId), $url);
 		$url = str_replace("{formatId}", $formatId, $url);
 		$cancelUrl = $this->baseSecureUrl.$url;
 		
 		$this->init($cancelUrl);
 		$this->setNoCheckSSL();
+        $this->setSessionCookieInCurl($session);
 		$result = $this->exec();
 		$urlAfterCancelHold = $this->odDOM->getUrlHTML302($result);
-		if(preg_match("/\/".$this->baseServerName."\/".$session."\/10\/50\/en\/waitinglistremove\.htm/", $urlAfterCancelHold))
+
+        if(strpos($urlAfterCancelHold, "waitinglistremove") !== false)
 		{
 			return true;
 		}
@@ -289,7 +285,7 @@ class OverDriveSS implements IOverDriveSS
 		$this->setNoCheckSSL();
 		$result = $this->exec();
 		$urlAfterLending =  $this->odDOM->getUrlHTML302($result);
-		if(preg_match("/\/".$this->baseServerName."\/".$session."\/10\/50\/en\/MyAccount\.htm\?PerPage\=80\#myAccount/", $urlAfterLending))
+        if(strpos($urlAfterLending, "MyAccount.htm") !== false)
 		{
 			return true;
 		}
@@ -313,10 +309,10 @@ class OverDriveSS implements IOverDriveSS
 	public function getItemDetails($session, $itemId)
 	{
 		$this->logger->log("OverDriveSS getItemDetails ".$itemId, PEAR_LOG_INFO);
-		
-		$url = $this->setSessionInURL($session, $this->itemDetailsUrl);
-		$url = str_replace("{itemID}", $itemId, $url);
-		$itemDetailUrl = $this->baseUrl.$url;
+
+        $url = $this->setSessionInURL($session, $this->itemDetailsUrl);
+        $url = str_replace("{itemID}", $itemId, $url);
+        $itemDetailUrl = $this->baseUrl.$url;
 		
 		$this->init($itemDetailUrl);
 		$result = $this->exec();
@@ -334,9 +330,9 @@ class OverDriveSS implements IOverDriveSS
 		$chList = array();
 		foreach ($itemsId as $itemId)
 		{
-			$url = $this->setSessionInURL($session, $this->itemDetailsUrl);
-			$url = str_replace("{itemID}", $itemId, $url);
-			$itemDetailUrl = $this->baseUrl.$url;
+            $url = $this->setSessionInURL($session, $this->itemDetailsUrl);
+            $url = str_replace("{itemID}", $itemId, $url);
+            $itemDetailUrl = $this->baseUrl.$url;
 			
 			$chList[$itemId] = curl_init($itemDetailUrl);
 			curl_setopt($chList[$itemId], CURLOPT_RETURNTRANSFER, TRUE);
@@ -376,12 +372,14 @@ class OverDriveSS implements IOverDriveSS
 	{
 		$this->logger->log("OverDriveSS getPatronCirculation", PEAR_LOG_INFO);
 		
-		$myAccountUrl = $this->baseSecureUrl.$this->setSessionInURL($session, $this->myAccountUrl);
+		//$myAccountUrl = $this->baseSecureUrl.$this->setSessionInURL($session, $this->myAccountUrl);
+        $myAccountUrl = $this->baseSecureUrl.$this->myAccountUrl;
 		$this->init($myAccountUrl);
+        $this->setSessionCookieInCurl($session);
 		$this->setNoCheckSSL();
 		$result = $this->exec();
 		
-		return $this->odDOM->getPatronCirculation($result, $this->baseSecureUrl."/".$session.$this->theme);
+		return $this->odDOM->getPatronCirculation($result, $this->baseSecureUrl.$this->theme);
 	}
 	
 	//Auxiliar methods
@@ -413,7 +411,8 @@ class OverDriveSS implements IOverDriveSS
 		$this->init($removeWishUrl);
 		$result = $this->exec();
 		$urlAfterAddWishList = $this->odDOM->getUrlHTML302($result);
-		if(preg_match("/\/".$session."\/10\/50\/en\/WishList\.htm/", $urlAfterAddWishList))
+
+        if(strpos($urlAfterAddWishList, "WishList") !== false)
 		{
 			return true;
 		}
@@ -478,5 +477,9 @@ class OverDriveSS implements IOverDriveSS
 		curl_close($this->ch);
 		return $result;
 	}
+
+    private function setSessionCookieInCurl($session) {
+        curl_setopt($this->ch, CURLOPT_COOKIE, 'SecureSession='.$session);
+    }
 }
 ?>
