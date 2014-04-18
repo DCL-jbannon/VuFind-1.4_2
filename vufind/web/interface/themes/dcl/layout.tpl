@@ -99,7 +99,8 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:none;'>All libraries will close at 3:00 p.m. on Dec. 31 and be closed all day on Jan. 1 in observance of the New Year's holiday.  
+		<div class='message-alert' style='display:block;'>
+		<div style="text-align:left;"><a href="javascript:void( window.open('http://douglascountylibraries.org/files/message.html', 'blank','scrollbars=yes,toolbar=no,width=380,height=475'))"><img src="http://douglascountylibraries.org/files/images/alert.png" style="float:left;margin-right:10px"></a>All libraries will be closed on Sunday, Apr. 20. <a href="javascript:void( window.open('http://douglascountylibraries.org/files/message.html', 'blank','scrollbars=yes,toolbar=no,width=380,height=475'))">Please read this IMPORTANT MESSAGE about an upcoming catalog upgrade</a> coming Tuesday, Apr. 22.</div>  
 		</div>
         <div class="clearer">&nbsp;</div>
       </div>
