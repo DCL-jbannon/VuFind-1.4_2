@@ -134,19 +134,16 @@ width: 90px; /*Width of each panel holding each content. If removed, widths shou
 	display:none !important;
 }
 
-#sidebar{
-  display: none;
-}
 #main-content{
   width: 925px !important;
 }
 .resultDetails{
   width: 615px !important;
 }
-#searchResultTopTools, #formatCategories{
-  display: none;
-}
 
-#list-recommended{
+#list-recommended, #book_bag, #searchResultTopTools, #formatCategories, #sidebar, #searchInfo{
 	display: none;
+}
+.holdingsSummary {
+    min-height: 5.5em !important;
 }
