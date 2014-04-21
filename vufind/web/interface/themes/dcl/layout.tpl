@@ -68,6 +68,20 @@
   </head>
   
   <body class="{$module} {$action}">
+  {literal}
+	<!-- Qualaroo for douglascountylibraries.org -->
+	<!-- Paste this code right after the <body> tag on every page of your site. -->
+	<script type="text/javascript">
+		var _kiq = _kiq || [];
+		(function(){
+		    setTimeout(function(){
+		    var d = document, f = d.getElementsByTagName('script')[0], s = d.createElement('script'); s.type = 'text/javascript';
+		    s.async = true; s.src = '//s3.amazonaws.com/ki.js/51644/bsy.js'; f.parentNode.insertBefore(s, f);
+		    }, 1);
+		  })();
+
+	</script>
+ {/literal}
     {*- Set focus to the correct location by default *}
     <script type="text/javascript">{literal}
     jQuery(function (){
