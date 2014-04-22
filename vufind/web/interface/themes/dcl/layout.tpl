@@ -113,7 +113,7 @@
             {include file="Search/searchbox.tpl"}
           {/if}
         {/if}
-		<div class='message-alert' style='display:block;'>
+		<div class='message-alert' style='display:none;'>
 		<div style="text-align:left;margin-left:100px;width:450px"><a href="javascript:void( window.open('http://douglascountylibraries.org/files/message.html', 'blank','scrollbars=yes,toolbar=no,width=380,height=475'))"><img src="http://douglascountylibraries.org/files/images/alert.png" style="float:left;margin-right:10px"></a><a href="javascript:void( window.open('http://douglascountylibraries.org/files/message.html', 'blank','scrollbars=yes,toolbar=no,width=380,height=475'))">Please read this IMPORTANT MESSAGE</a> about an upcoming catalog upgrade coming Tuesday, Apr. 22.</div>
 		</div>
         <div class="clearer">&nbsp;</div>
