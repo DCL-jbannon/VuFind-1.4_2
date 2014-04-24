@@ -5,6 +5,7 @@ require_once 'sys/eContent/EContentItem.php';
 require_once 'sys/eContent/EContentHold.php';
 require_once 'sys/eContent/EContentCheckout.php';
 require_once 'sys/eContent/EContentWishList.php';
+require_once 'Drivers/OverDriveAPIDriver.php';
 require_once dirname(__FILE__).'/../../classes/Utils/ArrayUtils.php';
 require_once dirname(__FILE__).'/../../classes/services/IDCLReaderServices.php';
 require_once dirname(__FILE__).'/../../classes/services/OverDriveServices.php';
@@ -730,7 +731,12 @@ public function getStatusSummaries($ids){
 				{
 					$details = EcontentDetailsFactory::get($eContentRecord);
 					$daysUntilDue = ceil((strtotime($item['Expires']) - mktime()) / (24 * 60 * 60));
-					
+
+                    $overDriveAPIDriver = new OverDriveAPIDriver();
+
+                    $linksO = $overDriveAPIDriver->getDownloadLinks($item['ItemId'], $user);
+                    //$links = $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn());
+
 					$return['transactions'][] = array(
 							'id' => $eContentRecord->id,
 							'recordId' => 'econtentRecord' . $eContentRecord->id,
@@ -741,7 +747,7 @@ public function getStatusSummaries($ids){
 							'checkoutdate' => '',
 							'daysUntilDue' => $daysUntilDue,
 							'holdQueueLength' => $details->getHoldLength(),
-							'links' => $details->getLinksInfo()->getLinksItemChekedOut($user, $details->canBeCheckIn())
+							'links' => $linksO
 					);
 				}
 			}
